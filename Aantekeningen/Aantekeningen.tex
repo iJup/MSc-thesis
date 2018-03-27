@@ -1,0 +1,362 @@
+\documentclass{amsart}
+
+%\usepackage{showlabels}
+\usepackage{amssymb, amsmath}
+\usepackage{mathrsfs}
+\usepackage{amscd}
+\usepackage{verbatim}
+\usepackage{enumerate}
+\usepackage{a4wide}
+\usepackage{dsfont}
+%\renewenvironment{comment}%{\noindent\mbox{}\dotfill\mbox{}\newline\footnotesize}%{\normalsize\newline\noindent\mbox{}\dotfill\mbox{}}
+
+%\usepackage{setspace}
+%\doublespacing
+
+%\usepackage[colorlinks,linkcolor={blue},
+%citecolor={blue},urlcolor={red},]{hyperref}
+
+%% commands
+
+%independent
+\newcommand\indep{\protect\mathpalette{\protect\independenT}{\perp}}
+\def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
+
+%indent
+\setlength\parindent{0pt}
+
+
+% theorems
+
+\theoremstyle{plain}
+\theoremstyle{remark}
+\newtheorem{theorem}{\textbf{\em Theorem}}[section]
+\newtheorem*{theorem*}{\textbf{\em Theorem}}
+\newtheorem{remark}{}
+\newtheorem*{remark*}{}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{lemma}{\textbf{\em Lemma}}[section]
+\newtheorem*{lemma*}{\textbf{\em Lemma}}
+\newtheorem{definition}{Definition}
+\newtheorem*{definition*}{\textbf{\em Def}}
+\newtheorem{proposition}{\textbf{\em Proposition}}[section]
+\newtheorem*{proposition*}{\textbf{\em Proposition}}
+\newtheorem{corollary}{\textbf{\em Corollary}}[section]
+
+\theoremstyle{plain}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{hypothesis}[theorem]{Hypothesis}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{question}[theorem]{Question}
+%\numberwithin{equation}{section}
+%\theoremstyle{problem}
+%\numberwithin{equation}{}
+
+
+% number systems
+
+\def\bbN{{\mathbb N}}
+\def\bbZ{{\mathbb Z}}
+\def\bbQ{{\mathbb Q}}
+\def\bbR{{\mathbb R}}
+\def\bbC{{\mathbb C}}
+
+
+% probability notations
+
+\newcommand{\E}{{\mathbb E}}
+\renewcommand{\P}{{\mathbb P}}
+\newcommand{\A}{{\mathcal A}}
+\newcommand{\F}{{\mathcal F}}
+\newcommand{\B}{{\mathcal B}}
+\newcommand{\C}{{\mathcal C}}
+\newcommand{\calF}{{\mathcal F}}
+\newcommand{\calB}{{\mathcal B}}
+\newcommand{\calG}{{\mathcal G}}
+\newcommand{\M}{{\mathcal M}}
+\newcommand{\calA}{{\mathcal A}}
+\newcommand{\calH}{{\mathcal H}}
+\newcommand{\G}{{\mathcal G}}
+\renewcommand{\H}{{\mathcal H}}
+\newcommand{\I}{{\mathcal{I}}}
+\newcommand{\U}{{\mathcal{U}}}
+\newcommand{\X}{{\mathcal{X}}}
+
+\newcommand{\bfx}{{\mathbf{x}}}
+\newcommand{\bfy}{{\mathbf{y}}}
+\newcommand{\bfX}{{\mathbf{X}}}
+
+% greek letters
+
+\renewcommand{\a}{\alpha}
+\renewcommand{\b}{\beta}
+\newcommand{\g}{\gamma}
+\renewcommand{\d}{\delta}
+\newcommand{\eps}{\varepsilon}
+\renewcommand{\l}{\lambda}
+\newcommand{\om}{\omega}
+\renewcommand{\O}{\Omega}
+\renewcommand{\t}{\tau}
+\renewcommand{\r}{\rho}
+\newcommand{\Fub}{{\rm Fub}}
+\newcommand{\Ito}{{\hbox{\rm It\^o}}}
+
+
+% spaces
+
+\renewcommand{\L}{L^2(0,1)}
+\newcommand{\LH}{L^2(0,1;H)}
+\renewcommand{\gg}{\g(\L,E)}
+\newcommand{\ggH}{\g(\LH,E)}
+
+
+% miscellaneous
+
+\renewcommand{\Re}{\hbox{\rm Re}\,}
+\renewcommand{\Im}{\hbox{\rm Im}\,}
+\newcommand{\D}{{\mathcal D}}
+\newcommand{\calL}{{\mathcal L}}
+\newcommand{\n}{\Vert}
+\newcommand{\one}{{{\bf 1}}}
+\newcommand{\embed}{\hookrightarrow}
+\newcommand{\lb}{\langle}
+\newcommand{\rb}{\rangle}
+\newcommand{\dps}{\displaystyle}
+\renewcommand{\SS}{{\bf S}}
+\newcommand{\limn}{\lim_{n\to\infty}}
+\newcommand{\limk}{\lim_{k\to\infty}}
+\newcommand{\limj}{\lim_{j\to\infty}}
+\newcommand{\sumn}{\sum_{n\ge 1}}
+\newcommand{\sumk}{\sum_{k\ge 1}}
+\newcommand{\sumj}{\sum_{j\ge 1}}
+\newcommand{\sumnN}{\sum_{n=1}^N}
+\newcommand{\Ra}{\Rightarrow}
+\newcommand{\LRa}{\Leftrightarrow}
+\newcommand{\da}{\downarrow}
+\newcommand{\wh}{\widehat}
+\newcommand{\supp}{\text{\rm supp\,}}
+\newcommand{\nn}{|\!|\!|}
+\newcommand{\K}{\mathbb{K}}
+\newcommand{\T}{\mathbb{T}}
+\newcommand{\fil}{\{\F_t\}}
+
+\let\emptyset\varnothing
+\newcommand{\sign}{\text{sign}}
+
+%spacing
+\newcommand{\vs}{\vspace{0.75pc}}
+
+\begin{document}
+Bayes' rule:
+\begin{align*}
+\P(A_i|B) = \frac{\P(B|A_i) \cdot \P(A_i)}{\sum_j \P(B|A_j) \cdot \P(A_j)}
+\end{align*}\\
+Binary Bayes' rule:
+\begin{align*}
+\P(A|B) = \frac{\P(B|A) \cdot \P(A)}{ \P(B)}
+\end{align*} \vs
+
+\textbf{Scriptie Weikamp:}\vs
+
+Main question: \textit{can we find a reliable (approximate) inference method that works theoretically as well as practically?} \\
+\begin{itemize}
+\item To what extent do the commonly used algorithms give reliable results?
+\item To what extent is the BL method useful in doing inference in Bayesian networks? \\ \textit{Not useful}
+\end{itemize}\vs
+
+\underline{Chapter 2, section 2.1} \vs
+
+\begin{definition*}\textbf{(Bayesian inference)}
+The calculation of the \textit{posterior distribution}:
+\begin{align*}
+\P(X = x | E = e).
+\end{align*}
+\end{definition*}\vs
+
+\underline{Chapter 2, section 2.2} \\
+\begin{definition*}\textbf{(Chain rule)}
+\begin{align*}
+\P(X, Y) = \P(X | Y) \P(Y)
+\end{align*}
+\end{definition*}\vs
+
+\begin{definition*}\textbf{ (General chain rule) }
+\begin{align*}
+\P(X_1, \ldots, X_n) = \prod_{i=1}^n \P(X_i | X_1, \ldots , X_{n-1})
+\end{align*}
+\end{definition*}\vs
+
+\begin{definition*}\textbf{(Conditionally independent)}
+We say that $A$ and $B$ are conditionally independent given $C$ if
+\begin{align*}
+\P(A | B,C) = \P(A | C).
+\end{align*}
+Equivalently,
+\begin{align*}
+\P(A, B | C) = \P(A | C)\P(B| C).
+\end{align*}
+We write $(A \indep B\ |\ C)$
+\end{definition*}\vs
+
+\begin{definition*}\textbf{ (Local independencies) }
+Local independencies, denoted by $\I_l(\G)$
+\begin{align*}
+For\ each\ X_i: (X_i \indep ND(X_i)\ |\ Pa(X_i)).
+\end{align*}
+\end{definition*}\vs
+
+\begin{definition*}\textbf{ (Factorization - chain rule for Bayesian networks) }
+\begin{align*}
+\P(X_1, \ldots , X_n) = \prod_{i=1}^n \P(X_i\ |\ Pa(X_i))
+\end{align*}
+\end{definition*}\vs
+
+\begin{definition*}\textbf{ (Factorization - chain rule for Bayesian networks) }
+\begin{align*}
+\P(X_1, \ldots , X_n) = \prod_{i=1}^n \P(X_i\ |\ Pa(X_i))
+\end{align*}
+\end{definition*}\vs
+
+\underline{Chapter 3, section 3.2} \\
+Inference methods:
+\begin{itemize}
+\item exact
+\begin{itemize}
+\item Variable elimination
+\item Clique trees
+\item Recursive conditioning
+\end{itemize}
+\item approximate
+\begin{itemize}
+\item Optimization
+\begin{itemize}
+\item \textit{Loopy belief Propagation} (lack of convergence, strong dependencies)
+\end{itemize}
+\item Sampling inference methods
+\begin{itemize}
+\item forward sampling
+\item rejected sampling
+\item likelihood sampling
+\item importance sampling
+\item MCMC
+\begin{itemize}
+\item Gibbs sampling
+\item prune sampling
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\end{itemize}\vs
+
+\begin{definition*}\textbf{ (Factor) }
+Each $ \P(X_i\ |\ Pa(X_i))$ can be written as $\phi_i$.
+\end{definition*}\vs
+
+\begin{definition*}\textbf{ (Factor marginalisation) }
+Let $\bfX$ be a set of variables and $Y \notin \bfX$ a variable. Let $\phi(\bfX,Y)$ be a factor. We define the factor marginalization of $Y$ in $\phi$, denoted $\sum_Y \phi$, to be a factor $\psi$ over $\bfX$ such that
+\begin{align*}
+\psi(X) = \sum_Y \phi(\bfX,Y).
+\end{align*}
+\end{definition*}\vs
+
+\begin{remark*}\textbf{(Variable Elimination)}
+Choosing an elimination sequence, applying factor marginalization and finally normalizing we can obtain marginal probabilities $\P(X_i)$, where $X_i$ is a variable of interest in the Bayesian network.\vs
+
+Drawbacks: if many connections $\implies$ large amount of factors $\psi$, which are products of $\phi_i$ $\implies$ exponential growth of the CPT of $\psi$. (memory intensive)
+\end{remark*}\vs
+
+\underline{Chapter 4, section 4.1} \\
+\begin{definition*}\textbf{ (Collection of all CPT-indices of a BN) }
+\begin{align*}
+\C = \{ k(i): c_{k(i)} \text{ is a CPT-value in the $i$-th CPT $\P(X_i\ |\ Pa(X_i))$, indexed by $k(i)$, i=1, \ldots , n } \}
+\end{align*}\vs
+\end{definition*}\vs
+
+\begin{definition*}\textbf{ (CPT-indices corresponding to state $\mathbf{x}$) }\begin{align*}
+\C_\bfx
+\end{align*}\vs
+\end{definition*}\vs 
+
+\begin{definition*}\textbf{ (States corresponding to a set of CPT-indices) }
+Given a collection of CPT-indices $C$. The set $S_C$ of states $\bfx$ that use only the CPT-indices in the collection $C$ are called states corresponding to the CPT-indices.
+\end{definition*}\vs 
+
+\begin{definition*}\textbf{ (Pruning around $\bfx$, collection of pruned CPT-indices) }
+\begin{align*}
+&\C_{\bfx,p} = \emptyset\\
+& \forall k(i) \in \C:
+\begin{cases}
+\text{add $k(i)$ to $\C_{\bfx, p}$} & \text{w.p. $1-c_{k(i)}$}\\
+\text{do not add $k(i)$ to $\C_{\bfx, p}$} & \text{w.p. $c_{k(i)}$}\\
+\end{cases}
+\end{align*}
+\end{definition*}\vs 
+
+\begin{definition*}\textbf{ (Collection of non-pruned CPT-indices) }
+\begin{align*}
+&\C_{\bfx,n}:=\C \setminus \C_{\bfx,p}\\
+\text{Note that: } &\C_\bfx \subset \C_{\bfx,n} \text{ and } \bfx \in S_{\C_{\bfx,n}}.
+\end{align*}
+\end{definition*}\vs 
+
+\begin{definition*}\textbf{ (Uniform sampling over a set of states) }
+Let $S_{\C_{\bfx,n}}$ be the set of feasible states corresponding to the CPT-indices which are not pruned. We define
+\begin{align*}
+\U(S_{\C_{\bfx,n}})
+\end{align*}
+as the uniform distribution over the states in $S_{\C_{\bfx,n}}$ and we write
+\begin{align*}
+\U(S_{\C_{\bfx,n}})(y) = \frac{1}{|S_{\C_{\bfx,n}}|}
+\end{align*}
+for the probability of sampling state $\bfy$ with respect to this uniform distribution.
+\end{definition*}\vs 
+
+\begin{remark*}\textbf{ (Remark) } - \textit{ (Could be proven more formally) }
+With strictly positive probability we have that $\C_{\bfx^{(i-1)},n}$ contains all the non-zero indices in $\C$. Implying that $S_{\C_{\bfx^{(i-1)},n}}$ contains all feasible states of the BN.
+\end{remark*}\vs
+
+\begin{definition*}\textbf{ (Pruning around $\bfx$ and $\bfy$, collection of pruned CPT-indices) }
+\begin{align*}
+&\C_{\{\bfx,\bfy\},p} = \emptyset\\
+& \forall k(i) \in \C:
+\begin{cases}
+\text{add $k(i)$ to $\C_{\bfx, p}$ when $k(i) \notin \C_\bfx, \C_\bfy$}  & \text{w.p. $1-c_{k(i)}$}\\
+\text{do not add $k(i)$ to $\C_{\bfx, p}$} & \text{w.p. $c_{k(i)}$}\\
+\end{cases}
+\end{align*}
+\end{definition*}\vs 
+
+\begin{definition*}\textbf{ (Collection of non-pruned CPT-indices) }
+\begin{align*}
+\C_{\{\bfx,\bfy\},n}:=\C \setminus \C_{\{\bfx,\bfy\},p}\\
+\end{align*}
+\end{definition*}\vs 
+
+\begin{definition*}\textbf{ (Total probability of transitioning from $\bfx \to \bfy$) }
+\begin{align*}
+Q(\bfx \to \bfy) = \sum_{j=1}^K Q_j(\bfx \to \bfy)
+\end{align*}
+\end{definition*}\vs 
+
+\underline{Chapter 4, section 4.2} \\
+\begin{definition*}\textbf{ (Non-trivial steps of prune sampling) }
+\begin{enumerate}[1)]
+\item Generating an initial state
+\begin{itemize}
+\item forward sampling: how many forward sampling walks will it take to generate one feasible solution?
+\item random forward sampling
+\item hybrid forward sampling 
+\end{itemize}
+\item Sampling uniformly over the pruned BN, i.e. sampling from the distribution $\U(S_{\C_{\bfx,n}})$.
+\end{enumerate}
+\end{definition*}\vs 
+
+\begin{definition*}\textbf{ (Literature about generating initial states) } \newline
+[18] James D Park, \textit{Using Weighted MAX-SAT engines to solve MPE}, pp. 682-687
+\end{definition*}\vs 
+
+\begin{definition*}\textbf{ (Literature about uniformly sampling $\U(S_{\C_{\bfx,n}})
+$) } \newline
+[28] Wei Wei, Jordan Erenrich and Bart Selman, \textit{Towards efficient sampling: Exploiting random walk strategies}, Aaai 2004, pp. 670-676
+\end{definition*}\vs 
+
+\end{document}
