@@ -147,6 +147,8 @@
 \newcommand{\vs}{\vspace{0.75pc}}
 
 \begin{document}
+GIT TEST \\
+
 Bayes' rule:
 \begin{align*}
 \P(A_i|B) = \frac{\P(B|A_i) \cdot \P(A_i)}{\sum_j \P(B|A_j) \cdot \P(A_j)}
@@ -182,7 +184,7 @@ The calculation of the \textit{posterior distribution}:
 
 \begin{definition*}\textbf{ (General chain rule) }
 \begin{align*}
-\P(X_1, \ldots, X_n) = \prod_{i=1}^n \P(X_i | X_1, \ldots , X_{n-1})
+\P(X_1, \ldots, X_n) = \sum{i=1}^n \P(X_i | X_1, \ldots , X_{n-1})
 \end{align*}
 \end{definition*}\vs
 
