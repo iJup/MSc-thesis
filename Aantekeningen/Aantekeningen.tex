@@ -247,7 +247,7 @@ Inference methods:
 \end{itemize}
 \end{itemize}
 \end{itemize}
-\end{itemize}\vs
+\end{itemize}\vs 
 
 \begin{definition*}\textbf{ (Factor) }
 Each $ \P(X_i\ |\ Pa(X_i))$ can be written as $\phi_i$.
@@ -257,6 +257,10 @@ Each $ \P(X_i\ |\ Pa(X_i))$ can be written as $\phi_i$.
 Let $\bfX$ be a set of variables and $Y \notin \bfX$ a variable. Let $\phi(\bfX,Y)$ be a factor. We define the factor marginalization of $Y$ in $\phi$, denoted $\sum_Y \phi$, to be a factor $\psi$ over $\bfX$ such that
 \begin{align*}
 \psi(X) = \sum_Y \phi(\bfX,Y).
+\end{align*}
+For example,
+\begin{align*}
+\P(C=0) = \sum_{A,B} \P(C=0 | B)\  \P(B | A)\ \P(A).
 \end{align*}
 \end{definition*}\vs
 
