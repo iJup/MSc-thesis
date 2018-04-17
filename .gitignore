@@ -1,7 +1,10 @@
 **/*.log
 **/*.pdf
-**/*.gz
 **/*.out
+**/*.toc
+**/*.aux
+**/*.synctex.gz
 .DS_Store
 Aantekeningen/dist
 Scriptie\ TeX/dist
+
