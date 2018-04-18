@@ -5,26 +5,36 @@
 \usepackage{mathrsfs}
 \usepackage{amscd}
 \usepackage{verbatim}
+\usepackage{color}
+\usepackage{xcolor}
 \usepackage{enumerate}
 \usepackage{a4wide}
 \usepackage{dsfont}
-%\renewenvironment{comment}%{\noindent\mbox{}\dotfill\mbox{}\newline\footnotesize}%{\normalsize\newline\noindent\mbox{}\dotfill\mbox{}}
 
-%\usepackage{setspace}
-%\doublespacing
 
-%\usepackage[colorlinks,linkcolor={blue},
-%citecolor={blue},urlcolor={red},]{hyperref}
 
-%% commands
+%% new commands
 
 %independent
 \newcommand\indep{\protect\mathpalette{\protect\independenT}{\perp}}
 \def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
 
+%tab
+\newcommand\tab[1][1cm]{\hspace*{#1}}
+
 %indent
 \setlength\parindent{0pt}
 
+%%colors
+%blue
+\definecolor{azure}{rgb}{0.0, 0.5, 1.0}
+\newcommand{\blue}[1]{\textcolor{azure}{#1}}
+%purple
+\definecolor{deepfuchsia}{rgb}{0.76, 0.33, 0.76}
+\newcommand{\purple}[1]{\textcolor{deepfuchsia}{#1}}
+%blond
+\definecolor{blond}{HTML}{C5B358}
+\newcommand{\blond}[1]{\textcolor{blond}{#1}}
 
 % theorems
 
@@ -147,8 +157,6 @@
 \newcommand{\vs}{\vspace{0.75pc}}
 
 \begin{document}
-GIT TEST123\\
-
 Bayes' rule:
 \begin{align*}
 \P(A_i|B) = \frac{\P(B|A_i) \cdot \P(A_i)}{\sum_j \P(B|A_j) \cdot \P(A_j)}
@@ -354,7 +362,31 @@ Q(\bfx \to \bfy) = \sum_{j=1}^K Q_j(\bfx \to \bfy)
 \end{itemize}
 \item Sampling uniformly over the pruned BN, i.e. sampling from the distribution $\U(S_{\C_{\bfx,n}})$.
 \end{enumerate}
-\end{definition*}\vs 
+\end{definition*}\vspace{2pc} 
+
+\makebox[\linewidth]{\rule{\textwidth}{0.6pt}} \\
+\textbf{Prune Sampling Algorithm} \\
+\makebox[\linewidth]{\rule{\textwidth}{0.4pt}} \\
+\texttt{
+\blue{def} sample\_states(data\_str\_node, col\_index) \\ \\
+data\_str\_node = data\_str[node] \\ \\
+data\_str = generate\_data\_str(network, ev, node\_list) \\ \\
+\blue{def} generate\_data\_str(network, evidence, node\_list)\\ \\
+network, evidence} is input \\ \\
+\texttt{
+node\_list = [] \\ \\
+\purple{for} i \blue{in} \blond{range}(num\_levels):\\
+\tab node\_list = node\_list + level\_sets[i] \\ \\ 
+level\_sets = create\_level\_sets(network) \\ \\
+\blue{def} \blond{create\_level\_sets}(\blue{network}) \\
+r.488
+}
+
+
+
+\newpage
+
+
 
 \begin{definition*}\textbf{ (Literature about generating initial states) } \newline
 [18] James D Park, \textit{Using Weighted MAX-SAT engines to solve MPE}, pp. 682-687
