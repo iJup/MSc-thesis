@@ -19,6 +19,11 @@
 \newcommand\indep{\protect\mathpalette{\protect\independenT}{\perp}}
 \def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
 
+%mathbf
+\newcommand{\bfx}{{\mathbf{x}}}
+\newcommand{\bfy}{{\mathbf{y}}}
+\newcommand{\bfX}{{\mathbf{X}}}
+
 %tab
 \newcommand\tab[1][1cm]{\hspace*{#1}}
 
@@ -29,6 +34,9 @@
 %blue
 \definecolor{azure}{rgb}{0.0, 0.5, 1.0}
 \newcommand{\blue}[1]{\textcolor{azure}{#1}}
+%light-blue
+\definecolor{lightblue}{HTML}{00BFFF}
+\newcommand{\lightblue}[1]{\textcolor{lightblue}{#1}}
 %purple
 \definecolor{deepfuchsia}{rgb}{0.76, 0.33, 0.76}
 \newcommand{\purple}[1]{\textcolor{deepfuchsia}{#1}}
@@ -71,30 +79,26 @@
 \def\bbR{{\mathbb R}}
 \def\bbC{{\mathbb C}}
 
+\renewcommand{\P}{{\mathbb P}}
+
 
 % probability notations
 
-\newcommand{\E}{{\mathbb E}}
-\renewcommand{\P}{{\mathbb P}}
 \newcommand{\A}{{\mathcal A}}
-\newcommand{\F}{{\mathcal F}}
 \newcommand{\B}{{\mathcal B}}
 \newcommand{\C}{{\mathcal C}}
-\newcommand{\calF}{{\mathcal F}}
-\newcommand{\calB}{{\mathcal B}}
-\newcommand{\calG}{{\mathcal G}}
-\newcommand{\M}{{\mathcal M}}
-\newcommand{\calA}{{\mathcal A}}
-\newcommand{\calH}{{\mathcal H}}
+\newcommand{\E}{{\mathbb E}}
+\newcommand{\F}{{\mathcal F}}
 \newcommand{\G}{{\mathcal G}}
 \renewcommand{\H}{{\mathcal H}}
 \newcommand{\I}{{\mathcal{I}}}
+\newcommand{\M}{{\mathcal M}}
+\newcommand{\Q}{{\mathcal{Q}}}
 \newcommand{\U}{{\mathcal{U}}}
 \newcommand{\X}{{\mathcal{X}}}
 
-\newcommand{\bfx}{{\mathbf{x}}}
-\newcommand{\bfy}{{\mathbf{y}}}
-\newcommand{\bfX}{{\mathbf{X}}}
+\newcommand{\calP}{{\mathcal{P}}}
+\newcommand{\Var}{{\text{Var}}}
 
 % greek letters
 
@@ -352,6 +356,11 @@ Q(\bfx \to \bfy) = \sum_{j=1}^K Q_j(\bfx \to \bfy)
 \end{definition*}\vs 
 
 \underline{Chapter 4, section 4.2} \\
+
+The prune sampling algorithm is inspired by the MC-SAT algorithm [23]. \\
+
+[23] Hoifung Poon and Pedro Domingos, \textit{Sound and efficient inference with probabilistic and deterministic dependencies}, Aaai, 2006, pp. 458-463. \\
+
 \begin{definition*}\textbf{ (Non-trivial steps of prune sampling) }
 \begin{enumerate}[1)]
 \item Generating an initial state
@@ -364,6 +373,26 @@ Q(\bfx \to \bfy) = \sum_{j=1}^K Q_j(\bfx \to \bfy)
 \end{enumerate}
 \end{definition*}\vspace{2pc} 
 
+\begin{enumerate}[1)]
+\item How is an initial state created? $\mathbf{x}^{(0)} \leftarrow \text{initial}$\\ \\ 
+\textit{Hybrid forward sampling:} \\ \\ 
+Basically \textit{forward sampling} but at each node $X_i$ either -- with probability $p$ -- the sampling distribution $\P(X_i\ |\ Pa(X_i)\ =\ \bfx )$ is chosen or -- with probability $1-p$ -- the uniform distribution over $\{x:\  \P(X_i\ |\ Pa(X_i)\ =\ \bfx)>0 \}$ is chosen. \\ \\
+ \texttt{
+initial = hybrid\_fw(network, \lightblue{evidence} = evidence, \lightblue{num\_walks} = num\_walks0, \lightblue{prob} = prob0) \\ \\
+} 
+To develop more intelligent ways to generate initial states: $[18]$. \\ \\
+$[18]$ James D Park, \textit{Using weighted MAX-SAT engines to solve MPE}, Eighteenth national conference on artificial intelligence, 2002, pp. 682-687. \\
+\item Sampling from $\U(S_{\C_{\mathbf{x,n}}})$
+\begin{itemize}
+\item Assuming we have sufficient memory, a breath first search approach can be used to list all feasible states of the pruned BN. From this collection we can easily draw uniformly a state. (in comparison to Gibbs sampling the uniform sampling step is relatively expensive)
+\item To reduce computational effort: we propose to use random forward sampling to construct a set $S$ (of predetermined fixed size) of feasible states of the pruned BN. Subsequently a state from S can be sampled uniformly.
+\item A more intelligent method, based on \textit{simulated annealing} is suggested by $[28]$. \\
+
+$[28]$ Wei Wei, Jordan Erenrich, and Bart Selman, \textit{Towards efficient sampling: Exploiting random walk strategies}, Aaai, 2004, pp. 670-676.
+\end{itemize}
+\end{enumerate}
+
+\vspace{2pc}
 \makebox[\linewidth]{\rule{\textwidth}{0.6pt}} \\
 \textbf{Prune Sampling Algorithm} \\
 \makebox[\linewidth]{\rule{\textwidth}{0.4pt}} \\
@@ -371,18 +400,100 @@ Q(\bfx \to \bfy) = \sum_{j=1}^K Q_j(\bfx \to \bfy)
 \blue{def} sample\_states(data\_str\_node, col\_index) \\ \\
 data\_str\_node = data\_str[node] \\ \\
 data\_str = generate\_data\_str(network, ev, node\_list) \\ \\
-\blue{def} generate\_data\_str(network, evidence, node\_list)\\ \\
-network, evidence} is input \\ \\
+} \\
+\makebox[\linewidth]{\rule{\textwidth}{0.4pt}} \\
+
 \texttt{
-node\_list = [] \\ \\
-\purple{for} i \blue{in} \blond{range}(num\_levels):\\
-\tab node\_list = node\_list + level\_sets[i] \\ \\ 
-level\_sets = create\_level\_sets(network) \\ \\
-\blue{def} \blond{create\_level\_sets}(\blue{network}) \\
-r.488
-}
+\blue{def} \blond{prune\_sampling} \\ \\
+\tab data\_str = generate\_data\_structure(...) \\
+\tab \blue{def} \blond{generate\_data\_structure} \\
+\tab \tab \blue{def} \blond{create\_cpt\_shifts} \\ \\
+\tab if heuristic == 1 \\
+\tab \blue{def} \blond{random\_fw\_heuristic} \\
+\tab \tab \blue{def} \blond{random\_walk} \\
+\tab \tab \tab \blue{def} \blond{depth} \\
+\tab \tab \tab \tab data\_str\_node = data\_str[node] \\
+\tab \tab \tab \tab shifts = data\_str\_node['shifts'] \\ \\
+\tab else \\
+\tab \blue{def} \blond{bfs\_exhaust} \\
+\tab \tab \blue{def} \blond{depth} \\ 
+\tab \tab \tab shifts = data\_str\_node[`shifts'] \\
+\tab \tab \tab pstates\_node = sample\_states(data\_str\_node, new\_col)
+} \vspace{2pc}
 
+Prune sampling algorithm
+\begin{itemize}
+\item Performance of prune sampling algorithm 
+\begin{itemize}
+\item Convergence of prior distribution $\Q$ to real distribution $\calP$
+\item Weight of BN
+\item Complexity
+\item Methods to compare when dag-treewidth and query nodes
+\begin{itemize}
+\item Forward sampling
+\item Metropolis sampling
+\item Gibbs sampling
+\item Prune sampling
+\begin{itemize}
+\item bfs\_exhaust
+\item hybrid\_fw\_heuristics
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\item Suggested Improvements
+\begin{itemize}
+\item Implementation 
+\item Results
+\end{itemize}
+\item Complexity of Bayesian networks
+\begin{itemize}
+\item Applications of Bayesian networks
+\begin{itemize}
+\item Medicine
+\item Finance
+\end{itemize}
+\end{itemize}
+\end{itemize}
 
+\newpage
+
+\section{Monte Carlo error analysis}
+
+\begin{align*}
+\sigma^2 &= \langle y^2 \rangle - \langle y \rangle ^2 \\
+\langle y \rangle &= \frac{1}{N} \sum_{i=1}^N y_i \\
+\langle y^2 \rangle &= \frac{1}{N} \sum_{i=1}^N y_i^2 \\
+\sigma_N &= \sqrt{ \frac{1}{N} \sum_{i=1}^N ( y_i - \bar{y}_N )^2 } \\
+\log \sigma_N &= \frac{1}{2} \log \big( \frac{1}{N} \sum_{i=1}^N ( y_i - \bar{y}_N )^2 \big)
+ \end{align*} \vspace{3pc}
+ 
+Let $Y$ has a finite variance and $\Var(Y)=\sigma^2 < \infty$. In IID sampling, $\hat{\mu}_n$ is a random variable and it has its own mean and variance. The mean of $\hat{\mu}_n$ is
+\begin{align*}
+\E[\hat{\mu}_n] = \frac{1}{n} \sum_{i=1}^n \E[Y_i] = \mu
+\end{align*}
+The variance of $\hat{\mu}_n$ is
+\begin{align*}
+\E[(\hat{\mu}_n - \mu)^2 ] = \frac{\sigma^2}{n}.
+\end{align*}
+This gives us, $\sqrt{\E[(\hat{\mu}_n - \mu)^2 ]} = \sigma / \sqrt{n}$. To emphasize that the error is order $\sqrt{n}$ and to de-emphasize $\sigma$, we write root mean squared error, RMSE $ = O(\sqrt{n})$ as $n \to \infty$.
+
+\vspace{3pc}
+
+ 
+\begin{align*}
+\P(Rain = T | GrassWet = T) &= \frac{\P(Rain = T, GrassWet = T)}{\P(GrassWet = T)} \\
+&=  \frac{\sum_{S \in \{T,F\}} \P(rain = T, Sprinkler, GrassWet = T)}{\sum_{R,S \in \{T,F\}} \P(GrassWet = T, Rain, Sprinkler)} \\
+&= \frac{0,00198_{TTT} + 0,1584_{TFT}}{0,00198_{TTT} + 0,288_{TTF} + 0,1584_{TFT} + 0.0_{TFF}} \\
+&= 0,3577 \\
+&= 1 - 0,6423
+\end{align*}\vs
+
+\begin{align*}
+\P(GrassWet = T, Rain = T, Sprinkler = T) = &\P(GrassWet = T | Rain = T, Sprinkler = T) * \\ 
+&\P(Sprinkler = T | Rain = T) * \P(Rain = T) \\
+= & 0,99 * 0,01 * 0,2 \\
+= & 0,00198
+\end{align*} \vs
 
 \newpage
 
@@ -396,5 +507,12 @@ r.488
 $) } \newline
 [28] Wei Wei, Jordan Erenrich and Bart Selman, \textit{Towards efficient sampling: Exploiting random walk strategies}, Aaai 2004, pp. 670-676
 \end{definition*}\vs 
+
+New literature:
+\begin{itemize}
+\item Bayesian Networks and Decision Grpahs, Finn V. JEnsen and Thomas D. Nielsen
+\item Probabilistic Graphical Models, Sucar, Luis Enrique
+\end{itemize}
+
 
 \end{document}
