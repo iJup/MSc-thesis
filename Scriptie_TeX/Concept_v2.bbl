@@ -1,0 +1,49 @@
+\begin{thebibliography}{1}
+
+\bibitem{fishelson2004}
+{\sc Fishelson, M., and Geiger, D.}
+\newblock Optimizing exact genetic linkage computations.
+\newblock {\em Journal of Computational Biology 11}, 2-3 (2004), 263--275.
+
+\bibitem{gogate2011samplesearch}
+{\sc Gogate, V., and Dechter, R.}
+\newblock Samplesearch: Importance sampling in presence of determinism.
+\newblock {\em Artificial Intelligence 175}, 2 (2011), 694--729.
+
+\bibitem{koller2009probabilistic}
+{\sc Koller, D., and Friedman, N.}
+\newblock {\em Probabilistic graphical models: principles and techniques}.
+\newblock MIT press, 2009.
+
+\bibitem{lauritzen1988local}
+{\sc Lauritzen, S.~L., and Spiegelhalter, D.~J.}
+\newblock Local computations with probabilities on graphical structures and
+  their application to expert systems.
+\newblock {\em Journal of the Royal Statistical Society. Series B
+  (Methodological)\/} (1988), 157--224.
+
+\bibitem{pearl2011}
+{\sc Pearl, J.}
+\newblock Bayesian networks.
+
+\bibitem{phillipson2015modelling}
+{\sc Phillipson, F., Bastings, I., and Vink, N.}
+\newblock Modelling the effects of a cbrn defence system using a bayesian
+  belief model.
+
+\bibitem{philipson2018}
+{\sc Phillipson, F., Parie, J., and Weikamp, R.}
+\newblock Prune sampling: a mcmc inference technique for discrete and
+  deterministic bayesian networks.
+
+\bibitem{poon2006sound}
+{\sc Poon, H., and Domingos, P.}
+\newblock Sound and efficient inference with probabilistic and deterministic
+  dependencies.
+\newblock In {\em AAAI\/} (2006), vol.~6, pp.~458--463.
+
+\bibitem{weikamp2015}
+{\sc Weikamp, R.}
+\newblock Inference methods in discrete bayesian networks, 2015.
+
+\end{thebibliography}
