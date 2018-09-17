@@ -17,9 +17,12 @@
 \usepackage[utf8]{inputenc}
 \usepackage[section]{placeins}
 \usepackage{graphicx}
+\usepackage{dsfont}
 \usepackage{caption}
 \usepackage{lipsum}
+\usepackage[hang,flushmargin]{footmisc} 
 \usepackage{cleveref}
+\usepackage{multicol}
 \usepackage[numbers,square,sort]{natbib}
 \usepackage{algorithmicx}
 \usepackage{algorithm}
@@ -51,7 +54,15 @@
 
 \AtBeginDocument{\renewcommand{\bibname}{References}}
 
+\newcommand\blfootnote[1]{%
+  \begingroup
+  \renewcommand\thefootnote{}\footnote{#1}%
+  \addtocounter{footnote}{-1}%
+  \endgroup
+}
+
 %Font and spacing of words/lines
+\setlength{\textfloatsep}{5pt}
 \usepackage{libertine}
 \usepackage{setspace}
 	\setstretch{1.05}
@@ -69,14 +80,14 @@
   				{\textsc{\lsstyle\chaptertitlename\ \thechapter}}{0pt}{\Huge\bfseries}
 	\titleformat
 		\section
-  			{\scshape\sffamily\normalfont\Large}{\thesection}{1em}{\normalfont\sffamily\textsc}
+  			{\bfseries\normalfont\Large}{\thesection}{1em}{}
 	\titleformat
 		\subsection
-			{\scshape\sffamily\normalfont\large}{\thesubsection}{1em}{\normalfont\sffamily\textsc}
+			{\bfseries\normalfont\large}{\thesubsection}{1em}{}
 	\titlespacing*{\section}{0cm}{0.5cm}{0.5cm}
 	
 \titleformat{\chapter}
-  {\scshape\sffamily\huge}{\normalfont\textsc{\sffamily\lsstyle\chaptertitlename\ \thechapter}}{1em}{}
+  {\bfseries\huge}{\normalfont{\lsstyle\chaptertitlename\ \thechapter}}{1em}{}
   
 \titlespacing*{\chapter}{0pt}{1pc}{1pc}
 \titlespacing*{\section}{0pt}{1pc}{1pc}
@@ -163,6 +174,16 @@
 \newcommand{\ps}{\textit{prune sampling }}
 \newcommand{\Ps}{\textit{Prune sampling }}
 
+\renewcommand{\gg}{{\text{g} }}
+\newcommand{\gT}{{\text{g}_\text{T} }}
+\newcommand{\gF}{{\text{g}_\text{F} }}
+\renewcommand{\ss}{{\text{s} }}
+\newcommand{\sT}{{\text{s}_\text{T} }}
+\newcommand{\sF}{{\text{s}_\text{F} }}
+\newcommand{\rr}{{\text{r} }}
+\newcommand{\rT}{{\text{r}_\text{T} }}
+\newcommand{\rF}{{\text{r}_\text{F} }}
+
 
 %mathbf
 \newcommand{\bfe}{{\mathbf{e}}}
@@ -176,7 +197,7 @@
 
 % number systems
 
-\def\bbN{{\mathbb N}}
+\def\N{{\mathbb N}}
 \def\bbZ{{\mathbb Z}}
 \def\bbQ{{\mathbb Q}}
 \def\bbR{{\mathbb R}}
@@ -238,7 +259,7 @@
 
 \vfill
 
-\large \scshape\sffamily{\today}
+\large \scshape\sffamily{september 14, 2018}
 
 	
 \end{titlepage}
@@ -248,14 +269,12 @@
 
 \pagestyle{plain}
 
-
-
-
-
 % Abstract
 
 \begin{abstract}
-The performance of the recently introduced \ps algorithm \cite{philipson2018} is characterised for various types of Bayesian networks and compared to the popular Markov chain Monte Carlo (MCMC) sampling methods Gibbs- and Metropolis sampling. We devised a procedure to obtain the performance of the MCMC sampling methods in the limit of infinite simulation time, extrapolated from relatively short simulations. This approach was used to conduct a study to compare the accuracy, rate of convergence and the time consumption of the sampling methods. We show that Markov chains created by \textit{prune sampling} always converge to the desired posterior distribution, also for networks where conventional Gibbs sampling fails. \red{Beside that, we demonstrate} that \ps outperforms \red{Gibbs sampling}, at least for a class of BNs. Though, this tempting feature comes at a price. In the first version of \textit{prune sampling}, the procedure to choose a configuration of the BN for the next iteration is rather time intensive. Our conclusion is that \ps is \red{a competitive} method for all types of small and medium sized BNs, but standard methods perform better for all types of large BNs.
+The performance of the recently introduced \ps algorithm \cite{phillipson2018} is characterised for various types of Bayesian networks and compared to the popular Markov chain Monte Carlo (MCMC) sampling methods Gibbs- and Metropolis sampling. We devised a procedure to obtain the performance of the MCMC sampling methods in the limit of infinite simulation time, extrapolated from relatively short simulations. This approach was used to conduct a study to compare the accuracy, rate of convergence and the time consumption of the sampling methods. We show that Markov chains created by \textit{prune sampling} always converge to the desired posterior distribution, also for networks where conventional Gibbs sampling fails. {Beside that, we demonstrate} that \ps outperforms {Gibbs sampling -- arguably the most widely used MCMC inference technique --} at least for a class of BNs. Though, this tempting feature comes at a price. In the first version of \textit{prune sampling}, the procedure to choose a configuration of the BN for the next iteration is rather time intensive. Our conclusion is that \ps is {a competitive} method for all types of small and medium sized BNs, but standard methods perform better for all types of large BNs.
+
+\blfootnote{\noindent Part of this thesis will be published as \textit{Prune sampling: a MCMC inference technique for discrete and deterministic Bayesian networks}} 
 \end{abstract}
 
 %a competitive
@@ -283,22 +302,21 @@ The performance of the recently introduced \ps algorithm \cite{philipson2018} is
 
 %Introduction
 
-\chapter{Introduction}
+\chapter{Introduction}\label{intro}
+This thesis is about Bayesian network inference. In particular, it is about Markov chain Monte Carlo methods, which form an important class of approximate inference techniques for Bayesian networks. In this first chapter, we give a brief overview of the study we performed in this master thesis.
 
 \section{Bayesian networks and inference}
-A Bayesian network (BN) is a probabilistic model that represents a set of random variables and their conditional dependencies. One could represent a BN graphically by considering a directed acyclic graph where the set of nodes is induced by the set of random variables and where the set of edges is given by the conditional dependencies between these random variables. Assuming that instances fall into one of a number of mutually exclusive and exhaustive classes, discrete BNs are used to model probabilistic relationships. As an illustration, BNs model genetic linkage \cite{fishelson2004}, causal reasoning \cite{pearl2011} and defence systems \cite{phillipson2015modelling}. For all of these models, BNs are used to answer probabilistic queries about variables and their relationships. An interesting feature of BNs is that the network can be used to find out updated knowledge of the state of a subset of variables when other variables (the evidence variables) are observed. This process of computing the posterior distribution of variables given evidence is called inference. Though, exact inference in BNs is often too computationally intensive. On the other hand, approximate inference methods have to deal with a lack of convergence and often perform poorly in the presence of determinism \cite{koller2009probabilistic, poon2006sound, gogate2011samplesearch}. 
-
+A Bayesian network (BN) is a probabilistic model that represents a set of random variables and their conditional dependencies. One could represent a BN graphically by considering a directed acyclic graph where the set of nodes is induced by the set of random variables and where the set of edges is given by the conditional dependencies between these random variables. Assuming that instances fall into one of a number of mutually exclusive and exhaustive classes, discrete BNs are used to model probabilistic relationships. As an illustration, BNs model genetic linkage \cite{fishelson2004}, causal reasoning \cite{pearl2014probabilistic} and defence systems \cite{phillipson2015modelling}. For all of these models, BNs are used to answer probabilistic queries about variables and their relationships. An interesting feature of BNs is that the network can be used to find out updated knowledge of the state of a subset of variables when other variables (the evidence variables) are observed. This process of computing the posterior distribution of variables given evidence is called inference. Though, exact inference in BNs is often too computationally intensive. On the other hand, approximate inference methods have to deal with a lack of convergence and often perform poorly in the presence of determinism \cite{koller2009probabilistic, poon2006sound, gogate2011samplesearch}. Therefore, a plethora of different inference strategies have been developed \cite{nasrabadi2007pattern, nielsen2009bayesian, koller2009probabilistic, pearl2014probabilistic}.
 
 \section{Goals and approach of this research project}
-Due to the real world applications of BNs, improving the reliability of approximate inference methods is quite important and can have a significant impact. For this reason, at TNO an unprecedented Markov Chain Monte Carlo (MCMC) approximate inference method named \ps was created. In this research project, I characterise the performance of the first implemented version of \ps for discrete and deterministic BNs. We devised a procedure to obtain the performance of MCMC sampling methods in the limit of infinite simulation time, extrapolated from relatively short simulations. This approach was used to conduct a study to compare the accuracy, rate of convergence and the time consumption of \ps with two conventional MCMC sampling methods: Gibbs- and Metropolis sampling. In addition, we disclose the pitfalls of \ps and show how this first version could be improved.  
-
+Due to the real world applications of BNs, improving the reliability of approximate inference methods is quite important and can have a significant impact. For this reason, at TNO an unprecedented Markov Chain Monte Carlo (MCMC) approximate inference method named \ps was created. In this research project, I characterise the performance of the first implemented version of \ps for discrete and deterministic BNs. We devised a procedure to obtain the performance of MCMC sampling methods in the limit of infinite simulation time, extrapolated from relatively short simulations. This approach was used to conduct a study to compare the accuracy, rate of convergence and the time consumption of \ps with two conventional MCMC sampling methods: Gibbs- and Metropolis sampling. In addition, we disclose the pitfalls of \ps and show how this first version could be improved. Results of this study will be published in \textit{Prune sampling: a MCMC inference technique for discrete and deterministic Bayesian networks}. \cite{phillipson2018}
 
 
 \section{Overview of the thesis}
-We start to specify the BN framework, popular approximate inference techniques and their shortcoming in Chapter 2. In Chapter 3, we introduce the concept and elaborate on the implementation of \textit{prune sampling}. Consecutively, in Chapter 4, we present the results of the performance of \ps in terms of accuracy, the rate of convergence and time consumption compared with Metropolis- and Gibbs sampling. In Chapter 5, we discuss results of improved versions of the \ps algorithm.
+We start to specify the BN framework, popular approximate inference techniques and their shortcomings in Chapter 2. In Chapter 3, we introduce the concept and elaborate on the implementation of \textit{prune sampling}. Consecutively, in Chapter 4, we present the performance of \ps in terms of accuracy, the rate of convergence and time consumption compared with Metropolis- and Gibbs sampling. In Chapter 5, we discuss results of improved versions of the \ps algorithm.
 
 \chapter{Bayesian network inference}
-In this chapter, we introduce the main concepts we work with in this thesis: the framework of Bayesian networks, inference methods and thirdly MCMC sampling methods. We pay special attention to the pros and cons of commonly used inference techniques. Such that -- later on -- we can make a comparison between those methods and the new \ps method more clearly.
+In this chapter, we introduce the main concepts our study: the framework of Bayesian networks (BNs), the task of doing BN inference and MCMC sampling methods for BNs. We highlight the pros and cons of commonly used MCMC inference techniques. Such that -- later on -- we can make a comparison between the performance of those methods and the \ps method more clearly.
 
 \section{Bayesian networks}
 \begin{definition}[Bayesian network]
@@ -306,15 +324,14 @@ A BN structure $\G$ is a directed acyclic graph whose nodes represent random var
 \begin{align*}
 \text{for each variable $X_i$: $(X_i \indep \text{ND}_{X_i} | \text{Pa}_{X_i})$}.
 \end{align*}
-In other words, the local independencies state that each node $X_i$ is conditionally independent of its non-descendants given its parents. [4] 
+In other words, the local independencies state that each node $X_i$ is conditionally independent of its non-descendants given its parents. \cite{koller2009probabilistic} 
 \end{definition}
 
-When dealing with spaces composed solely of discrete-valued random variables, to each node $X_i$ we assign a state $x_i \in Val(X_i)$. We could display the conditional probability distribution $P(X_i | \text{Pa}_{X_i})$ in a conditional probability table (CPT), where
+When dealing with spaces composed solely of discrete-valued random variables, to each node $X_i$ we assign a state $x_i \in Val(X_i)$, where $Val(X_i)$ denotes the set of values that a random variable $X_i$ can take. We could display the conditional probability distribution $P(X_i | \text{Pa}_{X_i})$ in a conditional probability table (CPT), where
 \begin{align*}
 \sum_{i \in \{1, \ldots , n\}} P(x_i | \text{Pa}_{X_i}) = 1.
 \end{align*}
-So, a BN $\G$ exists of a graph with a collection of local probability distributions, given in CPTs. Together, these local probability distributions give the joint probability distribution of the BN. We use $\bfX \subseteq \X$ to denote a set of random variables, while $\bfx$ denotes an assignment of values to the variables in this set. For convenience a state of a BN is denoted as $\bfx = (x_1, \ldots , x_n)$. And $P(\bfx)$ denotes the probability of state $\bfx$.
-
+So, a BN exists of a graph with a collection of local probability distributions, given in CPTs. Together, these local probability distributions give the joint probability distribution of the BN. We use $\bfX \subseteq \X$ to denote a set of random variables, while $\bfx$ denotes an assignment of values to the variables in this set. For convenience, a state (or configuration) of a BN is denoted as $\bfx = (x_1, \ldots , x_n)$ and $P(\bfx)$ denotes the probability of the BN having this state $\bfx$.
 \begin{definition}[Deterministic relation]
 The CPT contains one of more zeros. That is, there exists a function $f: Val(\text{Pa}_{X_i}) \to Val(X_i)$, such that
 \begin{align*}
@@ -325,23 +342,124 @@ P(x_i | \text{Pa}_{X_i}) =
 \end{cases}
 \end{align*} 
 \end{definition}
+The above introduced concepts are all depicted in Example \ref{ex:rain-sprinkler}.
+\begin{example}\label{ex:rain-sprinkler}
+Consider the \textit{Rain-Sprinkler} BN in Figure \ref{rainBN}. In this model, one could consider the event of grass being wet ($\gg$) as a results of two causes: either a sprinkler ($\ss$) is on or it is raining ($\rr$). Beside that, it is supposed that the rain has a direct effect on the use of the sprinkler. All three variables have two possible values, T (for true) and F (for false). From the CPTs it becomes clear that when it rains, the sprinkler is usually not turned on, i.e. $P( \text{s}_\text{T} |  \text{r}_\text{T}) = 0.01$. The counter intuitive state of the BN, that the grass is wet given it is not raining and the sprinkler is off: $\bfx = (\gT,  \sF,  \rF)$, is excluded by the deterministic relation $P( \gT,  \sF,  \rF) = 0$.  Taking the fixed order of the variables $G, S, R$ into account, the joint probability function is given by
+\begin{align}
+P(G, S, R) = P(G | S, R) P(S|R) P(R).
+\label{eq:jointprob}
+\end{align}
+This BN can answer queries like \textit{What is the probability that it is raining, given the grass is wet?} by using the conditional probability formula and summing over all (auxiliary) variables
+\begin{align}
+P(R = \text{r}_\text{T} | G = \text{g}_\text{T}) = \frac{P(G = \text{g}_\text{T}, R = \text{r}_\text{T})}{P(G = \text{g}_\text{T})} = \frac{\sum_{S \in \{T,F\}} P(G = \text{g}_\text{T}, S, R = \text{r}_\text{T})}{\sum_{S, R \in \{T,F\}} P(G = \text{g}_\text{T}, S, R)}.
+\label{eq:conditional-summation}
+\end{align}
+\end{example}
+More background concerning the mathematical representation of BNs and its methodology could be found in \cite{koller2009probabilistic, nielsen2009bayesian, pearl2014probabilistic}. 
+\begin{center}
+\begin{figure}[t!]
+\centering
+\begin{tikzpicture}[node distance=1.2cm, >=triangle 60]
+\node [events] (s) {Sprinkler};
+\node [events,  right=of s] (r) {Rain};
+\node [events,  below right=of s] (g) {Grass wet};
 
 
-\section{Inference methods}
-When values of variables are known, we call this set $\bfE \subset \X$ evidence. We can formulate our main goal as: given a set of evidence $\bfE = \bfe$ and nodes of interest $\bfX \subset \X$ -- such that $\bfE \cap \bfX = \emptyset$ -- what is the probability distribution $P(\bfX | \bfE = \bfe)$? The task of answering this question is called inference. We write $P$ as the posterior probability distribution of interest, with reduced CPTs according to the evidence nodes.
+\draw [->] (r) -- (s);
+\draw [->] (r) -- (g);
+\draw [->] (s) -- (g);
 
-When values of variables are known, we call this set $\bfE \subset \X$ evidence. We can formulate our main goal as: given a set of evidence $\bfE = \bfe$ and nodes of interest $\bfX \subset \X$ -- such that $\bfE \cap \bfX = \emptyset$ -- what is the probability distribution $P(\bfX | \bfE = \bfe)$? The task of answering this question is called inference. We write $P$ as the posterior probability distribution of interest, with reduced CPTs according to the evidence nodes.
+{\small
+\node [right = 2cm of r] (t_r) {
+    \begin{tabular}{|c||c|} \hline
+    	$\text{r}_\text{T}$ & $0.2$\\ \hline
+    	$\text{r}_\text{F}$ & $0.8$ \\ \hline
+    \end{tabular}
+    };
+    
+\node [left = 2cm of s] (t_s) {
+    \begin{tabular}{|c||c|c|} \hline
+	& $\text{r}_\text{T}$ & $\text{r}_\text{F}$    \\ \hline \hline
+	$\text{s}_\text{T}$ & 0.01 & 0.4   \\ \hline
+	$\text{s}_\text{F}$ & 0.99 & 0.6 \\ \hline
+\end{tabular}
+    };
+    
+\node [below left = 1cm of g] (t_g) {
+    \begin{tabular}{|c||c|c|c|c|} \hline
+	& $\text{r}_\text{T},\ \text{s}_\text{T}$ & $\text{r}_\text{T},\ \text{s}_\text{F}$ & $\text{r}_\text{F},\ \text{s}_\text{T}$ & $\text{r}_\text{F},\ \text{s}_\text{F}$  \\ \hline \hline
+	$\text{g}_\text{T}$ & 0.99 & 0.8 & 0.9 & 0  \\ \hline
+	$\text{g}_\text{F}$ & 0.01 & 0.2 & 0.1 & 1 \\ \hline
+\end{tabular}
+    };
+}
+    
+\draw [dotted] (r) -- (t_r);
+\draw [dotted] (s) -- (t_s);
+\draw [dotted] (g) -- (t_g);
 
-Since naively summing out all possible configurations -- to determine $P(\bfX | \bfe)$ -- could easily result in an exponential blown up, we want to appeal to a more sophisticated approach. Approximate inference methods provide such a solution.
+\end{tikzpicture}
+\caption{a BN structure and corresponding CPTs are used to model the event of grass being wet (g) as a results of two causes: either a sprinkler (s) is on or it is raining (r).}
+\label{rainBN}
+\end{figure}
+\end{center}
+\vspace{-1.9pc}
+\section{Inference}
+When values of variables are known, or are \textit{given}, we call this set $\bfE \subset \X$ evidence. In the context of BN modeling, our goal in this study is: given a set of evidence $\bfE = \bfe$ and nodes of interest $\bfX \subset \X$, such that $\bfE \cap \bfX = \emptyset$, what is the probability distribution $P(\bfX | \bfE = \bfe)$? The task of answering such type of questions is called \textit{inferring unobserved variables}. We write $P$ as the posterior probability distribution of interest, with reduced CPTs according to the evidence nodes. In the next example, we return to the \textit{Rain-Sprinkler} BN to make inference more specific.
+\begin{example}\label{ex:exact-marg}
+Again, consider the \textit{Rain-Sprinkler} BN from Figure \ref{rainBN}. We show how the question in Example \ref{ex:rain-sprinkler} -- $P(R = \text{r}_\text{T} | G = \text{g}_\text{T})$ -- could be computed explicitly. Using the expansion for the joint probability function from Equation \ref{eq:jointprob} and the conditional probabilities from the CPTs, one could evaluate each term in the numerator and denominator of Equation \ref{eq:conditional-summation} in the way we evaluate
+\begin{align*}
+P(G = \text{g}_\text{T}, S = \text{s}_\text{F}, R = \text{r}_\text{T}) &= P(G = \text{g}_\text{T} | S = \text{s}_\text{F}, R = \text{r}_\text{T}) P(S = \text{s}_\text{F} | R = \text{r}_\text{T}) P(R = \text{r}_\text{T}) \\
+&= 0.8 \cdot 0.99 \cdot 0.2 \\
+&= 0.1584. 
+\end{align*}
+Doing these calculations for all cases, one will obtain
+\begin{align*}
+P(R = \text{r}_\text{T} | G = \text{g}_\text{T}) &= \frac{0.00198_{\text{g}_\text{T}, \text{s}_\text{T}, \text{r}_\text{T}} + 0.1584_{\text{g}_\text{T}, \text{s}_\text{F}, \text{r}_\text{T}} }{0.00198_{\text{g}_\text{T}, \text{s}_\text{T}, \text{r}_\text{T}} + 0.288_{\text{g}_\text{T}, \text{s}_\text{T}, \text{r}_\text{F}} + 0.1584_{\text{g}_\text{T}, \text{s}_\text{F}, \text{r}_\text{T}} + 0.0_{\text{g}_\text{T}, \text{s}_\text{F}, \text{r}_\text{F}}}\\
+& = \frac{891}{2491} \approx 35.77\%.
+\end{align*}
+Hence, the probability that it is raining, given the grass is wet is approximately 36\%.
+\end{example}
+The procedure described in Example \ref{ex:exact-marg} is called \textit{exact marginalization}. It illustrates that in order to do inference, there is not always need for an explicit joint distribution. Though, dealing with more complex BNs we are often still haunted by exponentially many computations. In general, all exact inference methods -- variable elimination, clique tree propagation, recursive conditioning etc. -- have to execute computations that are exponential in the network's treewidth (a measure for graph complexity). To make all of those concepts detailed here is out of the scope of this thesis. Therefore, for a comprehensive discussion of those methods we refer to \cite{koller2009probabilistic, nielsen2009bayesian}. Another field of inference techniques are approximate methods. In the next section, we introduce how samples of states of BNs could be generated by using Markov chain Monte Carlo simulations.
 
 %In cases where much of the evidence is at the leaves of the network, forward sampling techniques for example are essentially sampling from the prior distribution, which is often very far from the desired posterior. 
 
 %\subsection{Exact algorithms}
 %\subsection{Approximation algorithms}
 
+%answer queries of the form
 
-\section{MCMC sampling methods}
-MCMC sampling methods construct a Markov chain such that, although the first sample may be generated from the prior distributions, successive samples are generated from distributions that provably get closer and closer to the desired posterior distribution. One can examine the desired distribution by observing its equilibrium distribution after a number of steps. In order to use this tempting feature of MCMC methods, we need to guarantee that the limit of this process exists and is unique. Since we only consider Markov chains on finite state spaces, from the theory of Markov chains we know that if a Markov chain is regular and reversible with respect to a distribution $\pi$, then $\pi$ is the unique stationary distribution. These notions are defined below. [4]
+\section{Approximate sampling methods}
+According to a heuristic based on the CPTs, sampling methods generate a bunch of states of a BN. These configurations, or samples, could be used to do inference. The next example illustrates the key concept of all approximate sampling techniques.
+\begin{example}\label{sampling}
+Consider the BN in Figure \ref{rainBN}. Let \rr be our variable of interest and suppose $Y_1, \ldots , Y_6$ are independent and identically distributed (i.i.d.) samples of $(G, S, R)$ created by a certain sampling heuristic,
+\begin{multicols}{2}
+\begin{enumerate}
+\item $Y_1 = ( G_1 = \gT, S_1 = \sT, R_1 = \rF)$
+\item $Y_2 = ( G_2 = \gT, S_2 = \sF, R_2 = \rT)$
+\item $Y_3 = ( G_3 = \gT, S_3 = \sT, R_3 = \rF)$
+\item $Y_4 = ( G_4 = \gF, S_4 = \sT, R_4 = \rF)$
+\item $Y_5 = ( G_5 = \gT, S_5 = \sT, R_5 = \rT)$
+\item $Y_6 = ( G_6 = \gF, S_6 = \sF, R_6 = \rF)$.
+\end{enumerate}
+\end{multicols}
+%Here, $\textasteriskcentered$ denotes that any value could be assigned to the corresponding variable, though (in this context) which values exactly is not relevant. 
+\noindent Then, the probability of $R = \text{r}_\text{T}$ can be approximated by 
+\begin{align*}
+P(R = \rT) = \E[ \mathds{1}_{R = \rT} ] \approx \sum_{i=1}^6 \mathds{1}_{R_i = \rT} = \frac{2}{6},
+\end{align*}
+where $\mathds{1}_{Y=y}$ is the indicator function of the event $Y = y$.
+\end{example}
+In general, for a variable of interest $Y$ with $N \in \N$ i.i.d. samples the probability of $Y = y$ can be approximated by 
+\begin{align*}
+P(Y = y) = \E[ \mathds{1}_{Y=y} ] \approx \sum_{i=1}^N \mathds{1}_{Y_i = y}.
+\end{align*}
+A plethora of techniques have been develop to create samples $Y_1, \ldots Y_N$. Again, discussing all those methods here in detail is beyond the scope of this thesis. For an overview of approximate inference methods and its limitations we refer to \cite{koller2009probabilistic, nielsen2009bayesian}. In the next subsection, we focus on how samples can be generated by using Markov chain Monte Carlo simulations. 
+
+\subsection{Markov chain Monte Carlo sampling}
+In contrast to Example \ref{sampling}, suppose that we do not create the samples $Y_i$ i.i.d. for all $i \geq 1$, but we create  sample $Y_{i+1}$ by tweaking the state of sample $Y_{i}$ according to a certain heuristic. Doing this process often -- for $i = 1, \ldots n$ with large $n$ -- we call this process \textit{Markov chain Monte Carlo sampling}.
+
+MCMC sampling heuristics construct a Markov chain such that, although the first sample may be generated from the prior distributions, successive samples are generated from distributions that provably get closer and closer to the desired posterior distribution. In order to use this tempting feature of MCMC methods, we need to guarantee that the limit of this process exists and is unique. Since we only consider Markov chains on finite state spaces, from the theory of Markov chains we know that if a Markov chain is regular and reversible with respect to a distribution $\pi$, then $\pi$ is the unique stationary distribution. These notions are defined below. [4]
 
 %In cases where much of the evidence is at the leaves of the network, forward sampling techniques for example are essentially sampling from the prior distribution, which is often very far from the desired posterior. 
 
@@ -364,7 +482,7 @@ A distribution $\pi$ is a stationary distribution for a Markov chain Q if
 
 \end{definition}
 
-Having recalled these definitions from stochastics, we visit the widely used MCMC approximate inference methods: Metropolis-, Gibbs- and slice sampling. And -- as already mentioned in the {\normalfont\scshape\sffamily introduction} -- its limitations.
+Having recalled these definitions from stochastics, we visit the widely used MCMC approximate inference methods Metropolis- and Gibbs sampling.
 
 
 \subsection{Metropolis sampling}
@@ -384,16 +502,16 @@ Having recalled these definitions from stochastics, we visit the widely used MCM
 {\small
 \node [left = 1cm of a] (ta) {
     \begin{tabular}{|c||c|} \hline
-    	$A=0$ & $0.5$ \hspace{0.5pc} $A(1)$\\ \hline
-    	$A=1$ & $0.5$ \hspace{0.5pc} $A(2)$ \\ \hline
+    	$A=0$ & $0.5$ \\ \hline
+    	$A=1$ & $0.5$\\ \hline
     \end{tabular}
     };
     
 \node [right = 1cm of b] (tb) {
     \begin{tabular}{|c||c|c|} \hline
 	&$A=0$&$ A=1 $  \\ \hline \hline
-	$B=0$ & $1$ \hspace{0.5pc} $B(1)$& $0$ \hspace{0.5pc} $B(2)$  \\ \hline
-	$B=1$ & $0$ \hspace{0.5pc} $B(3)$& $1$ \hspace{0.5pc} $B(4)$ \\ \hline
+	$B=0$ & $1$ & $0$ \\ \hline
+	$B=1$ & $0$ & $1$ \\ \hline
 \end{tabular}
     };}
     
@@ -414,20 +532,10 @@ In the first Gibbs iteration, we resample both unobserved variables, one at a ti
 yielding that all samples are equal to $(0,0)$. The real distribution for $A$ on the other hand must equal $P(A=0) = P(A=1) = 0.5$.
 \end{example}
 
-\begin{example} The collection of CPT-indices $\C$ for the BN in Figure \ref{gibbs} contains 6 indices: 2 for the CPT of node $A$ -- indexed by $A(1), A(2)$ -- and 4 for the CPT of node $B$ -- indexed by $B(1), B(2), B(3), B(4)$. For completeness, $\C = \{ A(1), A(2), B(1), B(2), B(3), B(4) \}$.
-\end{example}
-
-
-
-\subsection{Slice sampling}
-
 
 \chapter{Prune Sampling}
-
 \section{The prune sampling algorithm}
-
 \subsection{Background: MC-SAT algorithm}
-
 \subsection{Notation and definition}
 
 
@@ -777,7 +885,7 @@ Grid 8x8 & 20.50 & \textbf{8.83} & 105.17  \\
 \centering
 
 \begin{subfigure}{.33\linewidth}
-\includegraphics[width=1.1\columnwidth]{example-image-a}
+\includegraphics[width=1.1\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Asia/Prune/asia_hist_num_samples.png}
 \caption{Asia 0\% determinism}%
 \label{asia_ev}%
 \end{subfigure}\hfill%
@@ -846,12 +954,12 @@ Grid 8x8 & 20.50 & \textbf{8.83} & 105.17  \\
 \end{subfigure}
 
 \begin{subfigure}{.5\linewidth}
-\includegraphics[height=5.3cm]{example-image-c}
+\includegraphics[height=5.3cm]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Alarm_ev25/alarm_ev_ahd4_25000.png}
 \caption{Alarm 25\% determinism}%
 \label{grid_3x3}%
 \end{subfigure}\hfill%
 \begin{subfigure}{.5\linewidth}
-\includegraphics[height=5.3cm]{example-image-c}
+\includegraphics[height=5.3cm]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Win95pts_ev25/win95pts_ev_ahd7_25000.png}
 \caption{Win95pts 25\% determinism}%
 \label{grid_5x5}%
 \end{subfigure}
