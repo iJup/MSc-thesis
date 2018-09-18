@@ -344,14 +344,14 @@ P(x_i | \text{Pa}_{X_i}) =
 \end{definition}
 The above introduced concepts are all depicted in Example \ref{ex:rain-sprinkler}.
 \begin{example}\label{ex:rain-sprinkler}
-Consider the \textit{Rain-Sprinkler} BN in Figure \ref{rainBN}. In this model, one could consider the event of grass being wet ($\gg$) as a results of two causes: either a sprinkler ($\ss$) is on or it is raining ($\rr$). Beside that, it is supposed that the rain has a direct effect on the use of the sprinkler. All three variables have two possible values, T (for true) and F (for false). From the CPTs it becomes clear that when it rains, the sprinkler is usually not turned on, i.e. $P( \text{s}_\text{T} |  \text{r}_\text{T}) = 0.01$. The counter intuitive state of the BN, that the grass is wet given it is not raining and the sprinkler is off: $\bfx = (\gT,  \sF,  \rF)$, is excluded by the deterministic relation $P( \gT,  \sF,  \rF) = 0$.  Taking the fixed order of the variables $G, S, R$ into account, the joint probability function is given by
+Consider the \textit{Rain-Sprinkler} BN in Figure \ref{rainBN}. In this model, one could consider the event of grass being wet ($\gg$) as a results of two causes: either a sprinkler ($\ss$) is on or it is raining ($\rr$). Beside that, it is supposed that the rain has a direct effect on the use of the sprinkler. All three variables have two possible values, T (for true) and F (for false). From the CPTs it becomes clear that when it rains, the sprinkler is usually not turned on, i.e. $P( \sT |  \rT) = 0.01$. The counter intuitive state of the BN, that the grass is wet given it is not raining and the sprinkler is off: $\bfx = (\rF,  \sF, \gT)$, is excluded by the deterministic relation $P(\rF,  \sF, \gT) = 0$.  Taking the fixed (topological) order of the variables $R, S, G$ into account, the joint probability function is given by
 \begin{align}
-P(G, S, R) = P(G | S, R) P(S|R) P(R).
+P(R, S, G) = P(G | R, S) P(S|R) P(R).
 \label{eq:jointprob}
 \end{align}
-This BN can answer queries like \textit{What is the probability that it is raining, given the grass is wet?} by using the conditional probability formula and summing over all (auxiliary) variables
+This BN can answer queries like \textit{what is the probability that it is raining, given the grass is wet?} by using the conditional probability formula and summing over all (auxiliary) variables
 \begin{align}
-P(R = \text{r}_\text{T} | G = \text{g}_\text{T}) = \frac{P(G = \text{g}_\text{T}, R = \text{r}_\text{T})}{P(G = \text{g}_\text{T})} = \frac{\sum_{S \in \{T,F\}} P(G = \text{g}_\text{T}, S, R = \text{r}_\text{T})}{\sum_{S, R \in \{T,F\}} P(G = \text{g}_\text{T}, S, R)}.
+P(R = \rT | G = \gT) = \frac{P(R = \rT, G = \gT)}{P(G = \rT)} = \frac{\sum_{S \in \{T,F\}} P(R = \rT, S, G = \gT)}{\sum_{R, S \in \{T,F\}} P(R, S, G = \gT)}.
 \label{eq:conditional-summation}
 \end{align}
 \end{example}
@@ -405,22 +405,22 @@ More background concerning the mathematical representation of BNs and its method
 \end{center}
 \vspace{-1.9pc}
 \section{Inference}
-When values of variables are known, or are \textit{given}, we call this set $\bfE \subset \X$ evidence. In the context of BN modeling, our goal in this study is: given a set of evidence $\bfE = \bfe$ and nodes of interest $\bfX \subset \X$, such that $\bfE \cap \bfX = \emptyset$, what is the probability distribution $P(\bfX | \bfE = \bfe)$? The task of answering such type of questions is called \textit{inferring unobserved variables}. We write $P$ as the posterior probability distribution of interest, with reduced CPTs according to the evidence nodes. In the next example, we return to the \textit{Rain-Sprinkler} BN to make inference more specific.
+When values of variables are known, or are \textit{given}, we call this set $\bfE \subset \X$ evidence. In the context of BN modeling, our goal in this study is: given a set of evidence $\bfE = \bfe$ and nodes of interest $\bfX \subset \X$, such that $\bfE \cap \bfX = \emptyset$, what is the probability distribution $P(\bfX | \bfE = \bfe)$? The task of answering such type of questions is called \textit{inferring unobserved variables}. We write $P$ as the posterior probability distribution of interest, with reduced CPTs according to the evidence nodes. In the next example, we return to the \textit{Rain-Sprinkler} BN to make this type of inference more specific.
 \begin{example}\label{ex:exact-marg}
-Again, consider the \textit{Rain-Sprinkler} BN from Figure \ref{rainBN}. We show how the question in Example \ref{ex:rain-sprinkler} -- $P(R = \text{r}_\text{T} | G = \text{g}_\text{T})$ -- could be computed explicitly. Using the expansion for the joint probability function from Equation \ref{eq:jointprob} and the conditional probabilities from the CPTs, one could evaluate each term in the numerator and denominator of Equation \ref{eq:conditional-summation} in the way we evaluate
+Again, consider the BN from Figure \ref{rainBN}. We show how the question in Example \ref{ex:rain-sprinkler} -- \textit{what is $P(R = \text{r}_\text{T} | G = \text{g}_\text{T})$?} -- could be computed explicitly. Using the expansion for the joint probability function from Equation \ref{eq:jointprob} and the conditional probabilities from the CPTs, one could evaluate each term in the numerator and denominator of Equation \ref{eq:conditional-summation} in the way we evaluate
 \begin{align*}
-P(G = \text{g}_\text{T}, S = \text{s}_\text{F}, R = \text{r}_\text{T}) &= P(G = \text{g}_\text{T} | S = \text{s}_\text{F}, R = \text{r}_\text{T}) P(S = \text{s}_\text{F} | R = \text{r}_\text{T}) P(R = \text{r}_\text{T}) \\
+P(R = \rT, S = \sF, G = \gT) &= P(G = \gT | R = \rT, S = \sF) P(S = \sF | R = \rT) P(R = \rT) \\
 &= 0.8 \cdot 0.99 \cdot 0.2 \\
 &= 0.1584. 
 \end{align*}
 Doing these calculations for all cases, one will obtain
 \begin{align*}
-P(R = \text{r}_\text{T} | G = \text{g}_\text{T}) &= \frac{0.00198_{\text{g}_\text{T}, \text{s}_\text{T}, \text{r}_\text{T}} + 0.1584_{\text{g}_\text{T}, \text{s}_\text{F}, \text{r}_\text{T}} }{0.00198_{\text{g}_\text{T}, \text{s}_\text{T}, \text{r}_\text{T}} + 0.288_{\text{g}_\text{T}, \text{s}_\text{T}, \text{r}_\text{F}} + 0.1584_{\text{g}_\text{T}, \text{s}_\text{F}, \text{r}_\text{T}} + 0.0_{\text{g}_\text{T}, \text{s}_\text{F}, \text{r}_\text{F}}}\\
+P(R = \rT | G = \gT) &= \frac{0.00198_{\rT, \sT, \gT} + 0.1584_{\rT, \sF, \gT} }{0.00198_{\rT, \sT, \gT} + 0.288_{\rF, \sT, \gT} + 0.1584_{\rT, \sF, \gT} + 0.0_{\rF, \sF, \gT}}\\
 & = \frac{891}{2491} \approx 35.77\%.
 \end{align*}
 Hence, the probability that it is raining, given the grass is wet is approximately 36\%.
 \end{example}
-The procedure described in Example \ref{ex:exact-marg} is called \textit{exact marginalization}. It illustrates that in order to do inference, there is not always need for an explicit joint distribution. Though, dealing with more complex BNs we are often still haunted by exponentially many computations. In general, all exact inference methods -- variable elimination, clique tree propagation, recursive conditioning etc. -- have to execute computations that are exponential in the network's treewidth (a measure for graph complexity). To make all of those concepts detailed here is out of the scope of this thesis. Therefore, for a comprehensive discussion of those methods we refer to \cite{koller2009probabilistic, nielsen2009bayesian}. Another field of inference techniques are approximate methods. In the next section, we introduce how samples of states of BNs could be generated by using Markov chain Monte Carlo simulations.
+The procedure described in Example \ref{ex:exact-marg} is called \textit{exact marginalization}. It illustrates that in order to do inference, there is not always need for an explicit joint distribution. Though, when we deal with more complex BNs, \textit{exact marginalization} is still vulnerable for an exponentially blow up of the number of computations to be executed. In general, all exact inference methods -- variable elimination, clique tree propagation, recursive conditioning et cetera -- have to execute computations that are exponential in the network's treewidth (a measure for graph complexity). To make all of those concepts detailed here is out of the scope of this thesis. Therefore, for a comprehensive discussion of those methods we refer to \cite{koller2009probabilistic, nielsen2009bayesian}. One way to avoid the exponential character of exact inference techniques, is to consider approximate inference methods. In order to do so, in the next section, we introduce how samples of states of BNs could be generated by using Markov chain Monte Carlo simulations.
 
 %In cases where much of the evidence is at the leaves of the network, forward sampling techniques for example are essentially sampling from the prior distribution, which is often very far from the desired posterior. 
 
@@ -430,41 +430,41 @@ The procedure described in Example \ref{ex:exact-marg} is called \textit{exact m
 %answer queries of the form
 
 \section{Approximate sampling methods}
-According to a heuristic based on the CPTs, sampling methods generate a bunch of states of a BN. These configurations, or samples, could be used to do inference. The next example illustrates the key concept of all approximate sampling techniques.
+According to a heuristic based on the BN structure and correpsonding CPTs, sampling methods generate a bunch of states of a BN. These configurations, or samples, could be used to do inference. The next example illustrates the key concept of all approximate sampling techniques.
 \begin{example}\label{sampling}
-Consider the BN in Figure \ref{rainBN}. Let \rr be our variable of interest and suppose $Y_1, \ldots , Y_6$ are independent and identically distributed (i.i.d.) samples of $(G, S, R)$ created by a certain sampling heuristic,
+Consider the BN in Figure \ref{rainBN}. Let \rr be our variable of interest and suppose $Y_1, \ldots , Y_6$ are independent and identically distributed (i.i.d.) samples of $(R, S, G)$ created by a certain sampling heuristic,
 \begin{multicols}{2}
 \begin{enumerate}
-\item $Y_1 = ( G_1 = \gT, S_1 = \sT, R_1 = \rF)$
-\item $Y_2 = ( G_2 = \gT, S_2 = \sF, R_2 = \rT)$
-\item $Y_3 = ( G_3 = \gT, S_3 = \sT, R_3 = \rF)$
-\item $Y_4 = ( G_4 = \gF, S_4 = \sT, R_4 = \rF)$
-\item $Y_5 = ( G_5 = \gT, S_5 = \sT, R_5 = \rT)$
-\item $Y_6 = ( G_6 = \gF, S_6 = \sF, R_6 = \rF)$.
+\item $Y_1 = ( R_1 = \rF, S_1 = \sT,  G_1 = \gT)$
+\item $Y_2 = ( R_2 = \rT, S_2 = \sF,  G_2 = \gT)$
+\item $Y_3 = ( R_3 = \rF, S_3 = \sT,  G_3 = \gT)$
+\item $Y_4 = ( R_4 = \rF, S_4 = \sT,  G_4 = \gF )$
+\item $Y_5 = ( R_5 = \rT, S_5 = \sT,  G_5 = \gT)$
+\item $Y_6 = ( R_6 = \rF, S_6 = \sF,  G_6 = \gF)$.
 \end{enumerate}
 \end{multicols}
 %Here, $\textasteriskcentered$ denotes that any value could be assigned to the corresponding variable, though (in this context) which values exactly is not relevant. 
 \noindent Then, the probability of $R = \text{r}_\text{T}$ can be approximated by 
 \begin{align*}
-P(R = \rT) = \E[ \mathds{1}_{R = \rT} ] \approx \sum_{i=1}^6 \mathds{1}_{R_i = \rT} = \frac{2}{6},
+P(R = \rT) = \E[ \mathds{1}_{R = \rT} ] \approx \sum_{t=1}^6 \mathds{1}_{R_t = \rT} = \frac{2}{6},
 \end{align*}
-where $\mathds{1}_{Y=y}$ is the indicator function of the event $Y = y$.
+where $\mathds{1}_{R = \rT}$ is the indicator function of the event $R = \rT$.
 \end{example}
-In general, for a variable of interest $Y$ with $N \in \N$ i.i.d. samples the probability of $Y = y$ can be approximated by 
+In general, for a variable of interest $Y$ with $T \in \N$ (not te be confused with T  for true) i.i.d. samples the probability of $Y = y$ can be approximated by 
 \begin{align*}
-P(Y = y) = \E[ \mathds{1}_{Y=y} ] \approx \sum_{i=1}^N \mathds{1}_{Y_i = y}.
+P(Y = y) = \E[ \mathds{1}_{Y=y} ] \approx \sum_{t=1}^T \mathds{1}_{Y_t = y}.
 \end{align*}
-A plethora of techniques have been develop to create samples $Y_1, \ldots Y_N$. Again, discussing all those methods here in detail is beyond the scope of this thesis. For an overview of approximate inference methods and its limitations we refer to \cite{koller2009probabilistic, nielsen2009bayesian}. In the next subsection, we focus on how samples can be generated by using Markov chain Monte Carlo simulations. 
+A plethora of techniques have been develop to create samples $Y_1, \ldots Y_T$. Again, discussing all those methods here in detail is beyond the scope of this thesis. For an overview of approximate inference methods and its limitations we refer to \cite{koller2009probabilistic, nielsen2009bayesian}. In the next subsection, we focus on how samples can be generated by using Markov chain Monte Carlo simulations. 
 
 \subsection{Markov chain Monte Carlo sampling}
-In contrast to Example \ref{sampling}, suppose that we do not create the samples $Y_i$ i.i.d. for all $i \geq 1$, but we create  sample $Y_{i+1}$ by tweaking the state of sample $Y_{i}$ according to a certain heuristic. Doing this process often -- for $i = 1, \ldots n$ with large $n$ -- we call this process \textit{Markov chain Monte Carlo sampling}.
+In contrast to Example \ref{sampling}, suppose that we do not create samples $Y_t$ i.i.d. for all $t \geq 1$. But we create  sample $Y_{t+1}$ by tweaking the state of sample $Y_{t}$ according to a certain heuristic. Repeating this process yields the Markov chain $(Y_t)_{t \in \N_0}$. Repeating this often -- for $t = 1, \ldots T$ with large $T$  -- this process is called \textit{Markov chain Monte Carlo (MCMC) sampling}. 
+Due to a cleverly chosen heuristic, MCMC methods construct a Markov chain such that, although the first sample may be generated from the prior distributions, successive samples are generated from distributions that provably get closer and closer to the desired posterior distribution. In order to use this tempting feature of MCMC methods, we need to guarantee that the limit of this process exists and is unique. Since we only consider Markov chains on finite state spaces, from the theory of Markov chains we know that if a Markov chain is regular and reversible with respect to a distribution $\pi$, then $\pi$ is the unique stationary distribution. These notions are defined below [4].
 
-MCMC sampling heuristics construct a Markov chain such that, although the first sample may be generated from the prior distributions, successive samples are generated from distributions that provably get closer and closer to the desired posterior distribution. In order to use this tempting feature of MCMC methods, we need to guarantee that the limit of this process exists and is unique. Since we only consider Markov chains on finite state spaces, from the theory of Markov chains we know that if a Markov chain is regular and reversible with respect to a distribution $\pi$, then $\pi$ is the unique stationary distribution. These notions are defined below. [4]
 
 %In cases where much of the evidence is at the leaves of the network, forward sampling techniques for example are essentially sampling from the prior distribution, which is often very far from the desired posterior. 
 
 \begin{definition}[Regular Markov chain]
-A Markov chain is said to be regular if there exists some number $k$ such that, for every $\bfx, \bfx' \in Val(\bfX)$, the probability of getting from $\bfx$ to $\bfx'$, denoted as $(\bfx \to \bfx')$, in exactly $k$ steps is $> 0$. 
+A Markov chain is said to be regular if there exists some number $k \in \N$ such that for every $\bfx, \bfx' \in Val(\bfX)$ the probability of getting from $\bfx$ to $\bfx'$ -- denoted as $(\bfx \to \bfx')$ -- in exactly $k$ steps, is $> 0$. 
 \end{definition}
 
 \begin{definition}[Reversible Markov chain]
@@ -479,16 +479,30 @@ A distribution $\pi$ is a stationary distribution for a Markov chain Q if
 \begin{align}
 \pi(\bfx') = \sum_{\bfx \in Val(\bfX)} \pi(\bfx) Q(\bfx \to \bfx').
 \end{align}
-
 \end{definition}
-
-Having recalled these definitions from stochastics, we visit the widely used MCMC approximate inference methods Metropolis- and Gibbs sampling.
-
-
-\subsection{Metropolis sampling}
-
+In the next example, we illustrate one such a heuristic that guarantees regularity and reversibility of the Markov chain.
+\begin{example}[Metropolis sampling]
+Consider the BN in Figure \ref{rainBN}. Suppose we have the initial state 
+\begin{align*}
+Y_0 = (R = \rT, S = \sF, G = \gT),
+\end{align*}
+shortened $(\rT, \sF, \gT)$ and no evidence is available. Based on $Y_0$, according to the fixed ordening $(R, S, G)$, we can change 
+\end{example}
+Another approach to create Markov chains that converge to the desired posterior distribution is called Gibbs sampling. We expose this method in the next subsection.
 
 \subsection{Gibbs sampling}
+\begin{example}[Gibbs sampling]
+Consider the BN in Figure \ref{rainBN}, suppose we have the initial state 
+\begin{align*}
+Y_0 = (R_0 = \rT, S_0 = \sT, G_0 = \gT)
+\end{align*}
+and no evidence is available. For each Gibbs iteration, we resample all unobserved variables, one in a time, in the predetermined (topological) order. Thus, we first sample $R_1$ from the distribution $P(R_1 | S_0 = \sT, G_0 = \gT)$, which could be made explicitly
+\begin{align*}
+P(R_1 = \rT | S_0 = \sT, G_0 = \gT) &= \frac{P(\rT, \sT,  \gT)}{P(\sT, \gT)} = \frac{P(\gT | \rT, \sT) P(\sT | \rT) P(\rT)}{\sum_{\rr \in {\{T,F\}}}P(\rr, \sT, \gT)} \\
+&= \frac{0.99 \cdot 0.01 \cdot 0.2}{0.00198{\rT, \sT, \gT} + 0.288_{\rF, \sT, \gT}} \approx 0.0068.
+\end{align*}
+Hence $P(R_1 = \rF | S_0 = \sT, G_0 = \gT) \approx 0.9932$. Having sampled $R_1 = \rF$, we now continue to resample $S_1$ from the distribution $P(S_1 | R_1 = \rF, G_0 = \gT)$, obtaining for example $S_1 = \sT$. Finally, we sample $G_1$ from $P(G_1 | R_1 = \rF, S_1 = \sT)$, resulting in $\gT$. Therefore, the result of the first iteration of Gibbs sampling is the sample $Y_1 = (R_1 = \rF, S_1 = \sT, G = \gT)$. This process repeats.
+\end{example}
 \begin{center}
 \begin{figure}[h!]
 \centering
@@ -890,7 +904,7 @@ Grid 8x8 & 20.50 & \textbf{8.83} & 105.17  \\
 \label{asia_ev}%
 \end{subfigure}\hfill%
 \begin{subfigure}{.33\linewidth}
-\includegraphics[width=1.1\columnwidth]{example-image-b}
+\includegraphics[width=1.1\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Alarm/Prune/alarm_hist_num_samples.png}
 \caption{Alarm 0\% determinism}%
 \label{alarm_ev}%
 \end{subfigure}\hfill%
