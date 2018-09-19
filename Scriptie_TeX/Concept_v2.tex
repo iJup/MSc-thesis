@@ -1,5 +1,22 @@
 % Basic document and typesetting settings
 \documentclass[a4paper, twoside, 11pt]{report}
+\usepackage{glossaries}
+
+\newglossary{symbols}{sym}{sbl}{List of Abbreviations and Symbols}
+\makeglossary
+
+\newglossaryentry{var}{
+type=symbols,
+name={\ensuremath{X_i}},
+description={BN variable}
+}
+
+\newglossaryentry{var_set}{
+type=symbols,
+name={\ensuremath{\mathcal{X}}},
+description={set of all variables in the BN}
+}
+
 %\usepackage{geometry}
 \usepackage[english]{babel}
 \usepackage[hidelinks]{hyperref}
@@ -8,7 +25,7 @@
 \usepackage{adjustbox}
 \usepackage{enumitem}
 	\setenumerate{itemsep = 0.1cm}
-\usepackage[font = small]{caption}
+\usepackage[font = small, margin=0.5cm]{caption}
 \usepackage{subcaption}
 %\usepackage{fullpage} % messes up the margins headers/footers
 \usepackage{amssymb}
@@ -115,6 +132,9 @@
 
 %Pictures
 \usepackage{graphicx}
+\usepackage{mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 
 % Tikz
 \usepackage{tikz}
@@ -264,6 +284,7 @@
 	
 \end{titlepage}
 
+
 \pagenumbering{roman}
 %\pagenumbering{arabic}
 
@@ -316,9 +337,10 @@ Due to the real world applications of BNs, improving the reliability of approxim
 We start to specify the BN framework, popular approximate inference techniques and their shortcomings in Chapter 2. In Chapter 3, we introduce the concept and elaborate on the implementation of \textit{prune sampling}. Consecutively, in Chapter 4, we present the performance of \ps in terms of accuracy, the rate of convergence and time consumption compared with Metropolis- and Gibbs sampling. In Chapter 5, we discuss results of improved versions of the \ps algorithm.
 
 \chapter{Bayesian network inference}
-In this chapter, we introduce the main concepts our study: the framework of Bayesian networks (BNs), the task of doing BN inference and MCMC sampling methods for BNs. We highlight the pros and cons of commonly used MCMC inference techniques. Such that -- later on -- we can make a comparison between the performance of those methods and the \ps method more clearly.
+In this chapter, we introduce the main concepts our study: the framework of Bayesian networks (BNs), the task of doing BN inference and Markov chain Monte Carlo (MCMC) sampling methods for BNs. We highlight the pros and cons of commonly used MCMC inference techniques. Such that -- later on -- we can make a comparison between the performance of those methods and the \ps method more clearly.
 
 \section{Bayesian networks}
+First, we introduce the concept of a BN structure and its corresponding conditional probability tables (CPTs).
 \begin{definition}[Bayesian network]
 A BN structure $\G$ is a directed acyclic graph whose nodes represent random variables $\X = (X_1, \ldots , X_n)$. Let $\text{Pa}_{X_i}$ denote the parents of $X_i$ in $\G$ and $\text{ND}_{X_i}$ denote the variables in the graph that are not descendants of $X_i$. Then $\G$ encodes the following set of conditional independence assumptions, called the local independencies, and denoted by $\I_l(\G)$:
 \begin{align*}
@@ -327,7 +349,7 @@ A BN structure $\G$ is a directed acyclic graph whose nodes represent random var
 In other words, the local independencies state that each node $X_i$ is conditionally independent of its non-descendants given its parents. \cite{koller2009probabilistic} 
 \end{definition}
 
-When dealing with spaces composed solely of discrete-valued random variables, to each node $X_i$ we assign a state $x_i \in Val(X_i)$, where $Val(X_i)$ denotes the set of values that a random variable $X_i$ can take. We could display the conditional probability distribution $P(X_i | \text{Pa}_{X_i})$ in a conditional probability table (CPT), where
+When dealing with spaces composed solely of discrete-valued random variables, to each node $X_i$ we assign a state $x_i \in Val(X_i)$, where $Val(X_i)$ denotes the set of values that a random variable $X_i$ can take. We could display the conditional probability distribution $P(X_i | \text{Pa}_{X_i})$ in a CPT, where
 \begin{align*}
 \sum_{i \in \{1, \ldots , n\}} P(x_i | \text{Pa}_{X_i}) = 1.
 \end{align*}
@@ -405,7 +427,9 @@ More background concerning the mathematical representation of BNs and its method
 \end{center}
 \vspace{-1.9pc}
 \section{Inference}
-When values of variables are known, or are \textit{given}, we call this set $\bfE \subset \X$ evidence. In the context of BN modeling, our goal in this study is: given a set of evidence $\bfE = \bfe$ and nodes of interest $\bfX \subset \X$, such that $\bfE \cap \bfX = \emptyset$, what is the probability distribution $P(\bfX | \bfE = \bfe)$? The task of answering such type of questions is called \textit{inferring unobserved variables}. We write $P$ as the posterior probability distribution of interest, with reduced CPTs according to the evidence nodes. In the next example, we return to the \textit{Rain-Sprinkler} BN to make this type of inference more specific.
+The task of answering types of questions as \textit{what is $P(R = \text{r}_\text{T} | G = \text{g}_\text{T})$?} is called \textit{inferring unobserved variables}. Below, we describe how one could answer such queries by explicitly computing the exact probability. \\
+
+When values of variables are known, or are \textit{given}, we call this set $\bfE \subset \X$ evidence. Now, we can formulate the main goal of our this study as: given a set of evidence $\bfE = \bfe$ and nodes of interest $\bfX \subset \X$, such that $\bfE \cap \bfX = \emptyset$, what is the probability distribution $P(\bfX | \bfE = \bfe)$? In general, answering this type of questions is called \textit{inferring unobserved variables}. We write $P$ as the posterior probability distribution of interest, with reduced CPTs according to the evidence nodes. In the next example, we return to the \textit{Rain-Sprinkler} BN to give an illustration of this type of inference.
 \begin{example}\label{ex:exact-marg}
 Again, consider the BN from Figure \ref{rainBN}. We show how the question in Example \ref{ex:rain-sprinkler} -- \textit{what is $P(R = \text{r}_\text{T} | G = \text{g}_\text{T})$?} -- could be computed explicitly. Using the expansion for the joint probability function from Equation \ref{eq:jointprob} and the conditional probabilities from the CPTs, one could evaluate each term in the numerator and denominator of Equation \ref{eq:conditional-summation} in the way we evaluate
 \begin{align*}
@@ -416,11 +440,12 @@ P(R = \rT, S = \sF, G = \gT) &= P(G = \gT | R = \rT, S = \sF) P(S = \sF | R = \r
 Doing these calculations for all cases, one will obtain
 \begin{align*}
 P(R = \rT | G = \gT) &= \frac{0.00198_{\rT, \sT, \gT} + 0.1584_{\rT, \sF, \gT} }{0.00198_{\rT, \sT, \gT} + 0.288_{\rF, \sT, \gT} + 0.1584_{\rT, \sF, \gT} + 0.0_{\rF, \sF, \gT}}\\
-& = \frac{891}{2491} \approx 35.77\%.
+& = \frac{891}{2491} \approx 0.3577.
 \end{align*}
 Hence, the probability that it is raining, given the grass is wet is approximately 36\%.
 \end{example}
-The procedure described in Example \ref{ex:exact-marg} is called \textit{exact marginalization}. It illustrates that in order to do inference, there is not always need for an explicit joint distribution. Though, when we deal with more complex BNs, \textit{exact marginalization} is still vulnerable for an exponentially blow up of the number of computations to be executed. In general, all exact inference methods -- variable elimination, clique tree propagation, recursive conditioning et cetera -- have to execute computations that are exponential in the network's treewidth (a measure for graph complexity). To make all of those concepts detailed here is out of the scope of this thesis. Therefore, for a comprehensive discussion of those methods we refer to \cite{koller2009probabilistic, nielsen2009bayesian}. One way to avoid the exponential character of exact inference techniques, is to consider approximate inference methods. In order to do so, in the next section, we introduce how samples of states of BNs could be generated by using Markov chain Monte Carlo simulations.
+The procedure described in Example \ref{ex:exact-marg} is called \textit{exact marginalization}. It illustrates that in order to do inference, there is not always need for an explicit joint distribution. Though, when we deal with more complex BNs, \textit{exact marginalization} is still vulnerable for an exponentially blow up of the number of computations to be executed. In general, all exact inference methods -- variable elimination, clique tree propagation, recursive conditioning et cetera -- have to execute computations that are exponential in the network's treewidth (a measure for graph complexity). To make all of those concepts detailed here is out of the scope of this thesis. Therefore, for a comprehensive discussion of those methods we refer to \cite{koller2009probabilistic, nielsen2009bayesian}. \\
+One way to avoid the exponential character of exact inference techniques, is to consider approximate inference methods. In order to do so, in the next section, we introduce how samples of states of BNs could be generated by using Markov chain Monte Carlo simulations.
 
 %In cases where much of the evidence is at the leaves of the network, forward sampling techniques for example are essentially sampling from the prior distribution, which is often very far from the desired posterior. 
 
@@ -429,35 +454,39 @@ The procedure described in Example \ref{ex:exact-marg} is called \textit{exact m
 
 %answer queries of the form
 
-\section{Approximate sampling methods}
-According to a heuristic based on the BN structure and correpsonding CPTs, sampling methods generate a bunch of states of a BN. These configurations, or samples, could be used to do inference. The next example illustrates the key concept of all approximate sampling techniques.
-\begin{example}\label{sampling}
-Consider the BN in Figure \ref{rainBN}. Let \rr be our variable of interest and suppose $Y_1, \ldots , Y_6$ are independent and identically distributed (i.i.d.) samples of $(R, S, G)$ created by a certain sampling heuristic,
+\section{Approximate sampling methods}\label{sec:approx-inf}
+Approximate sampling methods create a bunch of states of a BN. These states are generated according to a heuristic related to the BN structure and corresponding CPTs. In this section, we show how inference techniques could be used to extract characteristics of the BN. Beside that, we give an illustration of heuristics that are used in the popular \textit{Markov chain Monte Carlo} (MCMC) sampling techniques Metropolis- and Gibbs sampling.\\ 
+
+For now, consider we already have created such a bunch of samples. The next example illustrates the key concept of inferring unobserved variables.
+\begin{example}\label{ex:sampling}
+Consider the BN in Figure \ref{rainBN}. Let \rr be our variable of interest and suppose $\bfx^{(1)}, \ldots , \bfx^{(6)}$ are independent and identically distributed (i.i.d.) samples of $(R, S, G)$ created by a certain sampling heuristic. The bunch of $6$ samples is given by
 \begin{multicols}{2}
 \begin{enumerate}
-\item $Y_1 = ( R_1 = \rF, S_1 = \sT,  G_1 = \gT)$
-\item $Y_2 = ( R_2 = \rT, S_2 = \sF,  G_2 = \gT)$
-\item $Y_3 = ( R_3 = \rF, S_3 = \sT,  G_3 = \gT)$
-\item $Y_4 = ( R_4 = \rF, S_4 = \sT,  G_4 = \gF )$
-\item $Y_5 = ( R_5 = \rT, S_5 = \sT,  G_5 = \gT)$
-\item $Y_6 = ( R_6 = \rF, S_6 = \sF,  G_6 = \gF)$.
+\item $\bfx^{(1)} = ( R^{(1)} = \rF, S^{(1)} = \sT,  G^{(1)} = \gT)$
+\item $\bfx^{(2)} = ( R^{(2)} = \rT, S^{(2)} = \sF,  G^{(2)} = \gT)$
+\item $\bfx^{(3)} = ( R^{(3)} = \rF, S^{(3)} = \sT,  G^{(3)} = \gT)$
+\item $\bfx^{(4)} = ( R^{(4)} = \rF, S^{(4)} = \sT,  G^{(4)} = \gF )$
+\item $\bfx^{(5)} = ( R^{(5)} = \rT, S^{(5)} = \sT,  G^{(5)} = \gT)$
+\item $\bfx^{(6)} = ( R^{(6)} = \rF, S^{(6)} = \sF,  G^{(6)} = \gF)$.
 \end{enumerate}
 \end{multicols}
 %Here, $\textasteriskcentered$ denotes that any value could be assigned to the corresponding variable, though (in this context) which values exactly is not relevant. 
 \noindent Then, the probability of $R = \text{r}_\text{T}$ can be approximated by 
 \begin{align*}
-P(R = \rT) = \E[ \mathds{1}_{R = \rT} ] \approx \sum_{t=1}^6 \mathds{1}_{R_t = \rT} = \frac{2}{6},
+P(R = \rT) = \E[ \mathds{1}_{R = \rT} ] \approx \sum_{t=1}^6 \mathds{1}_{R^{(t)} = \rT} = \frac{2}{6},
 \end{align*}
 where $\mathds{1}_{R = \rT}$ is the indicator function of the event $R = \rT$.
 \end{example}
-In general, for a variable of interest $Y$ with $T \in \N$ (not te be confused with T  for true) i.i.d. samples the probability of $Y = y$ can be approximated by 
+In general, for a variable of interest $X$ with $T \in \N$ (not te be confused with T  for true) i.i.d. samples the probability of $X = x$ can be approximated by 
 \begin{align*}
-P(Y = y) = \E[ \mathds{1}_{Y=y} ] \approx \sum_{t=1}^T \mathds{1}_{Y_t = y}.
+P(X = x) = \E[ \mathds{1}_{X=x} ] \approx \sum_{t=1}^T \mathds{1}_{X^{(t)} = x}.
 \end{align*}
-A plethora of techniques have been develop to create samples $Y_1, \ldots Y_T$. Again, discussing all those methods here in detail is beyond the scope of this thesis. For an overview of approximate inference methods and its limitations we refer to \cite{koller2009probabilistic, nielsen2009bayesian}. In the next subsection, we focus on how samples can be generated by using Markov chain Monte Carlo simulations. 
+A plethora of techniques have been develop to create samples $\bfx^{(1)}, \ldots \bfx^{(T)}$. Again, discussing all those methods here in detail is beyond the scope of this thesis. For an overview of approximate inference methods and its limitations we refer to \cite{koller2009probabilistic, nielsen2009bayesian}. In the next subsection, we focus on how samples of a BN can be generated using Markov chain Monte Carlo methods. 
 
 \subsection{Markov chain Monte Carlo sampling}
-In contrast to Example \ref{sampling}, suppose that we do not create samples $Y_t$ i.i.d. for all $t \geq 1$. But we create  sample $Y_{t+1}$ by tweaking the state of sample $Y_{t}$ according to a certain heuristic. Repeating this process yields the Markov chain $(Y_t)_{t \in \N_0}$. Repeating this often -- for $t = 1, \ldots T$ with large $T$  -- this process is called \textit{Markov chain Monte Carlo (MCMC) sampling}. 
+We introduce the concept of Markov chain Monte Carlo sampling and explain under which conditions the Markov chain guarantee convergence to the desired posterior distribution. Furthermore, we give an illustration how Metropolis sampling could be used on the \textit{Rain-Sprinkler} BN. \\
+
+In contrast to Example \ref{ex:sampling}, suppose that we do not create samples $\bfx^{(t)}$ i.i.d. for all $t \geq 1$. But we create  sample $\bfx^{(t+1)}$ by tweaking the state of sample $\bfx^{(t)}$ according to a certain heuristic. Repeating this process yields the Markov chain $(\bfx^{(t)})_{t \in \N_0}$. Repeating this often -- for $t = 1, \ldots T$ with large $T$  -- this process is called \textit{Markov chain Monte Carlo} (MCMC) sampling. 
 Due to a cleverly chosen heuristic, MCMC methods construct a Markov chain such that, although the first sample may be generated from the prior distributions, successive samples are generated from distributions that provably get closer and closer to the desired posterior distribution. In order to use this tempting feature of MCMC methods, we need to guarantee that the limit of this process exists and is unique. Since we only consider Markov chains on finite state spaces, from the theory of Markov chains we know that if a Markov chain is regular and reversible with respect to a distribution $\pi$, then $\pi$ is the unique stationary distribution. These notions are defined below [4].
 
 
@@ -480,30 +509,74 @@ A distribution $\pi$ is a stationary distribution for a Markov chain Q if
 \pi(\bfx') = \sum_{\bfx \in Val(\bfX)} \pi(\bfx) Q(\bfx \to \bfx').
 \end{align}
 \end{definition}
-In the next example, we illustrate one such a heuristic that guarantees regularity and reversibility of the Markov chain.
+One such a heuristic that guarantees regularity and reversibility of the generated Markov chain is \textit{Metropolis sampling}. In the context of BN sampling, it follows the next procedure.
+\begin{definition}[Metropolis sampling]
+\leavevmode
+\makeatletter
+\@nobreaktrue
+\makeatother
+\vspace{0.5pc}
+\begin{itemize}
+\item Select an initial state $\bfx^{(0)}$ of the BN;
+\item for each iteration $0 < t \leq T$: create a candidate sample $\bfx'$ by drawing a proposed value for all variables from a normal distribution centered at the current value of a variable. We could consider a normal distribution being `centered' on $X_i = x_i$ as making a random one-to-one representation of $Val(X_i) = \{x_1, \ldots , x_m \}$ (according to the fixed ordening) to the set $\{- \floor*{\frac{m}{2}}, \floor*{\frac{m}{2}}\}$. Then, we sample a random number $u$ from a normal distribution with mean that corresponds to the integer representing the variable of interest. According to specific boundaries we end up in a new proposed state.
+\item determine the acceptance ratio $\alpha = \min \big( 1, \frac{P(\bfx')}{P(\bfx^{(t-1)})} \big)$ from the CPTs;
+\item generate a uniform random number $0 \leq u \leq 1$;
+\begin{itemize}
+\item if $u \leq \alpha$ then $\bfx^{(t)} = \bfx'$;
+\item if $u > \alpha$ then $\bfx^{(t)} = \bfx^{(t-1)}$.
+\end{itemize}
+\end{itemize}
+\end{definition}
+In the next example, we show how Metropolis sampling works for the \textit{Rain-Sprinkler} network.
 \begin{example}[Metropolis sampling]
+Consider the BN in Figure \ref{rainBN}. Suppose that we have the initial state 
+\begin{align*}
+\bfx^{(0)} = (R^{(0)} = \rT, S^{(0)} = \sF, G^{(0)} = \gT)
+\end{align*}
+and no evidence is available. In order to generate a sample $R^{(1)}$ according to a normal distribution, we could consider a normal distribution being `centered' on $R^{(0)} = \rT$ as making a one-to-one representation of $Val(R) = \{\rT, \rF\}$ to the set $\{0, 1\}$. Then, we can sample a random number $u$ according a standard normal distribution. Then, if $u \leq 0$: $X^{(1)} = \rT$ and if $u > 0: X^{(1)} = \rF$. Repeating this for $S$ and $G$, one could obtain
+\begin{align*}
+\bfx' = (R' = \rT, S' = \sF, G' = \gF).
+\end{align*}
+We determine $\alpha$ as
+\begin{align*}
+\alpha = \frac{P(R' = \rT, S' = \sF, G' = \gF)}{P(R^{(0)} = \rT, S^{(0)} = \sF, G^{(0)} = \gT)} = \frac{0.0396}{0.1584} = 0.25. 
+\end{align*}
+Hence, we accept $\bfx'$ as $\bfx^{(1)}$ if the uniform random number $u \in [0,1]$ is smaller than $0.25$.
+\end{example}
+Repeating this procedure, we are able to generate $T \in \N$ samples. Ultimately, from this bunch we can do inference as described in Example \ref{ex:sampling}. Another MCMC sampling technique is called \textit{Gibbs sampling}. 
+\subsection{Gibbs sampling}
+Gibbs sampling \cite{geman1984stochastic} is one of the most popular MCMC methods to date. Despite that Gibbs sampling converges often to the desired posterior, reversibility and regularity could not always be guaranteed. We show how Gibbs sampling generates new samples of a BN and how regularity and reversibility could break down due to the appearance of deterministic relations in the BN.
+\begin{definition}[Gibbs sampling]
+Let $(X_1, \ldots , X_n)$ be an arbitrary ordering of the variables in $\G$. The Gibbs sampling algorithm begins with a random assignment $\bfx^{(0)}$ to all variables in the BN. Then, for $t = 1, \ldots, T$ it performs the following $T \in \mathbb{N}$ steps (each step is called a Gibbs iteration). For $i=1, \ldots, n$, it generates a new value $x_i^{(t)}$ for $X_i$ by sampling a value from the distribution $P(X_i | \bfx_{-i}^{(t)})$, where $\bfx_{-i}^{(t)} = (x_1^{(t)}, \ldots, x_{i-1}^{(t)}, x_{i+1}^{(t-1)}, \ldots, x_{n}^{(t-1)})$. After $T$ samples are generated, all one-variable marginals can be estimated using the following quantity
+\begin{align}\label{eq:gibss}
+\widetilde{P}_T(x_i) = \frac{1}{T} \sum_{t=1}^T P(x_i | \bfx_{-i}^{(t)} ).
+\end{align}
+It could be shown, that in the limit of infinite samples, $\widetilde{P}_T(x_i)$ will converge to $P(x_i)$ if the underlying Markov chain is regular and reversible \cite{venugopal2013giss}.
+\end{definition}
+In the next example, we show how Gibbs sampling works for the \textit{Rain-Sprinkler} network.
+\begin{example}[Gibbs sampling]
 Consider the BN in Figure \ref{rainBN}. Suppose we have the initial state 
 \begin{align*}
-Y_0 = (R = \rT, S = \sF, G = \gT),
+\bfx^{(0)} = (R^{(0)} = \rT, S^{(0)} = \sT, G^{(0)} = \gT)
 \end{align*}
-shortened $(\rT, \sF, \gT)$ and no evidence is available. Based on $Y_0$, according to the fixed ordening $(R, S, G)$, we can change 
-\end{example}
-Another approach to create Markov chains that converge to the desired posterior distribution is called Gibbs sampling. We expose this method in the next subsection.
-
-\subsection{Gibbs sampling}
-\begin{example}[Gibbs sampling]
-Consider the BN in Figure \ref{rainBN}, suppose we have the initial state 
+and no evidence is available. For each Gibbs iteration, we resample all unobserved variables, one in a time, in a predetermined order, say $(R, S, G)$. So, we first sample $R^{(1)}$ from the distribution $P(R | S^{(0)} = \sT, G^{(0)} = \gT)$, which could be made explicitly
 \begin{align*}
-Y_0 = (R_0 = \rT, S_0 = \sT, G_0 = \gT)
+P(R = \rT | S^{(0)} = \sT, G^{(0)} = \gT) &= \frac{P(\rT, \sT,  \gT)}{P(\sT, \gT)} = \frac{P(\gT | \rT, \sT) P(\sT | \rT) P(\rT)}{\sum_{\rr \in {\{T,F\}}}P(\rr, \sT, \gT)} \\
+&= \frac{0.99 \cdot 0.01 \cdot 0.2}{0.00198_{\rT, \sT, \gT} + 0.288_{\rF, \sT, \gT}} \approx 0.0068.
 \end{align*}
-and no evidence is available. For each Gibbs iteration, we resample all unobserved variables, one in a time, in the predetermined (topological) order. Thus, we first sample $R_1$ from the distribution $P(R_1 | S_0 = \sT, G_0 = \gT)$, which could be made explicitly
-\begin{align*}
-P(R_1 = \rT | S_0 = \sT, G_0 = \gT) &= \frac{P(\rT, \sT,  \gT)}{P(\sT, \gT)} = \frac{P(\gT | \rT, \sT) P(\sT | \rT) P(\rT)}{\sum_{\rr \in {\{T,F\}}}P(\rr, \sT, \gT)} \\
-&= \frac{0.99 \cdot 0.01 \cdot 0.2}{0.00198{\rT, \sT, \gT} + 0.288_{\rF, \sT, \gT}} \approx 0.0068.
-\end{align*}
-Hence $P(R_1 = \rF | S_0 = \sT, G_0 = \gT) \approx 0.9932$. Having sampled $R_1 = \rF$, we now continue to resample $S_1$ from the distribution $P(S_1 | R_1 = \rF, G_0 = \gT)$, obtaining for example $S_1 = \sT$. Finally, we sample $G_1$ from $P(G_1 | R_1 = \rF, S_1 = \sT)$, resulting in $\gT$. Therefore, the result of the first iteration of Gibbs sampling is the sample $Y_1 = (R_1 = \rF, S_1 = \sT, G = \gT)$. This process repeats.
+Hence $P(R = \rF | S^{(0)} = \sT, G^{(0)} = \gT) \approx 0.9932$. If we have drawn a value  from this distribution (for example $R^{(1)} = \rF$), we now continue to resample $S^{(1)}$ from the distribution $P(S | R^{(1)} = \rF, G^{(0)} = \gT)$, obtaining for example $S^{(1)} = \sT$. Finally, we sample $G^{(1)}$ from $P(G | R^{(1)} = \rF, S^{(1)} = \sT)$, resulting in $\gT$. Therefore, the result of the first iteration of Gibbs sampling is the sample $\bfx^{(1)} = (R^{(1)} = \rF, S^{(1)} = \sT, G^{(1)} = \gT)$. This process repeats.
 \end{example}
-\begin{center}
+As mentioned before, Gibbs sampling could perform poorly in the presence of deterministic relations \cite{koller2009probabilistic, poon2006sound, gogate2011samplesearch}. In the next example, we give an illustration of this phenomenon.
+\begin{example}\label{ex:gibbs}
+Consider the BN in Figure \ref{gibbs}. Suppose the initial configuration $\bfx^{(0)} = (A^{(0)} = 0,\ B^{(0)} = 0)$ -- shortened $(0,0)$ -- is given and suppose no evidence is available. 
+In the first Gibbs iteration, we resample both unobserved variables, one at a time, in the order $A, B$. Thus, we first sample $A^{(1)}$ from the distribution $P(A | B^{(0)} = 0)$. According to the CPTs, with probability $1$ this turns out to be $A=0$. Consecutively, we sample $B^{(1)}$ from the distribution $P(B | A^{(1)} = 0 )$. Which always returns $B = 0$. As a consequence the Markov chain created by Gibbs sampling behaves like
+\begin{align*}\label{gibbs-trap}
+(0,0) \to (0,0) \to (0,0) \to \ldots ,
+\end{align*}
+yielding that $\bfx^{(i)} = (0,0)$ for all $i \geq 0$. The real distribution for $A$ on the other hand must equal $P(A=0) = P(A=1) = 0.5$.
+\end{example}
+So, if the BN do not contain deterministic relations, it could be shown that the Markov chain is regular and reversible and therefore converges to the desired posterior distribution. Unfortunately, when the BN has deterministic dependencies, regularity and reversibility could break down and the estimation given in Equation (\ref{eq:gibss}) could no longer converge to $P(x_i)$. \\
+Many solutions have been proposed in the past to address this problem \cite{venugopal2013giss, poon2006sound}. We devised a new method  that makes use of  the sound MC-SAT algorithm -- from the more general framework of Markov Logic Networks (MLNs) -- in the compact and graphical context of BNs. \begin{center}
 \begin{figure}[h!]
 \centering
 \begin{tikzpicture}[node distance=1.2cm, >=triangle 60]
@@ -532,20 +605,10 @@ Hence $P(R_1 = \rF | S_0 = \sT, G_0 = \gT) \approx 0.9932$. Having sampled $R_1 
 \draw [dotted] (a) -- (ta);
 \draw [dotted] (b) -- (tb);
 \end{tikzpicture}
-\caption{a BN with a deterministic relation. The state of B is equal to the state of A with probability 1. In this CPTs the corresponding probability is displayed the left side of the CPT entry and the indexation of the CPT entries at the right side.}
+\caption{a BN with a deterministic relation. The state of B is equal to the state of A with probability 1.}
 \label{gibbs}
 \end{figure}
 \end{center}
-
-\begin{example}\label{ex:gibbs}
-In Figure \ref{gibbs}, consider the initial configuration $(a^{(0)} = 0,\ b^{(0)} = 0)$ -- shortened $(0,0)$ -- and suppose no evidence is available. 
-In the first Gibbs iteration, we resample both unobserved variables, one at a time, in the order $A, B$. Thus, we first sample $a^{(1)}$ from the distribution $P(A | B = 0)$. According to the CPTs, with probability $1$ this turns out to be $A=0$. Consecutively, we sample $b^{(1)}$ from the distribution $P(B | A = 0 )$. Which always returns $B = 0$. As a consequence the Markov chain created by Gibbs sampling behaves like
-\begin{align*}\label{gibbs-trap}
-(0,0) \to (0,0) \to (0,0) \to \ldots ,
-\end{align*}
-yielding that all samples are equal to $(0,0)$. The real distribution for $A$ on the other hand must equal $P(A=0) = P(A=1) = 0.5$.
-\end{example}
-
 
 \chapter{Prune Sampling}
 \section{The prune sampling algorithm}
@@ -897,50 +960,51 @@ Grid 8x8 & 20.50 & \textbf{8.83} & 105.17  \\
 \section{Uniformly sampling}
 \begin{figure*}[h!]
 \centering
+\captionsetup[subfigure]{justification=centering}
 
-\begin{subfigure}{.33\linewidth}
-\includegraphics[width=1.1\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Asia/Prune/asia_hist_num_samples.png}
-\caption{Asia 0\% determinism}%
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Asia/Prune/asia_hist_num_samples.png}
+\caption{Asia 0\% determinism, max set size $16$}%
 \label{asia_ev}%
 \end{subfigure}\hfill%
-\begin{subfigure}{.33\linewidth}
-\includegraphics[width=1.1\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Alarm/Prune/alarm_hist_num_samples.png}
-\caption{Alarm 0\% determinism}%
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Alarm/Prune/alarm_hist_num_samples.png}
+\caption{Alarm 0\% determinism, max set size $2.218$}%
 \label{alarm_ev}%
 \end{subfigure}\hfill%
-\begin{subfigure}{.33\linewidth}
-\includegraphics[width=1.1\columnwidth]{example-image-c}
-\caption{Win95pts 0\% determinism}%
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{example-image-c}
+\caption{Win95pts 0\% determinism, max set size $34.125$}%
 \label{win95pts_ev}%
 \end{subfigure}\hfill%
 
-\begin{subfigure}{.33\linewidth}
+\begin{subfigure}{.3\linewidth}
 \includegraphics[width=1.1\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Asia_ev25/Prune/asia_ev_hist_num_samples.png}
-\caption{Asia 25\% determinism}%
+\caption{Asia 25\% determinism, max set size $8$}%
 \label{asia_ev}%
 \end{subfigure}\hfill%
-\begin{subfigure}{.33\linewidth}
-\includegraphics[width=1.1\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Alarm_ev25/Prune/alarm_ev_hist_num_samples.png}
-\caption{Alarm 25\% determinism}%
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Alarm_ev25/Prune/alarm_ev_hist_num_samples.png}
+\caption{Alarm 25\% determinism, max set size $505$}%
 \label{alarm_ev}%
 \end{subfigure}\hfill%
-\begin{subfigure}{.33\linewidth}
-\includegraphics[width=1.1\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Win95pts_ev25/Prune/win95pts_ev_hist_num_samples.png}
-\caption{Win95pts 25\% determinism}%
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Win95pts_ev25/Prune/win95pts_ev_hist_num_samples.png}
+\caption{Win95pts 25\% determinism, max set size $\ldots$}%
 \label{win95pts_ev}%
 \end{subfigure}\hfill%
 
-\begin{subfigure}{.33\linewidth}
-\includegraphics[width=1.1\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_3x3/Prune/grid_3x3_hist_num_samples.png}
-\caption{Grid 3x3 50\% evidence}%
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_3x3/Prune/grid_3x3_hist_num_samples.png}
+\caption{Grid 3x3 50\% evidence, max set size $14$}%
 \label{grid_3x3}%
 \end{subfigure}\hfill%
-\begin{subfigure}{.33\linewidth}
-\includegraphics[width=1.1\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_5x5/Prune/grid_5x5_hist_num_samples.png}
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_5x5/Prune/grid_5x5_hist_num_samples.png}
 \caption{Grid 5x5 50\% evidence}%
-\label{grid_5x5}%
+\label{grid_5x5, max set size $130$}%
 \end{subfigure}\hfill%
-\begin{subfigure}{.33\linewidth}
+\begin{subfigure}{.3\linewidth}
 \includegraphics[width=1.1\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_8x8/Prune/grid_8x8_hist_num_samples.png}
 \caption{Grid 8x8 50\% evidence}%
 \label{grid_8x8}%
@@ -996,7 +1060,11 @@ Grid 8x8 & 20.50 & \textbf{8.83} & 105.17  \\
 
 \chapter{Conclusion}
 \citep{lauritzen1988local}
+\gls{var_set}
+\gls{var}
 
+%List of abbreviations
+\printglossaries
 
 %Bibliography
 \bibliographystyle{acm}
