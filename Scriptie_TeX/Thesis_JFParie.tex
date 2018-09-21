@@ -1,7 +1,22 @@
 % Basic document and typesetting settings
 \documentclass[a4paper, twoside, 11pt]{report}
 \usepackage[acronym, nonumberlist, automake, nopostdot, nogroupskip, section]{glossaries}
-
+\newcommand*{\glsgobblenumber}[1]{}
+% \renewcommand*{\glsgobblenumber}[1]{#1}% uncomment for testing
+\makeatletter
+\renewrobustcmd*{\glsadd}[2][]{%
+  \@gls@adjustmode
+  \glsdoifexists{#2}%
+  {%
+    \def\@glsnumberformat{glsnumberformat}%
+    \edef\@gls@counter{\csname glo@\glsdetoklabel{#2}@counter\endcsname}%
+    \setkeys{glossadd}{#1}%
+    \@gls@saveentrycounter%
+    \@gls@setsort{#2}%
+    \@@do@wrglossary{#2}%
+  }%
+}
+\makeatother
 \newglossary{symbols}{sym}{sbl}{Symbols}
 \setglossarystyle{super}
 \setlength\glsdescwidth{\textwidth}
@@ -32,7 +47,7 @@ description={indexation of variables in a BN, $1 \leq i \leq n$}
 \newglossaryentry{indep}{
 type=symbols,
 name={\ensuremath{\indep}},
-description={independence}
+description={independent}
 }
 \newglossaryentry{var_set}{
 type=symbols,
@@ -124,7 +139,7 @@ description={used to denote the abbreviation of a variable name}
 \newglossaryentry{kli}{
 type=symbols,
 name={\ensuremath{k(l_i)}},
-description={labels of all entries in the CPT of variable $X_i$}
+description={label of all entries in the CPT corresponding to variable $X_i$}
 }
 \newglossaryentry{c_k_l_i}{
 type=symbols,
@@ -149,7 +164,48 @@ description={all possible (not necessarily feasible) states of the BN which coul
 \newglossaryentry{Cxp}{
 type=symbols,
 name={\ensuremath{\C_\bfx^{\text{p}} }},
-description={set with the pruned CPT-labels}
+description={set with pruned CPT-labels, the BN is pruned around the state $\bfx$}
+}
+\newglossaryentry{Cxnp}{
+type=symbols,
+name={\ensuremath{\C_\bfx^{\text{np}}}},
+description={set with non-pruned CPT-labels, the BN is pruned around the state $\bfx$}
+}
+\newcommand{\U}{{\mathcal{U}}}
+\newglossaryentry{U}{
+type=symbols,
+name={\ensuremath{\U(\cdot)}},
+description={uniform distribution over a set}
+}
+\newglossaryentry{Cpxy}{
+type=symbols,
+name={\ensuremath{\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}}^{\text{p}}}},
+description={set with pruned CPT-labels, the BN is pruned around the states $\bfx$ and $\bfy$}
+}
+\newglossaryentry{Cnpxy}{
+type=symbols,
+name={\ensuremath{\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}}^{\text{np}}}},
+description={set with non-pruned CPT-labels, the BN is pruned around the states $\bfx$ and $\bfy$}
+}
+\newglossaryentry{H}{
+type=symbols,
+name={\ensuremath{H}},
+description={number of steps needed to make a pruned collection $\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}, h}^{\text{p}}$ and $\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}, h}^{\text{np}}$, such that $\bfx$ can make a transition to $\bfy$}
+}
+\newglossaryentry{Cpxyh}{
+type=symbols,
+name={\ensuremath{\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\},h}^{\text{p}}}},
+description={$h$-th step in creating a set with pruned CPT-labels $\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}}^{\text{p}}$, such that $\bfx$ can make a transition to $\bfy$}
+}
+\newglossaryentry{Cnpxyh}{
+type=symbols,
+name={\ensuremath{\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\},h}^{\text{np}}}},
+description={$h$-th step in creating a set with non-pruned CPT-labels $\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}}^{\text{np}}$, such that $\bfx$ can make a transition to $\bfy$}
+}
+\newglossaryentry{Rhxy}{
+type=symbols,
+name={\ensuremath{{R}_h (\mathbf{x} \to \mathbf{y})}},
+description={transition probability to get from $\bfx$ to $\bfy$ in the $h$-th step}
 }
 \newglossaryentry{gamma}{
 type=symbols,
@@ -162,7 +218,7 @@ description={acceptance probability in Metropolis sampling}
 \newacronym{MCMC}{MCMC}{Markov chain Monte Carlo}
 \newacronym{DAG}{DAG}{directed acyclic graph}
 \newacronym{CPT}{CPT}{conditional probability table}
-\newacronym{MLNs}{MLNs}{Markov logic networks}
+\newacronym{MLN}{MLN}{Markov logic network}
 \newacronym{SAT}{SAT}{satisfiability problem}
 \newacronym{HFS}{HFS}{hybrid forward sampling}
 
@@ -331,7 +387,6 @@ description={acceptance probability in Metropolis sampling}
 \newcommand{\I}{{\mathcal{I}}}
 \newcommand{\M}{{\mathcal M}}
 \newcommand{\Q}{{\mathcal{Q}}}
-\newcommand{\U}{{\mathcal{U}}}
 \newcommand{\X}{{\mathcal{X}}}
 
 \newcommand{\calP}{{\mathcal{P}}}
@@ -770,7 +825,7 @@ Many solutions have been proposed in the past to address this problem \cite{venu
 In Section \ref{sec:mcmc} we looked at MCMC sampling methods and their short comings when deterministic relations appear in a BN. In this chapter we define \psp \Ps is a MCMC sampling method that always converges to the correct posterior distribution, even in the presence of determinism. First, we explain how this technique is inspired by the sound MC-SAT algorithm. Then, we introduce the mathematical notation and -definition of \psp Consecutively, we show theoretically why the \textit{prune} technique always generates a regular and reversible Markov chain with respect to the desired distribution. Ultimately, we elaborate on the practical implementation of the \ps algorithm.
 
 \section{Background: MC-SAT algorithm}
-As we concluded Chapter \ref{ch:2}, many solutions have been proposed in the past to address the problem of trapped Gibbs samples. Notable examples are the Sample Search, GiSS algorithm \cite{venugopal2013giss} and the slice sampling method \cite{besag1993spatial, damlen1999gibbs, gilks1996interdisciplinary}. The algorithm MC-SAT \cite{poon2006sound} is a special case of slice sampling and applies the strategy of using auxiliary variables in the more general framework of \gls{MLNs}. Poon and Domingos show that MC-SAT is a sound MCMC algorithm, meaning it generates a Markov chain which is regular and reversible, even in the presence of deterministic relations. \\
+As we concluded Chapter \ref{ch:2}, many solutions have been proposed in the past to address the problem of trapped Gibbs samples. Notable examples are the Sample Search, GiSS algorithm \cite{venugopal2013giss} and the slice sampling method \cite{besag1993spatial, damlen1999gibbs, gilks1996interdisciplinary}. The algorithm MC-SAT \cite{poon2006sound} is a special case of slice sampling and applies the strategy of using auxiliary variables in the more general framework of Markov logic networks (MLNs). Poon and Domingos show that MC-SAT is a sound MCMC algorithm, meaning it generates a Markov chain which is regular and reversible, even in the presence of deterministic relations. \\
 
 To apply MC-SAT on BNs, a translation to a weighted \gls{SAT} is necessary. This has two drawbacks. In the first place, an explicit translation of a BN to a weighted SAT problem is memory intensive. Secondly, the graphical dependencies of BNs are lost when the BN structure is translated to a SAT problem. In order not to suffer from these drawbacks, we bring the key strenghts of the MC-SAT algorithm -- the construction of a random sample space --  to the field of BNs. In doing so, it keeps using the compact and graphical structure of BNs. To be able to share these concepts in the best possible way, we first introduce the mathematical notation and -definition of \psp
 
@@ -871,30 +926,88 @@ Consider the BN in Figure \ref{pruning}. Pruning around the boldfaced initial st
 \end{align*}
 Note that the lower the value of the CPT-entry, the higher the probability that the index gets pruned. 
 \end{example}
+The collection of CPT-indices that do not get pruned is given by $\gls{Cxnp}:=\C \setminus \C_\bfx^{\text{p}}$. In the situation of Example \ref{ex:pruning}, $S_{\C_\bfx^{\text{np}}}$ exist of two feasible states, i.e. $(k_g, l_b, b_e, s_y, m_e)$ and $(k_g, l_b, b_e, s_n, m_e)$. Having introduced these concepts, one should note three things
+\begin{enumerate}
+\item $\C_\bfx^{\text{p}}$ is a random set;
+\item $\C_\bfx \subset \C_\bfx^{\text{np}} \text{ and } \bfx \in S_{\C_\bfx^{\text{np}}}$;
+\item the probability of generating $\C_\bfx^{\text{p}}$ and $\C_\bfx^{\text{np}}$ is given by
+\begin{align*}
+\prod_{k(l) \in \C_\bfx^{\text{p}}}(1-c_{k(l)}) \cdot \prod_{k(l) \in \C_\bfx^{\text{np}} \setminus \C_{\bfx}} c_{k(l)}.
+\end{align*}
+%\item $\C_{\bfx^{(i-1)},n}$ contains all the non-zero indices in $\C$, implying that $S_{\C_{\bfx^{(i-1)},n}}$ contains all feasible states of the BN, with strictly positive probability.
+\end{enumerate}
+Due to the pruning of CPT-entries in the original BN, the number of feasible states in the pruned BN is much smaller in comparison to the number of feasible states in the original BN. This significant decrease of the number of feasible states, can make \ps practically applicable. Assuming we have sufficient memory, a breath first search approach can be used to list all feasible states of the pruned BN. From this collection we can easily draw a state uniformly.
 
+\begin{definition}[Uniform sampling over a set of states]
+As defined before, $S_{\C_\bfx^{\text{np}}}$ is the set of (feasible) states corresponding to the CPT-indices which are not pruned. We define $\gls{U}$
+as the uniform distribution over the states in $S_{\C_\bfx^{\text{np}}}$ and we write
+\begin{align*}
+\U(S_{\C_\bfx^{\text{np}}})(\bfy) = \frac{1}{|S_{\C_\bfx^{\text{np}}}|}
+\end{align*}
+for the probability of sampling state $\bfy$ with respect to this uniform distribution.
+\end{definition}
+Doing these steps -- pruning, uniform sampling, updating the sample space --  gives us a sequence of samples that is able to visit the whole state space. We call this proces \ps, the pseudo-code could be found in Algorithm \ref{prunealg}. The algorithm takes as input a BN structure $\G$ with corresponding CPTs, an initial configuration $\bfx$ and the integer $T$ for the number of samples to be generated. The algorithm begins with an initial state $\bfx^{(0)}$. For $t = 1, \ldots , T$ it then prunes around $\bfx^{(t-1)}$ to obtain $\C_{\bfx^{(t-1)}}^{\text{np}}$ and to consecutively sample $\bfx^{(t)}$ from $\U(S_{\C_\bfx^{\text{np}}})$. Finally, the algorithm updates the new configuration $S$ of the BN.  \\
+
+Note that with strictly positive probability $\C_{\bfx^{(t-1)}}^{\text{np}}$ contains all the non-zero indices in $\C$, implying that $S_{\C_{\bfx^{(t-1)}}^{\text{np}}}$ contains all feasible states of the BN. This means that \ps generates a regular Markov chain, i.e. with positive probability a state $\bfx$ can transition to any other feasible state $\bfy$ in one step. The reversibility conditions takes more effort to show and is addressed in the next section. 
 \begin{algorithm}[h!]
 \renewcommand\thealgorithm{1}
 \caption{Prune sampling algorithm}
 \label{prunealg}
 \begin{algorithmic}
 %\Require{We can prune a BN given a state $\mathbf{x}$}
-\Function{PruneSampling}{BN, initial, M}
+\Function{PruneSampling}{BN, initial, T}
 \State $\mathbf{x}^{(0)} \gets $ initial
      \State $\mathcal{S} \gets \{\mathbf{x}^{(0)}\}$
-     \For{$m \gets 1 $ to$ $ M}
-     \State $\C_{\bfx^{(m-1)}}^{\text{p}} \gets \text{Prune around } \mathbf{x}^{(m-1)}$ \\ \Comment{{\footnotesize See Definition $3.2$ }}
-	\State $\C_{\bfx^{(m-1)}}^{\text{np}} \gets \mathcal{C} \setminus \C_\bfx^{\text{p}}$  
-     \State $\mathbf{x}^{(m)} \sim  \U(S_{\C_\bfx^{\text{np}}}) $ 
-     \State $\mathcal{S} \gets \mathcal{S} \cup \mathbf{x}^{(m)}$
+     \For{$t \gets 1 $ to$ $ T}
+     \State $\C_{\bfx^{(t-1)}}^{\text{p}} \gets \text{Prune around } \mathbf{x}^{(t-1)}$ \\ \Comment{{\footnotesize See Definition $3.2$ }}
+	\State $\C_{\bfx^{(t-1)}}^{\text{np}} \gets \mathcal{C} \setminus \C_\bfx^{\text{p}}$  
+     \State $\mathbf{x}^{(t)} \sim  \U(S_{\C_\bfx^{\text{np}}}) $ 
+     \State $\mathcal{S} \gets \mathcal{S} \cup \mathbf{x}^{(t)}$
      \EndFor
      \State \Return{$\mathcal{S}$}
 \EndFunction
 \end{algorithmic}
 \end{algorithm}
 
-
-
 \subsection{Regularity and reversibility}
+To make a transition from a state $\bfx$ to a state $\bfy$ we need to prune around $\bfx$ such that non of the indices corresponding to $\bfy$ is pruned. This leads to the following definition. 
+
+\begin{definition}[Pruning around state $\bfx$ and $\bfy$]
+Let $\gls{Cpxy}$ be the subset of $\mathcal{C}$ that is constructed by pruning around $\mathbf{x}$ or pruning around $\mathbf{y}$ such that none of the indices corresponding to $\mathbf{x}$ and non of the indices corresponding to $\mathbf{y}$ is contained in $\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}}^{\text{p}}$.
+\end{definition}
+Note that the collection of CPT-indices that do not get pruned is given by $\gls{Cnpxy} := \C \setminus \mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}}^{\text{p}}$. For each two states $\bfx$ and $\bfy$ there are finitely many ways, $\gls{H}$, to create a pruned collection $\gls{Cpxyh}$ and a non-pruned collection $\gls{Cnpxyh}$, where $h =1,\ldots, H$, such that $\bfx$ can make a transition to $\bfy$ by sampling from $\U(S_{\C_{\{\bfx, \bfy\},h}^{\text{np}}})$. For $h =1, \ldots, H$ we define the transition probabilities from $\bfx$ to $\bfy$ by pruning a certain collection by
+\begin{align}\label{transprob}
+\gls{Rhxy} &:= \left(\prod_{k(l) \in \C_{\{\bfx, \bfy\},h}^{\text{p}} } (1-c_{k(l)}) \right) \cdot \left( \prod_{k(l) \in \C_{\{\bfx, \bfy\},h}^{\text{np}} \setminus \mathcal{C}_{\mathbf{x}}  } c_{k(l)}   \right) \cdot \mathcal{U} \big( S_{\C_{\{\bfx, \bfy\},h}^{\text{np}}} \big)(\mathbf{y}) \\ \nonumber
+&\;=\left(\prod_{k(l) \in \C_{\{\bfx, \bfy\},h}^{\text{p}} } (1-c_{k(l)}) \right)\cdot \left( \prod_{k(l) \in \C_{\{\bfx, \bfy\},h}^{\text{np}} \setminus \mathcal{C}_{\mathbf{x}}  } c_{k(l)}   \right)  \nonumber \cdot \frac{1}{|S_{\C_{\{\bfx, \bfy\},h}^{\text{np}}}|}.
+\end{align}
+In words, Equation (\ref{transprob}) expresses the probability of pruning certain CPT-indices around $\bfx$, such that none of the CPT-indices corresponding to $\bfy$ is pruned, and subsequently sampling $\bfy$ uniformly from the states corresponding to the CPT-indices that were not pruned. The total probability of transitioning from $\bfx$ to $\bfy$ is therefore given by
+\begin{align} \label{total}
+{R}(\mathbf{x} \to \mathbf{y}) = \sum_{h=1}^{H} {R}_h (\mathbf{x} \to \mathbf{y}).
+\end{align}
+To show reversibility we need to show that the transition probability satisfies the detailed balance equation
+\begin{align*}
+P(\mathbf{x}) R(\mathbf{x} \to \mathbf{y}) = P(\mathbf{y}) R(\mathbf{y} \to \mathbf{x}) 
+\end{align*}
+which equals
+\begin{align*}
+P(\mathbf{x}) \left(\sum_{h=1}^{H} {R}_h (\mathbf{x} \to \mathbf{y}) \right) = P(\mathbf{y}) \left(\sum_{h=1}^{H} {R}_h (\mathbf{y} \to \mathbf{x}) \right).
+\end{align*}
+So, it is sufficient to show that
+\begin{align} \label{toshow}
+P(\mathbf{x}) {R}_h (\mathbf{x} \to \mathbf{y}) = P(\mathbf{y})  {R}_h (\mathbf{y} \to \mathbf{x}), 
+\end{align}
+for $h = 1, \ldots, H$. The following computation shows that Equation \eqref{toshow} holds
+\begin{align*}
+&P(\mathbf{x}) {R}_h (\mathbf{x} \to \mathbf{y}) \\
+&= \frac{1}{Z} \cdot P(\mathbf{x}) \cdot \left(\prod_{k(l) \in \C_{\{\bfx, \bfy\},h}^{\text{p}} } (1-c_{k(l)}) \right)\cdot \left( \prod_{k(l) \in \C_{\{\bfx, \bfy\},h}^{\text{np}}  \setminus \mathcal{C}_{\mathbf{x}} } c_{k(l)} \right) \\ 
+&= \frac{1}{Z} \cdot \prod_{k(l) \in \mathcal{C}_{\mathbf{x}}} c_{k(l)} \cdot \left(\prod_{k(l) \in \C_{\{\bfx, \bfy\},h}^{\text{p}} } (1-c_{k(l)}) \right)\cdot \left( \prod_{k(l) \in \C_{\{\bfx, \bfy\},h}^{\text{np}} \setminus \mathcal{C}_{\mathbf{x}} } c_{k(l)} \right) \\ 
+&= \frac{1}{Z} \cdot \left(\prod_{k(l) \in \C_{\{\bfx, \bfy\},h}^{\text{p}}} (1-c_{k(l)}) \right)\cdot \left( \prod_{k(l) \in \C_{\{\bfx, \bfy\},h}^{\text{np}}   } c_{k(l)}   \right) \\ 
+&= \frac{1}{Z} \cdot \left(\prod_{k(l) \in \C_{\{\bfx, \bfy\},h}^{\text{p}}} (1-c_{k(l)}) \right)\cdot \left( \prod_{k(l) \in \mathcal{C}_{\mathbf{y}}} c_{k(l)}   \right) \cdot  \prod_{k(l) \in \C_{\{\bfx, \bfy\},h}^{\text{np}} \setminus \mathcal{C}_{\mathbf{y}}  } c_{k(l)} \\ 
+&= \frac{1}{Z} \cdot \left(\prod_{k(l) \in \C_{\{\bfx, \bfy\},h}^{\text{p}} } (1-c_{k(l)}) \right)\cdot P(\mathbf{y}) \cdot\left( \prod_{k(l) \in \C_{\{\bfx, \bfy\},h}^{\text{np}}  \setminus \mathcal{C}_{\mathbf{y}}  } c_{k(l)}   \right) \\ 
+&= P(\mathbf{y}) {R}_h (\mathbf{y} \to \mathbf{x}),
+\end{align*}
+\noindent where $Z = |S_{\C_{\{\bfx, \bfy\},h}^{\text{np}} }|$. We conclude that \ps generates a regular and a reversible Markov chain with respect to the desired distribution $P$. As discussed before, we therefore know that $P$ is the unique stationary distribution of the Markov chain generated by \textit{prune sampling}.
+
 
 \section{Practical implementation}
 The implementation of the pruning technique requires two non-trivial steps: to generate an initial state of the BN and to sample uniformly over the pruned BN. We explain how we met these requirements in this first version of \ps and explain how the MC-SAT algorithm deals with these questions.
@@ -1246,6 +1359,8 @@ Grid 8x8 & 20.50 & \textbf{8.83} & 105.17  \\
 \newpage
 \chapter*{List of acronyms and symbols}
 %List of abbreviations
+\glsadd{MLN}
+\glsadd{U}
 \printglossaries
 
 %Bibliography
