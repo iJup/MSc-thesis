@@ -1044,15 +1044,20 @@ Hybrid forward sampling provides a heuristic to assess the maximum a posteriori 
 
 
 \subsection{Sampling from the pruned network}
-To generate states nearly uniform, MC-SAT uses an intelligent heuristic based on a weighted SAT problem and applies the concept of simulated annealing \cite{wei2004towards}. Though, in contrast to \textit{prune sampling}, MC-SAT does not generate states completely uniform. Briefly, we explain why.\\
+To generate states nearly uniform, MC-SAT uses an intelligent heuristic \cite{wei2004towards} based on a weighted SAT problem and applies the concept of simulated annealing. Though, in contrast to \textit{prune sampling}, MC-SAT does not generate states completely uniform. Briefly, we explain why.\\
 
-It could be shown that sampling from a random subset of the whole state space still guarantees complete uniformity \cite{}. So, due to the exhaustive listing of all feasible states of the pruned network -- to determine the set $\U(S_{\C_\bfx^{\text{np}}})$ explicitly -- \ps still guarantees completely uniform sampling. Though, the exhaustive enumeration of all feasible states of the pruned network is unavoidable. If one still runs into memory problems or one wants to reduce the computational effort, a heuristic method can be developed. \\
-In doing so, we propose to use random forward sampling (definition \ref{def:rfs}) to construct a set $V$ (of predetermined fixed size) of feasible states of the pruned BN. Subsequently, a state from $V$ can be sampled randomly. This can be interpreted as a trade-off between uniformity and computational effort. We expect that there should be more intelligent heuristics to obtain near-uniform samples from the pruned network and we again refer to the simulated annealing approach in \cite{wei2004towards} for inspiration. We take a closer look at these approaches in Chapter \ref{ch:5}.
+Due to exhaustive listing of all feasible states of the pruned network -- determining the set $\U(S_{\C_\bfx^{\text{np}}})$ explicitly -- \ps guarantees completely uniform sampling. Though, the exhaustive enumeration of all feasible states of the pruned network is unavoidable. For this reason, it could be the case that one still runs into memory problems. To reduce this computational effort, an other heuristic method should be developed. Wei, Erenrich and Selman show in \cite{wei2004towards} that one can exploit ideas from random walk based methods to obtain effective near-uniform sampling. Although, further analysis of this approach is beyond the scope of this thesis. \\
+
+However, the event of excessive computational effort to determine $\U(S_{\C_\bfx^{\text{np}}})$ explicitly is relevant for the \ps algorithm. To anticipate this, we propose an easy to implement solution for further improvement of the pruning technique. As presented in definition \ref{def:rfs}, we can use random forward sampling to generate feasible states of a BN. In order to prevent exhaustive listing, one could consider generating a set of $V$ (with predetermined fixed size) candidate samples. Subsequently, a sample from $V$ will be chosen randomly. The size of $V$ can be interpreted as a trade-off between uniformity and computational effort. We expect that there should be more intelligent heuristics to obtain near- and completely uniform samples from the pruned network and we again refer to the simulated annealing approach in \cite{wei2004towards} for inspiration. We take a closer look at these approaches in Chapter \ref{ch:5}.
 
 %To prevent extreme memory consumption one could consider the well-known sampling strategy \textit{reservoir sampling}.
 
 
 \chapter{Results}
+In this chapter we study the performance of the \ps algorithm and conventional MCMC sampling methods. First, we elaborate on some important general details of the experiments we conducted. Then, we show \ps outperforms Gibbs sampling on two classes of BNs. Consecutively, for 3 domains of 3 BNs with an increasing amount of deterministic relations, we present and discuss results in terms of accuracy. Afterwards, we characterise the performance of the three MCMC sampling methods in term of convergence rates and time consumption.
+
+\section{Experiments}
+We compare \ps with the two widely used MCMC inference methods Gibbs- and Metropolis sampling in terms of accuracy, rate of convergence and time consumption. Since pruning is devised to deal with determinism, we experimented on BNs with gradually increasing rates of evidence, i.e. deterministic relations. We evaluated the three MCMC sampling methods on small, medium and large BNs from four benchmark domains: simple deterministic-, block shaped-, Grid- and real world BNs. We used a tool capable of creating and translating BNs in GeNIe into an equivalent model in Python. In Python, we used the implementations of Gibbs- and Metropolis sampling from the PyMC package. All the BNs used in this study can be found for free online via the bnlearn Bayesian network repository or the UAI repository. We produced results without thinning. If we used a burn-in period, this could be mentioned from the starting number of the `number of samples' at the x-axis. We executed our experiments on an Intel(R) Core(TM) i5-5300 CPU 2.30GHz core machine with 8 GB RAM, running operating system Windows 10.
 
 \section{Simple deterministic network}
 
@@ -1114,8 +1119,7 @@ $P(X_i |X_{i-1})=$
 \end{table}
 
 \section{Benchmark Bayesian networks}
-\subsection{Accuracy}
-\subsubsection{Real world Bayesian networks 0\% determinism}\label{real_world_no_evidence}
+\subsection{Real world Bayesian networks 0\% determinism}\label{real_world_no_evidence}
 
 \begin{figure}[H]
 \centering
@@ -1140,7 +1144,7 @@ $P(X_i |X_{i-1})=$
 \end{figure}
 
 \newpage
-\subsubsection{Real world Bayesian networks 25\% determinism}
+\subsection{Real world Bayesian networks 25\% determinism}
 
 \begin{figure}[H]
 \centering
@@ -1165,7 +1169,7 @@ $P(X_i |X_{i-1})=$
 \end{figure}
 
 \newpage
-\subsubsection{Grid Bayesian networks 50\% determinism}
+\subsection{Grid Bayesian networks 50\% determinism}
 \begin{figure}[H]
 \centering
 \begin{subfigure}{0.49\textwidth}
@@ -1188,6 +1192,7 @@ $P(X_i |X_{i-1})=$
 \end{figure}
 
 
+\section{Performance indicators}
 \subsection{Rate of convergence}
 
 \begin{figure}[H]
