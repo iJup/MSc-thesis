@@ -1484,7 +1484,7 @@ Grid 8x8 & 20.50 & \textbf{8.83} & 105.17  \\
 \end{center}
 \end{table}
 \end{center}
-For small and medium sized BNs, we see that \ps is always faster than Gibbs- and Metropolis sampling. For large networks, this is not the case. As already mentioned in section \ref{sec:sampling_uni}, due to the exhaustive enumeration during the uniform sampling step, for large BNs this results in an exponential blow up of $|S_{\C_\bfx^{\text{np}}}|$. As a consequence, for large BNs \ps becomes a time intensive method.
+For small and medium sized BNs, we see that \ps is always faster than Gibbs- and Metropolis sampling. For large networks, this is not the case. As mentioned earlier in section \ref{sec:sampling_uni}, due to the exhaustive enumeration during the uniform sampling step, for large BNs this results in an exponential blow up of $|S_{\C_\bfx^{\text{np}}}|$. As a consequence, for large BNs \ps becomes a time intensive method.
 
 \section{Prune sampling in practice}
 Since we have characterised the behavior of \textit{prune sampling} by three indicators, now we can pass a well-founded judgement on its performance. \\
@@ -1501,11 +1501,14 @@ We conclude that \ps is a MCMC sampling method for discrete and deterministic BN
 %\section{Logic sampling}
 %\section{Simulated annealing}
 \chapter{Improvement of prune sampling}\label{ch:5}
-In order to improve the first implemented version of \textit{prune sampling}, in this chapter we provide and review solutions for the principal obstacle of the {pruning} technique: uniformly sampling from the pruned network. In the first section, we construct solid grounds to address the problem. Afterwards, we consider a solution based on the concept of hybrid forward sampling.
+In order to improve the first implemented version of \textit{prune sampling}, in this chapter we provide and review solutions for the principal obstacle of the {pruning} technique: uniformly sampling from the pruned network. In the first section, we construct solid grounds to address the problem. Afterwards, we consider solutions based on the concept of hybrid forward sampling and simulated annealing.
 
 \section{Exhaustive listing of all feasible states in a pruned network}
-As discussed in section \ref{sec:sampling_uni}, exhaustive listing of all feasible states of the pruned network -- i.e determining the set $\U(S_{\C_\bfx^{\text{np}}})$ explicitly -- could be computational intensive. This view is echoed by the time consumption rates of \ps on small, medium and large networks in section \ref{sec:time-cons}. In this subsection, we take a closer look in which way the set $\U(S_{\C_\bfx^{\text{np}}})$ is constructed.   
+As discussed in section \ref{sec:sampling_uni}, exhaustive listing of all feasible states of the pruned network -- i.e enumerating the set $S_{\C_\bfx^{\text{np}}}$ explicitly -- could be computational intensive. This view is echoed by the experiments we conducted regarding the time consumption of \ps on small, medium and large networks. In this subsection, we take a closer look in which way the set $S_{\C_\bfx^{\text{np}}}$ is constructed.\\
 
+From section \ref{sec:time-cons} we know that \ps is a fast MCMC sampling method on small and medium sized BNs. On the Asia Alarm, Grid $3 \times 3$ and $5 \times 5$ BNs, \ps in fact outperforms Gibbs- and Metropolis sampling consistently. However, on the large BNs \ps is a rather slow MCMC sampling method. For the Win95pts BN, \ps is respectively $1.25$ to $2$ times slower than Gibbs- and Metropolis sampling. For the Grid $8 \times 8$ BN \ps is even $5$ to almost $12$ times slower than Gibbs- and Metropolis sampling respectively. \\
+
+The excessive time consumption of \ps on large BNs is caused by the amount of feasible states in the pruned network, $|S_{\C_\bfx^{\text{np}}}|$. As for a non-pruned BNs, it is very reasonable that for large BNs the number of feasible states in the pruned network still grows exponentially in the number of variables and parameters in the network. In Figure \ref{results4} we display a histogram of the number of feasible states generated during $2.400$ iterations of \ps on the Asia, Alarm and Win95pts BNs without any available evidence. During one iteration, we observe a maximum of respectively $16$, $2.218$ and $34.125$ number of feasible states.
 \begin{figure*}[h!]
 \centering
 \captionsetup[subfigure]{justification=centering}
@@ -1525,12 +1528,13 @@ As discussed in section \ref{sec:sampling_uni}, exhaustive listing of all feasib
 \caption{Win95pts 0\% determinism, max set size $34.125$}%
 \label{win95pts_ev}%
 \end{subfigure}\hfill%
-
 \vspace{0.75pc}
-\caption{histogram of the number of feasible states in the pruned network. As the size of the BNs (nodes and parameters) increases, the number of feasible states increases. Therefore, exhaustive listing of all feasible states becomes time intensive for large BNs.}
+\caption{histogram of the number of feasible states in a pruned network during $2.400$ random iterations of \ps applied on the Asia, Alarm and Win95pts BNs without any available evidence. As the size of the BNs (nodes and parameters) increases, the number of feasible states increases exponentially. Therefore, exhaustive listing of all feasible states becomes time intensive for large BNs.}
 \label{results4}
-\end{figure*}
+\end{figure*}\newpage
+As we can observe from the histograms, the maximum for $|S_{\C_\bfx^{\text{np}}}|$ are extreme outliers. Though, they are responsible for the excessive computation time. In contrast, the median value of the number of feasible states during one iteration of \ps for the BNs displayed in Figure \ref{results4} are respectively $2$, $34$ and $50$. Note that these medians not necessarily correspond to the highest peak in the histogram due to the use of bins for plotting a histogram.\\
 
+We observe the same phenomena for the Asia, Alarm and Win95pts BNs with 25\%. The maximum set size of $|S_{\C_\bfx^{\text{np}}}|$ is $8$, $505$ and $2.662$ respectively. Note that due to the presence of evidence, more CPT-entries are fixed during the generation of feasible states. Hence, there are less feasible states and the maximum set size of $|S_{\C_\bfx^{\text{np}}}|$ decreases. Though, the maximum set sizes still stand apart far from the median values: $2$, $12$ and $108$ respectively.
 \begin{figure*}[h!]
 \centering
 \captionsetup[subfigure]{justification=centering}
@@ -1580,8 +1584,9 @@ As discussed in section \ref{sec:sampling_uni}, exhaustive listing of all feasib
 \caption{histogram of the number of feasible states in the pruned network. As the size of the BNs (nodes and parameters) increases, the number of feasible states increases. Therefore, exhaustive listing of all feasible states becomes time intensive for large BNs.}
 \label{results5}
 \end{figure*}
+Median values $3$, $14$ and $609.5$ respectively.
 
-\newpage
+
 \section{Hybrid forward sampling}
 \begin{figure*}[h!]
 \centering
@@ -1623,6 +1628,9 @@ As discussed in section \ref{sec:sampling_uni}, exhaustive listing of all feasib
 \caption{consistent underperformance of \ps using the \gls{HFS} approach. HFS allows \ps to construct a set $V$ of predetermined fixed size ($1$, $10$, $100$ or $1000$) of feasible states from the pruned BN in order to select (randomly) a state of the BN as the new sample.}
 \label{results5}
 \end{figure*}
+
+\section{Simulated annealing}
+
 
 \chapter{Conclusion}
 
