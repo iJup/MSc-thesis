@@ -202,6 +202,11 @@ type=symbols,
 name={\ensuremath{H}},
 description={number of steps needed to make a pruned collection $\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}, h}^{\text{p}}$ and $\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}, h}^{\text{np}}$, such that $\bfx$ can make a transition to $\bfy$}
 }
+\newglossaryentry{h}{
+type=symbols,
+name={\ensuremath{h}},
+description={indexation of the number of steps needed to make a pruned collection such that $\bfx$ can make a transition to $\bfy$, $1 \leq h \leq H$}
+}
 \newglossaryentry{Cpxyh}{
 type=symbols,
 name={\ensuremath{\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\},h}^{\text{p}}}},
@@ -252,10 +257,35 @@ type=symbols,
 name={\ensuremath{{\alpha}}},
 description={quantifies the proportionality constant of the MCMC sampling technique that belongs to the convergence class $\mathcal{O}(t^{-1/2})$, used as indicator of the ROC}
 }
+\newglossaryentry{alpha'}{
+type=symbols,
+name={\ensuremath{{\alpha'}}},
+description={candidate proportionality constant during the procedure to determine the ROC $\alpha$}
+}
+\newglossaryentry{beta_i}{
+type=symbols,
+name={\ensuremath{{\beta_i}}},
+description={coefficients in the polynomial expansion of the standard deviation $\sigma^2(t)$}
+}
 \newglossaryentry{gamma}{
 type=symbols,
 name={\ensuremath{\gamma}},
 description={acceptance probability in Metropolis sampling}
+}
+\newglossaryentry{g_t}{
+type=symbols,
+name={\ensuremath{g(t)}},
+description={simplified polynomial expansion of $\sigma^2(t)\sqrt{t}$ }
+}
+\newglossaryentry{delta}{
+type=symbols,
+name={\ensuremath{\delta}},
+description={parameter in the polynomial expansion of $g(t)=\sigma^2(t)\sqrt{t}$, used to tune the convex- and concaveness of $g(t)$ }
+}
+\newglossaryentry{j}{
+type=symbols,
+name={\ensuremath{j}},
+description={linear function fitted to the simplified polynomial expansion $g$ plotted in terms $t^{-\delta}$}
 }
 
 \setacronymstyle{long-short}
@@ -1022,7 +1052,7 @@ To make a transition from a state $\bfx$ to a state $\bfy$ we need to prune arou
 \begin{definition}[Pruning around state $\bfx$ and $\bfy$]
 Let $\gls{Cpxy}$ be the subset of $\mathcal{C}$ that is constructed by pruning around $\mathbf{x}$ or pruning around $\mathbf{y}$ such that none of the labels corresponding to $\mathbf{x}$ and non of the labels corresponding to $\mathbf{y}$ is contained in $\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}}^{\text{p}}$.
 \end{definition}
-The collection of CPT-labels that do not get pruned is given by $\gls{Cnpxy} := \C \setminus \mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}}^{\text{p}}$. For each two states $\bfx$ and $\bfy$ there are finitely many ways, $\gls{H} \in \N$, to create a pruned collection $\gls{Cpxyh}$ and a non-pruned collection $\gls{Cnpxyh}$, where $h =1,\ldots, H$, such that $\bfx$ can make a transition to $\bfy$ by sampling from $\U(S_{\C_{\{\bfx, \bfy\},h}^{\text{np}}})$. We define the transition probability to get from $\bfx$ to $\bfy$ by
+The collection of CPT-labels that do not get pruned is given by $\gls{Cnpxy} := \C \setminus \mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}}^{\text{p}}$. For each two states $\bfx$ and $\bfy$ there are finitely many ways, $\gls{H} \in \N$, to create a pruned collection $\gls{Cpxyh}$ and a non-pruned collection $\gls{Cnpxyh}$, where $\gls{h} =1,\ldots, H$, such that $\bfx$ can make a transition to $\bfy$ by sampling from $\U(S_{\C_{\{\bfx, \bfy\},h}^{\text{np}}})$. We define the transition probability to get from $\bfx$ to $\bfy$ by
 \begin{align}\label{transprob}
 \gls{Rhxy} &:= \left(\prod_{k(l_i) \in \C_{\{\bfx, \bfy\},h}^{\text{p}} } (1-c_{k(l_i)}) \right) \cdot \left( \prod_{k(l_i) \in \C_{\{\bfx, \bfy\},h}^{\text{np}} \setminus \mathcal{C}_{\mathbf{x}}  } c_{k(l_i)}   \right) \cdot \mathcal{U} \big( S_{\C_{\{\bfx, \bfy\},h}^{\text{np}}} \big)(\mathbf{y}) \\ \nonumber
 &\;=\left(\prod_{k(l_i) \in \C_{\{\bfx, \bfy\},h}^{\text{p}} } (1-c_{k(l_i)}) \right)\cdot \left( \prod_{k(l_i) \in \C_{\{\bfx, \bfy\},h}^{\text{np}} \setminus \mathcal{C}_{\mathbf{x}}  } c_{k(l_i)}   \right)  \nonumber \cdot \frac{1}{|S_{\C_{\{\bfx, \bfy\},h}^{\text{np}}}|}.
@@ -1096,7 +1126,7 @@ Consider a hybrid approach in which we apply forward sampling, but at each varia
 Hybrid forward sampling provides a heuristic to assess the \gls{MAP} estimate, which is an initial state $\bfx$ of the BN such that $P(\bfx)$ is maximised. In the case one wants to start with a Markov chain from a highly probable state, this approach could be of added value. For situations in which this MAP estimate is useful, could be found in \cite{park2002using}.
 
 
-\subsection{Sampling from the pruned network}
+\subsection{Sampling from the pruned network}\label{sec:sampling_uni}
 In order to generate states nearly uniform, MC-SAT uses an intelligent heuristic \cite{wei2004towards} based on a weighted SAT problem and applies the concept of simulated annealing. But, in contrast to \textit{prune sampling}, MC-SAT does not generate states completely uniform. Briefly, we explain why \ps does generate its states completely uniform.\\
 
 Due to exhaustive listing of all feasible states of the pruned network -- determining the set $\U(S_{\C_\bfx^{\text{np}}})$ explicitly -- \ps guarantees completely uniform sampling. Although, the exhaustive enumeration of all feasible states of the pruned network is unavoidable. For this reason, it could be the case that one still runs into memory problems. To reduce this computational effort, an other heuristic method should be developed. We give three suggestion which could provide such a solution
@@ -1225,7 +1255,7 @@ H(P,Q) = \frac{1}{\sqrt{2}}\sqrt{ \sum_{i=1}^2 ( \sqrt{p_i} - \sqrt{q_i})^2 }.
 \end{align*}
 Note that the maximum distance $H(P,Q) = 1$ occurs when for all $i$: $p_i =1$ and $q_i = 0$ or vice versa. In the next section we use the AHD to measure the accuracy of the sampling methods. On all the 9 BNs we will discuss, we first compute all $25.000$ Hellinger distances with respect to the exact probability. Note that this exact probability is computed by an exact inference algorithm, for example by using the decision modelling software in GeNIe. Consecutively, for all $100$ runs we averaged these Hellinger distances at every $t$-th point in the sample, $1 \leq t \leq 25.000$. 
 
-\section{Benchmark Bayesian networks}
+\section{Benchmark Bayesian networks}\label{BenchBNs}
 Since \ps was developed to deal with deterministic relations in BNs, we conducted experiments from four benchmark BN domains with gradually increasing rate of determinism (0\%, 25\%, 50\%). We experimented with three real world Bayesian networks: the small network (8 nodes, 18 parameters) Asia \cite{lauritzen1988local}, the medium network (37 nodes, 509 parameters) Alarm \cite{beinlich1989alarm} and the large network (76 nodes, 574 parameters) Win95pts. On these BNs, we first conducted experiments with no available evidence, i.e. 0\% determinism. Note that in a BN evidence is equivalent to a deterministic relation. Consecutively, we applied the three approximation methods on the same BNs with 25\% available evidence. In the end, we conducted experiments on Grid BNs  \cite{sang2005solving} of size $3 \times 3$, $5 \times 5$ and $8 \times 8$. We used Grid networks with 50\% available evidence. We present and discuss the results -- in terms of accuracy (AHD) -- in the next subsections.
 
 \subsection{Real world Bayesian networks 0\% determinism}\label{real_world_0_ev}
@@ -1308,7 +1338,7 @@ In Figure \ref{results3} we see the performance of the three sampling methods on
 In this section, we present the performance of the sampling methods in terms of the rate of convergence and time consumption. On top of that, we elaborate on a procedure to obtain these performance indicators of a MCMC sampling method in the limit of infinite simulation time, extrapolated from relatively short simulations.
 
 \subsection{Rate of convergence}
-In this subsection, we show how relatively short simulations -- $100$ simulations of $25.000$ samples -- could be used to determine the rate of convergence (ROC) carefully. \\
+In this subsection, we show how relatively short simulations -- $100$ simulations of $25.000$ samples -- could be used to determine the rate of convergence (ROC). \\
 
 Say, we qualify the probability we want to know as the expected value of a random variable $Y$, such as $\gls{mu} = \E[\gls{Y}]$. Suppose that by repeating a MCMC sampling method, we generate $\gls{N}$ simulations: $\bfy_1, \ldots , \bfy_N$. Where each simulation (still) exists of $T$ number of samples. In order to approximate $Y$, we could take the average $\gls{mu_hat} = \sum_{s=1}^N \bfy_s$. The accuracy of this approximation depends on the number of simulations $N$ and the number of samples $T$. A possible measure for the error of MCMC approximation methods, is the standard deviation $\gls{sigma_t} = \langle y^2 \rangle - \langle y \rangle ^2$, where
 \begin{align*}
@@ -1341,16 +1371,16 @@ As an example, in Figure \ref{fig1}(a) we have run metropolis sampling $N=100$ t
 \end{flalign*}
 To emphasize that the rate of convergence is of order $t^{-1/2}$ and to de-emphasize $\sigma$, we write ROC = $\mathcal{O}(t^{-1/2})$ as $t \to \infty$. In Figure \ref{fig1}(b), we see that -- based on $N = 100$ simulations -- $\sigma(t)$ indeed behaves like $t^{-1/2}$. One could say: $\sigma^2(t) = \gls{alpha} / \sqrt{t}$. This proportionality constant $\alpha$ quantifies the ROC of the MCMC sampling technique that belongs to the convergence class  $\mathcal{O}(t^{-1/2})$. Therefore, $\alpha$ is a performance indicator of the MCMC sampling techniques we examine in contrast. \\
 
-In order to determine this constant, we introduce an educated guessing method. If we plot $\log \sigma(t)$ versus $\log t$, we obtain Figure \ref{fig2}(a). For the interval $10^0 < t < 10^1$, we see that $\sigma(t)$ does not yet behave as $t^{-1/2}$. Ideally -- when determining $\alpha$ for the simulations in this figure -- we do not involve this non-representative region. We show how to ignore this region in a sophisticated way. First, we introduce an auxiliary polynomial expansion such that
+In order to determine this constant, we introduce an educated guessing method. If we plot $\log \sigma(t)$ versus $\log t$, we obtain Figure \ref{fig2}(a). For the interval $10^0 < t < 10^1$, we see that $\sigma(t)$ does not yet behave as $t^{-1/2}$. Ideally -- when determining $\alpha$ for the simulations in this figure -- we do not involve this non-representative region. We show how to ignore this region in a sophisticated way. Lets introduce an auxiliary polynomial expansion such that
 \begin{align*}
 {\sigma}^2(t) = \frac{\alpha}{\sqrt{t}}(1+\beta_1 t^{-\delta} + \beta_2 t^{-2\delta} + \ldots )\ .
 \end{align*}
 Due to the prospect of overfitting, we simplify the above equation as
-\begin{align*}
-g(t) = {\sigma}^2(t) \sqrt{t} = \alpha(1+ \beta t^{-\delta})\ .
-\end{align*}
-One should note that if we plot $g(t)$ in terms of $t^{-\delta}$, for certain $\delta$, $g(t)$ becomes approximately a linear function. We learn how to choose $\delta$ by doing. Once, we have found an approximate linear plot - like Figure \ref{fig2}(b) -- where we have chosen $\delta = 0.90$ -- we could interpret $\alpha$ as the point of intersection with the y-axis. Hence, for the bunch of Metropolis samples displayed in Figure \ref{fig1}(a) we determine that the proportionality constant of the ROC is $\alpha = 0.40$.
-
+\begin{align}
+\gls{g_t} = {\sigma}^2(t) \sqrt{t} = \alpha(1+ \beta t^{-\delta})\ .
+\label{poly-expan}
+\end{align}
+What happens if we plot $g(t)$ in terms of $t^{-\delta}$ ? As we see in Figure \ref{fig2}(b), for $\delta =0.90$, $0 < t^{-\delta} \leq 0.5$. Since $t$ is multiplicatively being inversed as $t^{-\delta}$, the right side of the plot in Figure \ref{fig2}(a) is displayed at the left side of \ref{fig2}(b). It depends on the value of $\delta$ how strong $t^{-\delta}$ goes towards $0$. One should note that for higher $\delta$, $t^{-\delta}$ decreases faster. So, albeit that the intervals $[10^0,10^1], [10^1,10^2], [10^2,10^3], [10^3,10^4]$ have equal length in Figure \ref{fig2}(a). 
 \begin{figure}[H]
 \begin{subfigure}[t]{0.5\textwidth}
   \centering
@@ -1369,7 +1399,25 @@ One should note that if we plot $g(t)$ in terms of $t^{-\delta}$, for certain $\
 \caption{Procedure to determine the proportionality constant of a MCMC method by approximating the asymptotic behavior of the standard deviation.}
 \label{fig2}
 \end{figure}
-Following this procedure, we have determined the ROCs of Gibbs-, Metropolis- and \ps for all the 9 benchmark networks in Figure \ref{results1}-\ref{results3}. The results are presented in Table \ref{ROC-table}. We see that \ps has always a significantly higher ROC than Gibbs- and Metropolis sampling . Hence, \ps convergences slower to the desired distribution.
+In Figure \ref{fig2}(b), the ratio of the length of those intervals is unequally distributed and depends on the value of $\delta$, i.e. the ratio reduces as $\delta$ becomes bigger. For multiple values of $\delta$ we displayed this multiplicatively inversion in Figure \ref{fig3}.
+\begin{figure}[H]
+\centering
+\captionsetup{width = 0.9\textwidth}
+\includegraphics[width = 0.75\textwidth]{example-image-a}
+\caption{Multiplicatively inversion $t^{-\delta}$ of the intervals $t \in [10^0,10^1], [10^1,10^2], [10^2,10^3], [10^3,10^4]$ for different values of $\delta \in (0,1)$. }
+\label{fig3}
+\end{figure}
+Note that this translation exposes the interval $[10^0,10^1]$ more prominently than others. As we saw in Figure \ref{fig2}(a) this interval is exactly the interval that not behaves proportional to $1 / \sqrt{t}$. Though, due to the multiplicatively inversion $t^{-\delta}$ we can extract useful information from it. Because if we plot $g(t)$ in terms of $t^{-\delta}$, for certain values of $\gls{delta}$, $g(t)$ have the appearance of a linear function. We learn how to choose $\delta$ by doing. For some values of $\delta$, $g(t)$ is more wobbly, convex or concave than others. Once, we have found an approximate linear plot -- like we did Figure \ref{fig2}(b) for $\delta = 0.90$ -- we could interpret $\alpha$ as the point of intersection with the y-axis. Hence, for the bunch of Metropolis samples displayed in Figure \ref{fig1}(a) we determine that the proportionality constant -- i.e. ROC -- is $\alpha = 0.40$. We summarize the above described procedure to obtain the ROC of a MCMC sampling method in the limit of infinite simulation time, extrapolated from relatively short simulations as
+\begin{itemize}
+\item generate a bunch of MCMC simulations of arbitrary size;
+\item determine the standard deviation ${\sigma}^2(t)$ between the simulations on every step $t$ in the sample size;
+\item plot the $\log$ of ${\sigma}^2(t)$ versus the $\log$ of the number of samples $t$;
+\item determine a candidate proportionality constant $\alpha'$ by fitting $\alpha' / \sqrt{t}$ to the above $\log$ plot;
+\item plot $g(t) = {\sigma}^2(t) \sqrt{t}$ in terms of $t^{-\delta}$ for $0 < \delta < 1$ (as described in Equation \ref{poly-expan});
+\item for $\delta$ such that $g(t)$ have the appearance of a linear function: fit a linear function $\gls{j}$ to $g$;
+\item adjust $\gls{alpha'}$ according to the intersection of $j$ with the y-axis.
+\end{itemize}
+Following this procedure, we have determined the ROCs of Gibbs-, Metropolis- and \ps for all the 9 benchmark networks in Figure \ref{results1}-\ref{results3}. The results are presented in Table \ref{ROC-table}. We see that \ps has always a significantly higher ROC than Gibbs- and Metropolis sampling . Hence, \ps convergences always slower to the desired distribution.
 \begin{center}
 \begin{table}[H]
 \begin{center}
@@ -1392,14 +1440,25 @@ Grid 8x8 & \textbf{0.39} & 0.40 & 0.53  \\
 %Grid 11x11 & 0.45 & 0.45 & x \\
 \bottomrule
 \end{tabular}
-\caption{the proportionality constants of \ps are always higher than Gibbs- and Metropolis sampling. Hence, samples generated by \ps converge slower to the desired distribution.}
+\caption{the proportionality constants of \ps are always higher than Gibbs- and Metropolis sampling. Hence, samples generated by \ps converge slower to the desired stationary distribution.}
 \label{ROC-table}
 \end{center}
 \end{table}
 \end{center}
+As an extra illustration why this method work, we give one last example.
+\begin{example}
+.
+\end{example}
 
 \subsection{Time consumption}
+The last performance indicator we take into account is the time consumption of the MCMC sampling methods. Based on the average of $100$ simulations, for all networks in Figure \ref{results1}-\ref{results3} we examined the time the methods took to achieve $\sigma^2 = 0.01$. In this section we present the result and explain how we determined the time consumption exactly. \\
 
+As we saw in section \ref{BenchBNs}, the equilibrium a sampling method is converging to, is not necessarily the correct probability (distribution). \textit{Prune sampling}, for example, is on the Win95pts BN converging to a value that differs $0.05$ AHD from the real distribution. Despite its approximation is close to the exact probability, it is not the same stationary distribution. Though, we did not take this into account in order to determine the time consumption of a sampling method. \\
+With the information about $\alpha$ from Table \ref{ROC-table}, we can determine the amount of samples a method need to generate to achieve $\sigma^2 = 0.01$, namely: $t = (\alpha / 0.01)^{2}$. So, if we use the Gibbs sampling method on the Asia BN with 0\% evidence available, we need
+\begin{align*}
+0.01= \frac{0.52}{\sqrt{t}} \qquad \implies \qquad t = \bigg( \frac{0.52}{0.01} \bigg)^2 = 2.704 \text{ samples},
+\end{align*}
+to achieve $\sigma^2 = 0.01$. Consecutively, we measured the time the methods needed to generate this number of samples, including the generation of an initial state at the start. The results are displayed in Table \ref{time-table}.
 \begin{center}
 \begin{table}[!htb]
 \begin{center}
@@ -1421,10 +1480,11 @@ Grid 8x8 & 20.50 & \textbf{8.83} & 105.17  \\
 \bottomrule
 \end{tabular}
 \caption{time consumption of the sampling methods. \Ps is the fastest on small and medium sized network. Metropolis performs better on the large sized networks. }
-\label{ROC-table}
+\label{time-table}
 \end{center}
 \end{table}
 \end{center}
+For small and medium sized BNs, we see that \ps is always faster than Gibbs- and Metropolis sampling. For large networks, this is not the case. As already mentioned in section \ref{sec:sampling_uni}, due to the exhaustive enumeration during the uniform sampling step, for large BNs this results in an exponential blow up of $|S_{\C_\bfx^{\text{np}}}|$. As a consequence, for large BNs \ps becomes a time intensive method.
 
 %\section{Measures of complexity}
 %\subsection{d-seperation}
@@ -1534,7 +1594,7 @@ Grid 8x8 & 20.50 & \textbf{8.83} & 105.17  \\
 
 \vspace{0.75pc}
 \caption{consistent underperformance of \ps using the \gls{HFS} approach. HFS allows \ps to construct a set $V$ of predetermined fixed size ($1$, $10$, $100$ or $1000$) of feasible states from the pruned BN in order to select (randomly) a state of the BN as the new sample.}
-\label{results1}
+\label{results5}
 \end{figure*}
 
 \chapter{Conclusion}
@@ -1544,6 +1604,7 @@ Grid 8x8 & 20.50 & \textbf{8.83} & 105.17  \\
 %List of abbreviations
 \glsadd{MLN}
 \glsadd{U}
+\glsadd{beta_i}
 \printglossaries
 
 %Bibliography
