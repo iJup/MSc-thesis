@@ -352,7 +352,7 @@ description={linear function fitted to the simplified polynomial expansion $g$ p
 }
 \usepackage{filecontents}
 \setlength\parindent{24pt}
-\usepackage[hmarginratio=1:1, left=25mm, top=25mm, bottom=30mm]{geometry}
+\usepackage[hmarginratio=1:1, left=25mm, top=25mm, bottom=35mm]{geometry}
 \allowdisplaybreaks
 \AtBeginDocument{\renewcommand{\bibname}{References}}
 
@@ -1110,9 +1110,9 @@ In random forward sampling it is only relevant to know whether a CPT-entry is ze
 \centering
 \resizebox{0.5\columnwidth}{!}{
     \begin{tabular}{|c||c|c|c|c|} \hline
-	& $\text{r}_\text{T},\ \text{s}_\text{T}$ & $\text{r}_\text{T},\ \text{s}_\text{F}$ & $\text{r}_\text{F},\ \text{s}_\text{T}$ & $\text{r}_\text{F},\ \text{s}_\text{F}$  \\ \hline \hline
-	$\text{g}_\text{T}$ & $\star$ & $\star$ & $\star$ & 0  \\ \hline
-	$\text{g}_\text{F}$ & $\star$ & $\star$ & $\star$ & $\star$ \\ \hline
+	& {\small $\text{r}_\text{T},\ \text{s}_\text{T}$ }& {\small $\text{r}_\text{T},\ \text{s}_\text{F}$ } & {\small $\text{r}_\text{F},\ \text{s}_\text{T}$ } & {\small $\text{r}_\text{F},\ \text{s}_\text{F}$ } \\ \hline \hline
+	{\small $ \text{g}_\text{T}$ } & $\star$ & $\star$ & $\star$ & 0  \\ \hline
+	{\small $\text{g}_\text{F}$ } & $\star$ & $\star$ & $\star$ & $\star$ \\ \hline
 \end{tabular}
 }.
 \caption{in order to select a CPT-entry, the random forward sampling approach is only interested whether an entry is zero or non-zero. Consecutively, from all $\star$ CPT-entries it selects one entry randomly.}
@@ -1120,7 +1120,7 @@ In random forward sampling it is only relevant to know whether a CPT-entry is ze
 \end{table}
 \end{example}
 Since random forward sampling is only interested whether a CPT-entry is zero or non-zero and consecutively selects a CPT-entry randomly, it generates more diverse initial states than regular forward sampling. We could even consider a \textit{hybrid forward sampling approach} that combines {forward sampling} and {random forward sampling}.
-\begin{definition}[Hybrid forward sampling]
+\begin{definition}[Hybrid forward sampling]\label{def:hfs}
 Consider a hybrid approach in which we apply forward sampling, but at each variable $X_i$ either (say with probability $p$) we choose the sampling distribution $P(X_i \mid \text{Pa}_{X_i} = \mathbf{x})$ or (with probability $1-p$) we choose the uniform distribution over $\{x : P(X_i = x \mid \text{Pa}_{X_i}=\mathbf{x}) > 0\}$. 
 \end{definition}
 Hybrid forward sampling provides a heuristic to assess the \gls{MAP} estimate, which is an initial state $\bfx$ of the BN such that $P(\bfx)$ is maximised. In the case one wants to start with a Markov chain from a highly probable state, this approach could be of added value. For situations in which this MAP estimate is useful, could be found in \cite{park2002using}.
@@ -1131,7 +1131,7 @@ In order to generate states nearly uniform, MC-SAT uses an intelligent heuristic
 
 Due to exhaustive listing of all feasible states of the pruned network -- determining the set $\U(S_{\C_\bfx^{\text{np}}})$ explicitly -- \ps guarantees completely uniform sampling. Although, the exhaustive enumeration of all feasible states of the pruned network is unavoidable. For this reason, it could be the case that one still runs into memory problems. To reduce this computational effort, an other heuristic method should be developed. We give three suggestion which could provide such a solution
 \begin{itemize}
-\item an easy to implement solution is to use random forward sampling to generate feasible states of a pruned BN up to a fixed amount. So, consider generating a set of $V$ (with predetermined fixed size) candidate samples. Subsequently, a sample from $V$ will be chosen randomly. The size of $V$ can be interpreted as a trade-off between uniformity and computational effort;
+\item an easy to implement solution is to use hybrid forward sampling to generate feasible states of a pruned BN up to a fixed amount. So, consider generating a set of $V$ (with predetermined fixed size) candidate samples. Subsequently, a sample from $V$ will be chosen randomly. The size of $V$ can be interpreted as a trade-off between uniformity and computational effort;
 \item Wei, Erenrich and Selman show in \cite{wei2004towards} that one can exploit ideas from random walk based methods to obtain effective near-uniform sampling;
 \item a more intelligent heuristics to obtain near- and completely uniform samples from the pruned BN could be found by using simulated annealing approach in \cite{wei2004towards}.
 \end{itemize}
@@ -1259,80 +1259,79 @@ Note that the maximum distance $H(P,Q) = 1$ occurs when for all $i$: $p_i =1$ an
 Since \ps was developed to deal with deterministic relations in BNs, we conducted experiments from four benchmark BN domains with gradually increasing rates of determinism (0\%, 25\%, 50\%, 100\%). We discussed the first benchmark domain of simple deterministic and block-shaped BNs in section \ref{sec:gibbs-res}. In this section, we conduct experiments with the other three benchmark domains. We consider three types of real world Bayesian networks: the small network (8 nodes, 18 parameters) Asia \cite{lauritzen1988local}, the medium network (37 nodes, 509 parameters) Alarm \cite{beinlich1989alarm} and the large network (76 nodes, 574 parameters) Win95pts. On these BNs, we first conduct experiments with no available evidence. Note that in a BN evidence is equivalent to a deterministic relation. Consecutively, we applied the three approximation methods on the same BNs with 25\% available evidence, , i.e. 25\% determinism. At last, we conduct experiments on Grid BNs  \cite{sang2005solving} of size $3 \times 3$, $5 \times 5$ and $8 \times 8$. We used Grid networks with 50\% available evidence. We present and discuss the results -- in terms of accuracy (AHD) -- in the next subsections.
 
 \subsection{Real world Bayesian networks 0\% determinism}\label{real_world_0_ev}
-Since \ps is devised to deal with deterministic relation we do not expect the best performance of the pruning technique on this class of BNs. Figure \ref{results1} shows the performance of Gibbs-, Metropolis- and \ps on the Asia, Alarm and Win95pts BNs with 0\% evidence available. On the small Asia BN we see that \ps is (almost) a competitive sampling method and reaches at least $0.01$ AHD. 
-\begin{figure}[H]
+\begin{figure}[b!]
 \centering
 \begin{subfigure}{0.5\textwidth}
 \includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/asia_ahd_25000.png}
-\caption{Asia 0\% evidence}%
+\caption{Asia 0\% determinism}%
 \label{asia}%
 \end{subfigure}\hfill%
 \begin{subfigure}{0.5\textwidth}
 \includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/alarm_ahd_25000.png}
-\caption{Alarm 0\% evidence}%
+\caption{Alarm 0\% determinism}%
 \label{alarm}%
 \end{subfigure}%
 \begin{subfigure}{0.5\textwidth}
 \includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/win95pts_ahd_25000.png}
-\caption{Win95pts 0\% evidence}%
+\caption{Win95pts 0\% determinism}%
 \label{win95pts}%
 \end{subfigure}\hfill%
 \vspace{0.75pc}
 \caption{underperformance of \ps in terms of accuracy on the benchmark real world BNs without evidence. Since no evidence is available, 0\% of the nodes contain deterministic relations. Because \ps is created to deal with determinism, we did expect underperformance of the pruning technique on these type of networks.  }
 \label{results1}
 \end{figure}
+Since \ps is devised to deal with deterministic relation we do not expect the best performance of the pruning technique on this class of BNs. Figure \ref{results1} shows the performance of Gibbs-, Metropolis- and \ps on the Asia, Alarm and Win95pts BNs with 0\% evidence available. On the small Asia BN we see that \ps is (almost) a competitive sampling method and reaches at least $0.01$ AHD. \\
+
 On the Alarm BN, \ps is close to the $0.01$ AHD but not as accurate as Gibbs- and Metropolis sampling are. We see structural underperformance of \ps on the Win95pts BN, converging to $0.05$ AHD whereas Gibbs- and Metropolis sampling guarantee at least an accuracy of $0.01$ AHD.
 
 \subsection{Real world Bayesian networks 25\% determinism}\label{real_world_25_ev}
-For the same three BNs we used in the previous subsection, we now conduct experiments with 25\% evidence available. Hence, we expect \ps to become more competitive. Figure \ref{results2} shows the performance of Gibbs-, Metropolis- and \ps on the Asia, Alarm and Win95pts BNs with 25\% evidence available. On the Asia BN, we see strong performance of all three the sampling methods: reaching at least $0.004$ AHD. On the Alarm BN all the three sampling methods have more difficulties to reach accuracy. Though, \ps starts to become competitive and even outperforms Metropolis sampling. However, we see strong underperformance of \ps on the Win95pts BN: reaching $0.024$ AHD in contrast to less than $0.01$ AHD for Gibbs- and Metropolis sampling.
-\begin{figure}[H]
+\begin{figure}[b!]
 \centering
 \begin{subfigure}{0.5\textwidth}
 \includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/asia_ev_ahd_25000.png}
-\caption{Asia 25\% evidence}%
+\caption{Asia 25\% determinism}%
 \label{asia}%
 \end{subfigure}\hfill%
 \begin{subfigure}{0.5\textwidth}
 \includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/alarm_ev_ahd_25000.png}
-\caption{Alarm 25\% evidence}%
+\caption{Alarm 25\% determinism}%
 \label{alarm}%
 \end{subfigure}%
 \begin{subfigure}{0.5\textwidth}
 \includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/win95pts_ev_ahd_25000.png}
-\caption{Win95pts 25\% evidence}%
+\caption{Win95pts 25\% determinism}%
 \label{win95pts}%
 \end{subfigure}\hfill%
 \vspace{0.75pc}
 \caption{compared with the results in section \ref{real_world_0_ev}, \ps starts to become more competitive in terms of accuracy as more determinism is present in the BNs. In these real world BNs 25\% of the nodes contain deterministic relations (evidence). Though, on the win95pts BN \ps underperforms significantly.}
 \label{results2}
 \end{figure}
+For the same three BNs we used in the previous subsection, we now conduct experiments with 25\% evidence available. Hence, we expect \ps to become more competitive. Figure \ref{results2} shows the performance of Gibbs-, Metropolis- and \ps on the Asia, Alarm and Win95pts BNs with 25\% evidence available. On the Asia BN, we see strong performance of all three the sampling methods: reaching at least $0.004$ AHD. On the Alarm BN all the three sampling methods have more difficulties to reach accuracy. Though, \ps starts to become competitive and even outperforms Metropolis sampling. However, we see strong underperformance of \ps on the Win95pts BN: reaching $0.024$ AHD in contrast to less than $0.01$ AHD for Gibbs- and Metropolis sampling.
 
-\newpage
 \subsection{Grid Bayesian networks 50\% determinism}
-The last class of BNs we conducted experiments on is the class of Grid BNs. This type of BNs is developed by Sang, Beame, and Kautz 2005 \cite{sang2005solving} to create benchmark problems that are intrinsically hard because they are highly structured and contain many deterministic relations. The variables of a $n \times n$ grid are denoted by $X_{i,j}$ for $1 \leq i,j \leq n$. Each variable $X_{i,j}$ has parents $X_{i-1,j}$ and $X_{i,j-1}$ for $i,j>1$. Thus, $X_{1,1}$ is a source variable and $X_{n,n}$ is a sink variable. Given the CPTs of the variables, the problem is to compute the marginal probability of the sink $X_{n,n}$. The \textit{deterministic ratio} is the fraction of the variables that have a deterministic relation. The CPTs for such nodes are randomly filled in with $0$ or $1$. For the remaining variables, the CPTs are randomly filled with values chosen uniformly in the interval $(0, 1)$.\\
-
-In Figure \ref{results3} we see the performance of the three sampling methods on a Grid $3 \times 3$, $5 \times 5$ and $8 \times 8$ BN with 50\% deterministic relations. On all three Grid BNs we see significant underperformance of the \ps method. Gibbs- and Metropolis tend to reach at least $0.01$ AHD on all three BNs. In contrast, on the Grid $3 \times 3$ and $5 \times 5$ BN \ps reaches respectively $0.17$ and $0.15$ AHD. On the $8 \times 8$ BN \ps shows significant underperformance by reaching $0.05$ AHD. Hence, against our expectations, we have to conclude that \ps is not competitive on this class of BNs with the most deterministic relations.
-\begin{figure}[H]
+\begin{figure}[b!]
 \centering
 \begin{subfigure}{0.49\textwidth}
 \includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/grid_3x3_ahd_25000.png}
-\caption{Grid $3 \times 3$ network 50\% evidence}%
+\caption{Grid $3 \times 3$ network 50\% determinism}%
 \label{grid_3x3}%
 \end{subfigure}\hfill%
 \begin{subfigure}{0.49\textwidth}
 \includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/grid_5x5_ahd_25000.png}
-\caption{Grid $5 \times 5$ network 50\% evidence}%
+\caption{Grid $5 \times 5$ network 50\% determinism}%
 \label{grid_5x5}%
 \end{subfigure}
 \begin{subfigure}{0.49\textwidth}
 \includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/grid_8x8_ahd_25000.png}
-\caption{Grid $8 \times 8$ network 50\% evidence}%
+\caption{Grid $8 \times 8$ network 50\% determinism}%
 \label{grid_8x8}%
 \end{subfigure}\hfill%
 \caption{underperformance of \ps in terms of accuracy on the benchmark grid BNs. 50\% of the nodes in these Grid networks are deterministic. Since \ps is created to deal with determinism, we did expect that pruning would perform much better on these type of networks. In this case, Gibbs and Metropolis sampling do converge to the correct posterior distribution. Note that this is not always true.}
 \label{results3}
 \end{figure}
+The last class of BNs we conducted experiments on is the class of Grid BNs. This type of BNs is developed by Sang, Beame, and Kautz 2005 \cite{sang2005solving} to create benchmark problems that are intrinsically hard because they are highly structured and contain many deterministic relations. The variables of a $n \times n$ grid are denoted by $X_{i,j}$ for $1 \leq i,j \leq n$. Each variable $X_{i,j}$ has parents $X_{i-1,j}$ and $X_{i,j-1}$ for $i,j>1$. Thus, $X_{1,1}$ is a source variable and $X_{n,n}$ is a sink variable. Given the CPTs of the variables, the problem is to compute the marginal probability of the sink $X_{n,n}$. The \textit{deterministic ratio} is the fraction of the variables that have a deterministic relation. The CPTs for such nodes are randomly filled in with $0$ or $1$. For the remaining variables, the CPTs are randomly filled with values chosen uniformly in the interval $(0, 1)$.\\
 
+In Figure \ref{results3} we see the performance of the three sampling methods on a Grid $3 \times 3$, $5 \times 5$ and $8 \times 8$ BN with 50\% deterministic relations. On all three Grid BNs we see significant underperformance of the \ps method. Gibbs- and Metropolis tend to reach at least $0.01$ AHD on all three BNs. In contrast, on the Grid $3 \times 3$ and $5 \times 5$ BN \ps reaches respectively $0.17$ and $0.15$ AHD. On the $8 \times 8$ BN \ps shows significant underperformance by reaching $0.05$ AHD. Hence, against our expectations, we have to conclude that \ps is not competitive on this class of BNs with the most deterministic relations.
 
 \section{Performance indicators}
 In this section, we discuss the performance of the sampling methods in terms of the rate of convergence and time consumption. On top of that, we elaborate on a procedure to determine these performance indicators of a MCMC sampling method in the limit of infinite simulation time, extrapolated from relatively short simulations.
@@ -1346,7 +1345,7 @@ Say, we qualify the probability we want to know as the expected value of a rando
 \langle y \rangle = \frac{1}{N} \sum_{s=1}^N \bfy_s^{(t)} \hspace{1pc} \text{and} \hspace{1pc}  \langle y^2 \rangle = \frac{1}{N} \sum_{s=1}^N (\bfy_s^{(t)})^2
 \end{align*}
 and $1 \leq t \leq T$. So, $\bfy_s^{(t)}$ denotes the $t$-th element in the sample during the $s$-th time we run the MCMC method. 
-\begin{figure}[H]
+\begin{figure}[b!]
 \centering
 \begin{subfigure}[t]{0.5\textwidth}
   \centering
@@ -1380,7 +1379,7 @@ Due to the prospect of overfitting, we simplify the above equation as
 \gls{g_t} = {\sigma}^2(t) \sqrt{t} = \alpha(1+ \beta t^{-\delta})\ .
 \label{poly-expan}
 \end{align}
-\begin{figure}[H]
+\begin{figure}[b!]
 \begin{subfigure}[t]{0.5\textwidth}
   \centering
   \captionsetup{width = 0.9\textwidth}
@@ -1395,14 +1394,12 @@ Due to the prospect of overfitting, we simplify the above equation as
   \caption{To determine $\alpha$ based on its asymptotic behavior as $\alpha / \sqrt{t}$, we want to ignore the interval $[10^0, 10^1]$ in Figure \ref{fig2}(a). In doing so, we introduce a polynomial expansion to approximate the linear log plot as $\alpha(1+\beta t^{-\delta})$. Fitting this orange function to the blue line in the above figure, we retrieve that $\alpha = 0.40$. }
   \label{sub_2b}
 \end{subfigure}
-\caption{Procedure to determine the proportionality constant of a MCMC method by approximating the asymptotic behavior of the standard deviation}
+\caption{procedure to determine the proportionality constant of a MCMC method by approximating the asymptotic behavior of the standard deviation}
 \label{fig2}
 \end{figure}
-One should note that $g(t^{-\delta})$ is a linear function. In Figure \ref{fig3} we plot $g(t^{-\delta})$ for $\gls{delta} = 0.4, \ldots, 0.9$ based on the above samples from the Grid $8 \times 8$ BN generated by Metropolis sampling displayed in Figure \ref{fig2}(a). We consider $\delta = 0.9$ to be the approximation with the most linear appearance. Consecutively, we fit a linear function $\gls{f}$ to $g(t^{-\delta})$ to determine its intersection with the y-axis, i.e. the proportionality constant $\alpha$ we are looking for. The result is depicted in Figure \ref{fig2}(b) and we retrieve that $\alpha = 0.40$. 
 \begin{figure*}[t!]
 \centering
 \captionsetup[subfigure]{justification=centering}
-
 \begin{subfigure}{.3\linewidth}
 \includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_8x8/Metropolis/delta_dev/d_04_new}
 \end{subfigure}\hfill%
@@ -1412,7 +1409,6 @@ One should note that $g(t^{-\delta})$ is a linear function. In Figure \ref{fig3}
 \begin{subfigure}{.3\linewidth}
 \includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_8x8/Metropolis/delta_dev/d_06_new}
 \end{subfigure}\hfill%
-
 \begin{subfigure}{.3\linewidth}
 \includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_8x8/Metropolis/delta_dev/d_07_new}
 \end{subfigure}\hfill%
@@ -1422,16 +1418,14 @@ One should note that $g(t^{-\delta})$ is a linear function. In Figure \ref{fig3}
 \begin{subfigure}{.3\linewidth}
 \includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_8x8/Metropolis/delta_dev/d_09_new}
 \end{subfigure}\hfill%
-
 \vspace{0.75pc}
 \caption{Linear appearance of $g(t^{-\delta})$ for different values of $\delta$}
 \label{fig3}
-\end{figure*}\\
-
-%[0, 0.5] interval length
+\end{figure*}
+One should note that $g(t^{-\delta})$ is a linear function. In Figure \ref{fig3} we plot $g(t^{-\delta})$ for $\gls{delta} = 0.4, \ldots, 0.9$ based on the above samples from the Grid $8 \times 8$ BN generated by Metropolis sampling displayed in Figure \ref{fig2}(a). We consider $\delta = 0.9$ to be the approximation with the most linear appearance. Consecutively, we fit a linear function $\gls{f}$ to $g(t^{-\delta})$ to determine its intersection with the y-axis, i.e. the proportionality constant $\alpha$ we are looking for. The result is depicted in Figure \ref{fig2}(b) and we retrieve that $\alpha = 0.40$. \\
 
 We call the translation of the number of samples $t$ to $t^{-\delta}$ a \textit{multiplicative inversion}. An essential observation is: since $t$ is multiplicatively being inversed as $t^{-\delta}$, the right side of the plot in Figure \ref{fig2}(a) is displayed at the left side of Figure \ref{fig2}(b). On top of that, where the intervals $[10^0,10^1], [10^1,10^2], [10^2,10^3], [10^3,10^4]$ in Figure \ref{fig2}(a) on a logarithmic scale are of equal length (equidistant), the projection of those intervals in Figure \ref{fig2}(b) is not. The ratio of the lengths of those intervals is unequally distributed and depends on the value of $\delta$, i.e. the interval $[10^0,10^1]$ is represented more prominently as $\delta$ becomes bigger. Therefore, we only consider a subset of the interval $[0,1]$ to determine the proportionality constant $\alpha$. In Figure \ref{fig2}(b) and \ref{fig3} we took the interval $[0,0.5]$. To illustrate this projection graphically, we display the multiplicative inversion of the border points of the intervals $[10^0,10^1], \ldots, [10^3,10^4]$ to the interval $[0,1]$ for $\delta = 0.1, \ldots, 0.9$ in Figure \ref{fig4}.
-\begin{figure}[H]
+\begin{figure}[t!]
 \centering
 \captionsetup{width = 0.9\textwidth}
 \includegraphics[width = 0.68\textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Scriptie_TeX/mult_inv.png}
@@ -1452,7 +1446,7 @@ As an extra illustration why this method work, we give one last example.
 \begin{example}
 .
 \end{example}
-Following this procedure, we have determined the ROCs of Gibbs-, Metropolis- and \ps for all the 9 benchmark networks in Figure \ref{results1}-\ref{results3}. The results are presented in Table \ref{ROC-table}. We see that \ps has always a significantly higher ROC than Gibbs- and Metropolis sampling . Hence, \ps convergences always slower to the desired distribution.
+\vspace{5pc}
 \begin{center}
 \begin{table}[H]
 \begin{center}
@@ -1480,6 +1474,7 @@ Grid 8x8 & \textbf{0.39} & 0.40 & 0.53  \\
 \end{center}
 \end{table}
 \end{center}
+Following this procedure, we have determined the ROCs of Gibbs-, Metropolis- and \ps for all the 9 benchmark networks in Figure \ref{results1}-\ref{results3}. The results are presented in Table \ref{ROC-table}. We see that \ps has always a significantly higher ROC than Gibbs- and Metropolis sampling . Hence, \ps convergences always slower to the desired distribution.
 
 \subsection{Time consumption}\label{sec:time-cons}
 The last performance indicator we take into account is the time consumption of the MCMC sampling methods. Based on the average of $100$ simulations, for all networks in Figure \ref{results1}-\ref{results3} we examined the time the methods took to achieve $\sigma^2 = 0.01$. In this section we present the results and elaborate on the method how we determine the time consumption. \\
@@ -1491,7 +1486,7 @@ With the information about $\alpha$ from Table \ref{time-table}, we can determin
 \end{align*}
 to achieve $\sigma^2 = 0.01$. Consecutively, we measure the time the methods need to generate this number of samples, including the generation of an initial state at the start using the time package in Python. The results are displayed in Table \ref{time-table}.
 \begin{center}
-\begin{table}[!htb]
+\begin{table}[b!]
 \begin{center}
 \begin{tabular}{l c c c}  
 \toprule
@@ -1535,11 +1530,11 @@ We conclude that \ps is a MCMC sampling method for discrete and deterministic BN
 In order to improve the first implemented version of \textit{prune sampling}, in this chapter we provide and review solutions for the principal obstacle of the {pruning} technique: uniformly sampling from the pruned network. In the first section, we construct solid grounds to address the problem. Afterwards, we consider solutions based on the concept of hybrid forward sampling and simulated annealing.
 
 \section{Exhaustive listing of all feasible states in a pruned network}
-As discussed in section \ref{sec:sampling_uni}, exhaustive listing of all feasible states of the pruned network -- i.e enumerating the set $S_{\C_\bfx^{\text{np}}}$ explicitly -- could be computational intensive. This view is echoed by the experiments we conducted regarding the time consumption of \ps on small, medium and large networks. In this subsection, we take a closer look in which way the set $S_{\C_\bfx^{\text{np}}}$ is constructed en enumerated.\\
+As discussed in section \ref{sec:sampling_uni}, exhaustive listing of all feasible states of the pruned network -- i.e enumerating the set $S_{\C_\bfx^{\text{np}}}$ explicitly -- could be computational intense. This view is echoed by the experiments we conducted regarding the time consumption of \ps on small, medium and large networks. In this subsection, we take a closer look in which way the set $S_{\C_\bfx^{\text{np}}}$ is constructed en enumerated.\\
 
 From section \ref{sec:time-cons} we know that \ps is a fast MCMC sampling method on small and medium sized BNs. On the Asia Alarm, Grid $3 \times 3$ and $5 \times 5$ BNs, \ps in fact outperforms Gibbs- and Metropolis sampling consistently. However, on the large BNs \ps is a rather slow MCMC sampling method. For the Win95pts BN, \ps is respectively $1.25$ to $2$ times slower than Gibbs- and Metropolis sampling. For the Grid $8 \times 8$ BN \ps is even $5$ to almost $12$ times slower than Gibbs- and Metropolis sampling respectively. \\
 
-In other words, success of the \ps technique relies heavily on the set size $|S_{\C_\bfx^{\text{np}}}|$. Though, as for non-pruned BNs, it is very reasonable that for large BNs the number of feasible states in the pruned network still grows exponentially in the number of available variables and parameters. To illustrate this, in Figure \ref{results4} we display a histogram of the number of feasible states generated during $2.400$ iterations of \ps on the Asia, Alarm and Win95pts BNs without any available evidence. During one iteration, we observe a maximum of respectively $16$, $2.218$ and $34.125$ number of feasible states.
+In other words, time-consumption of the \ps technique relies heavily on the set size $|S_{\C_\bfx^{\text{np}}}|$. Though, as for non-pruned BNs, it is very reasonable that for large BNs the number of feasible states in the pruned network still grows exponentially in the number of available variables and parameters. To illustrate this, we display in Figure \ref{results4} a histogram of the number of feasible states ($|S_{\C_\bfx^{\text{np}}}|$) generated during $2.400$ iterations of \ps on the Asia, Alarm and Win95pts BNs without any available evidence.
 \begin{figure*}[h!]
 \centering
 \captionsetup[subfigure]{justification=centering}
@@ -1560,12 +1555,14 @@ In other words, success of the \ps technique relies heavily on the set size $|S_
 \label{win95pts_ev}%
 \end{subfigure}\hfill%
 \vspace{0.75pc}
-\caption{histogram of the number of feasible states in a pruned network during $2.400$ random iterations of \ps applied on the Asia, Alarm and Win95pts BNs without any available evidence. As the size of the BNs (nodes and parameters) increases, the maximum number of feasible states increases exponentially. Therefore, exhaustive listing of all feasible states becomes time intensive for large BNs.}
+\caption{histogram of the number of feasible states in a pruned network during $2.400$ random iterations of \ps applied on the Asia, Alarm and Win95pts BNs without any available evidence. As the size of the BNs (nodes and parameters) increases, the maximum number of feasible states increases exponentially. The computation time for the set of $34.125$ feasible states takes $83$ times longer than average and therefore confiscates a large part of total time consumption.}
 \label{results4}
-\end{figure*}\newpage
-As we can observe from the histograms, the maximum for $|S_{\C_\bfx^{\text{np}}}|$ are extreme outliers. Though, they are responsible for the excessive computation time. In contrast, the median value of the number of feasible states during one iteration of \ps for the BNs displayed in Figure \ref{results4} are respectively $2$, $34$ and $50$. Note that these medians not necessarily correspond to the highest peak in the histogram due to the use of bins for plotting a histogram.\\
+\end{figure*}
+We chose these $2.400$ iterations random from the $25.000$ iterations (samples) that were made. We observe a maximum of respectively $16$, $2.218$ and $34.125$ number of feasible states at one iteration.\\
 
-We observe the same phenomena for the Asia, Alarm and Win95pts BNs with 25\%. The maximum set size of $|S_{\C_\bfx^{\text{np}}}|$ is $8$, $505$ and $2.662$ respectively. Note that due to the presence of evidence, more CPT-entries are fixed during the generation of feasible states. Hence, there are less feasible states and the maximum set size of $|S_{\C_\bfx^{\text{np}}}|$ decreases. Though, the maximum set sizes still stand apart far from the median values: $2$, $12$ and $108$ respectively.
+We observe from the histograms that for the medium and large BN the maximum value for $|S_{\C_\bfx^{\text{np}}}|$ is an extreme outlier. For the Alarm and Win95pts BN without evidence, the maximum set sizes are $2.218$ and $34.125$, respectively $35$ and $83$ times the average set size and with median set size $34$ and $50$ respectively. Therefore, for a significant part the set with the maximum number of feasible states are responsible for the excessive computation time of \ps on large BNs.\\
+
+We observe the same phenomena for the Asia, Alarm and Win95pts BNs with 25\% of available evidence. The maximum set size of $|S_{\C_\bfx^{\text{np}}}|$ is $8$, $505$ and $2.662$ respectively. 
 \begin{figure*}[h!]
 \centering
 \captionsetup[subfigure]{justification=centering}
@@ -1587,43 +1584,51 @@ We observe the same phenomena for the Asia, Alarm and Win95pts BNs with 25\%. Th
 \end{subfigure}\hfill%
 
 \vspace{0.75pc}
-\caption{histogram of the number of feasible states in the pruned network. As the size of the BNs (nodes and parameters) increases, the number of feasible states increases. Therefore, exhaustive listing of all feasible states becomes time intensive for large BNs.}
+\caption{histogram of the number of feasible states in a pruned network during $2.400$ random iterations of \ps applied on the Asia, Alarm and Win95pts BNs with $25\%$ available evidence.  As the amount of available evidence increases, more CPT-entries are fixed during the generation of feasible states. Hence, the number of feasible states generated during one iteration and the maximum value of $|S_{\C_\bfx^{\text{np}}}|$ decreases. Though, the set with the maximum number of feasible states is still responsible for a significant part of the (excessive) time consumption of \psp }
 \label{results5}
 \end{figure*}
-
 \begin{figure*}[h!]
 \centering
 \captionsetup[subfigure]{justification=centering}
 
 \begin{subfigure}{.3\linewidth}
 \includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_3x3/Prune/grid_3x3_hist_num_samples.png}
-\caption{Grid 3x3 50\% evidence, max set size $14$}%
+\caption{Grid 3x3 50\% determinism, max set size $14$}%
 \label{grid_3x3}%
 \end{subfigure}\hfill%
 \begin{subfigure}{.3\linewidth}
 \includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_5x5/Prune/grid_5x5_hist_num_samples.png}
-\caption{Grid 5x5 50\% evidence, max set size $130$}%
+\caption{Grid 5x5 50\% determinism, max set size $130$}%
 \label{grid_5x5}%
 \end{subfigure}\hfill%
 \begin{subfigure}{.3\linewidth}
 \includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_8x8/Prune/grid_8x8_hist_num_samples.png}
-\caption{Grid 8x8 50\% evidence, max set size $8.157$}%
+\caption{Grid 8x8 50\% determinism, max set size $8.157$}%
 \label{grid_8x8}%
 \end{subfigure}\hfill%
 
 \vspace{0.75pc}
-\caption{histogram of the number of feasible states in the pruned network. As the size of the BNs (nodes and parameters) increases, the number of feasible states increases. Therefore, exhaustive listing of all feasible states becomes time intensive for large BNs.}
+\caption{histogram of the number of feasible states in a pruned network during $2.400$ random iterations of \ps applied on Grid $3 \times 3$, $5 \times 5$ and $8 \times 8$ BNs. For this domain of BNs, we see a less scattered distribution of the set sizes $|S_{\C_\bfx^{\text{np}}}|$. In contrast to the Asia, Alarm and Win95pts BNs, the average set size of feasible states generated during one iteration is higher. For this reason, as we saw before in section \ref{sec:time-cons}, \ps consumes a lot of time to generate samples from Grid BNs. }
 \label{results5}
 \end{figure*}
-Median values $3$, $14$ and $609.5$ respectively.
+Note that, due to the presence of evidence, more CPT-entries are fixed during the generation of feasible states. Hence, the number of feasible states generated during one iteration and the maximum set size of $|S_{\C_\bfx^{\text{np}}}|$ decreases. Though, the maximum set sizes still stand far apart from the average set size $1.95$, $22.02$, $176.77$ and median values $2$, $12$, $108$ respectively.\\ 
 
+For the Grid $3 \times 3$, $5 \times 5$ and $8 \times 8$ BNs we find average set sizes of $3.11$, $17.02$ and $794.02$ feasible states. With set sizes respectively $4.5$, $7,6$ and $10.27$ times bigger than average and median values $3$, $14$ and $609.5$, we conclude that the maximum number of feasible states is less scattered.\\
+
+Now, we know that the excessive time consumption of \ps is caused by pruned BNs with large amounts of feasible states. Enumeration of those feasible states to choose completely uniformly the next sample is rather time intensive. In order to improve \ps one could consider to curb the enumeration of all feasible states, i.e. to limit the set size $|S_{\C_\bfx^{\text{np}}}|$. This approach could be interpreted as a trade-off between uniformity and computational effort. We discuss this concept known as \textit{hybrid forward sampling} further in the next section.
 
 \section{Hybrid forward sampling}
+In order to control the time consumption of \textit{prune sampling}, one could consider a {hybrid forward sampling} (HFS) approach to curb the set size $|S_{\C_\bfx^{\text{np}}}|$ during each iteration. In this section, we discuss this approach and present the results of an implemented version in the existing \ps algorithm. \\
+
+At first, we make the concept of HFS more detailed. Once we have a pruned version of a BN, we apply the HFS -- as defined in definition \ref{def:hfs} -- to find feasible states. \\
+
+So, consider generating a set of $V$ (with predetermined fixed size) candidate samples. Subsequently, a sample from $V$ will be chosen randomly. The size of $V$ can be interpreted as a trade-off between uniformity and computational effort;
+
 \begin{figure*}[h!]
 \centering
 
 \begin{subfigure}{.5\linewidth}
-\includegraphics[height=5.3cm]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Alarm/alarm_ahd4_25000.png}
+\includegraphics[height=5.3cm]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Alarm/alarm_ahd5_25000.png}
 \caption{Alarm 0\% determinism}%
 \label{alarm_ev}%
 \end{subfigure}\hfill%
