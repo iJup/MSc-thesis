@@ -1,0 +1,1735 @@
+% Basic document and typesetting settings
+\documentclass[a4paper, twoside, 11pt]{report}
+\usepackage[acronym, nonumberlist, automake, nopostdot, nogroupskip, section]{glossaries}
+\newcommand*{\glsgobblenumber}[1]{}
+% \renewcommand*{\glsgobblenumber}[1]{#1}% uncomment for testing
+\makeatletter
+\renewrobustcmd*{\glsadd}[2][]{%
+  \@gls@adjustmode
+  \glsdoifexists{#2}%
+  {%
+    \def\@glsnumberformat{glsnumberformat}%
+    \edef\@gls@counter{\csname glo@\glsdetoklabel{#2}@counter\endcsname}%
+    \setkeys{glossadd}{#1}%
+    \@gls@saveentrycounter%
+    \@gls@setsort{#2}%
+    \@@do@wrglossary{#2}%
+  }%
+}
+\makeatother
+\newglossary{symbols}{sym}{sbl}{Symbols}
+\setglossarystyle{super}
+\setlength\glsdescwidth{\textwidth}
+
+\newglossaryentry{BN_structure}{
+type=symbols,
+name={\ensuremath{\mathcal{G}}},
+description={Bayesian network structure, a directed acyclic graph}
+}
+\newglossaryentry{var}{
+type=symbols,
+name={\ensuremath{X_i}},
+description={variable in a BN}
+}
+\newglossaryentry{n}{
+type=symbols,
+name={\ensuremath{n}},
+description={total number of variables in a BN}
+}
+\newglossaryentry{i}{
+type=symbols,
+name={\ensuremath{i}},
+description={indexation of variables in a BN, $1 \leq i \leq n$}
+}
+%independent
+\newcommand\indep{\protect\mathpalette{\protect\independenT}{\perp}}
+\def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
+\newglossaryentry{indep}{
+type=symbols,
+name={\ensuremath{\indep}},
+description={independent}
+}
+\newglossaryentry{var_set}{
+type=symbols,
+name={\ensuremath{\mathcal{X}}},
+description={set of all variables in the BN}
+}
+\newglossaryentry{par_var}{
+type=symbols,
+name={\ensuremath{\text{Pa}_{X_i}}},
+description={direct parents of variable $X_i$}
+}
+\newglossaryentry{non_des_var}{
+type=symbols,
+name={\ensuremath{\text{ND}_{X_i}}},
+description={non-descendants of variable $X_i$}
+}
+\newglossaryentry{loc_indep}{
+type=symbols,
+name={\ensuremath{\mathcal{I}_l(\mathcal{G})}},
+description={local independencies of $\mathcal{G}$}
+}
+\newglossaryentry{val_X_i}{
+type=symbols,
+name={\ensuremath{Val(X_i)}},
+description={values that a random variable $X_i$ can take}
+}
+\newglossaryentry{x_i}{
+type=symbols,
+name={\ensuremath{x_i}},
+description={assigned value to random variable $X_i$}
+}
+\newglossaryentry{bfX}{
+type=symbols,
+name={\ensuremath{\mathbf{X}}},
+description={set of random variables}
+}
+\newcommand{\bfx}{{\mathbf{x}}}
+\newglossaryentry{bfx}{
+type=symbols,
+name={\ensuremath{\bfx}},
+description={set of assigned values to random variables}
+}
+\newglossaryentry{Omega}{
+type=symbols,
+name={\ensuremath{\Omega}},
+description={state space, all possible (not necessarily feasible) states of a BN}
+}
+\newglossaryentry{bfx_a}{
+type=symbols,
+name={\ensuremath{\mathbf{x}'}},
+description={proposed sample}
+}
+\newglossaryentry{P}{
+type=symbols,
+name={\ensuremath{P}},
+description={probability distribution over the BN, given by its CPTs}
+}
+\newglossaryentry{m}{
+type=symbols,
+name={\ensuremath{m}},
+description={indexation of $Val(X_i)$, i.e. the number of column entries in the CPT corresponding to variable $X_i$}
+}
+\newglossaryentry{tilde_P}{
+type=symbols,
+name={\ensuremath{\widetilde{P}}},
+description={estimation of $P$}
+}
+\newglossaryentry{T}{
+type=symbols,
+name={\ensuremath{T}},
+description={total number of samples}
+}
+\newglossaryentry{t}{
+type=symbols,
+name={\ensuremath{t}},
+description={indexation of samples, $1 \leq t \leq T$}
+}
+\newglossaryentry{sample_x}{
+type=symbols,
+name={\ensuremath{\mathbf{x}^{(t)}}},
+description={sample of a BN at step $t$}
+}
+\newglossaryentry{l_i}{
+type=symbols,
+name={\ensuremath{l_i}},
+description={indexation of the entries in the CPT of variable $X_i$, $1 \leq l \leq Val(X_i)$}
+}
+\newcommand{\C}{{\mathcal C}}
+\newglossaryentry{C}{
+type=symbols,
+name={\ensuremath{\C}},
+description={set with labels of all CPT-entries of all variables in the BN}
+}
+\newglossaryentry{k}{
+type=symbols,
+name={\ensuremath{k}},
+description={used to denote the abbreviation of a variable name}
+}
+\newglossaryentry{kli}{
+type=symbols,
+name={\ensuremath{k(l_i)}},
+description={label of all entries in the CPT corresponding to variable $X_i$}
+}
+\newglossaryentry{c_k_l_i}{
+type=symbols,
+name={\ensuremath{c_{ k(l_i)}}},
+description={CPT-entry corresponding to label $k(l_i)$}
+}
+\newglossaryentry{textC}{
+type=symbols,
+name={\ensuremath{C}},
+description={a collection of (arbitrary) CPT-labels}
+}
+\newglossaryentry{Cx}{
+type=symbols,
+name={\ensuremath{\C_\bfx}},
+description={CPT-labels corresponding to state $\bfx$ of the BN}
+}
+\newglossaryentry{S_C}{
+type=symbols,
+name={\ensuremath{S_{C}}},
+description={all possible (not necessarily feasible) states of the BN which could be created from $C$}
+}
+\newglossaryentry{Cxp}{
+type=symbols,
+name={\ensuremath{\C_\bfx^{\text{p}} }},
+description={set with pruned CPT-labels, the BN is pruned around the state $\bfx$}
+}
+\newglossaryentry{Cxnp}{
+type=symbols,
+name={\ensuremath{\C_\bfx^{\text{np}}}},
+description={set with non-pruned CPT-labels, the BN is pruned around the state $\bfx$}
+}
+\newcommand{\U}{{\mathcal{U}}}
+\newglossaryentry{U}{
+type=symbols,
+name={\ensuremath{\U(\cdot)}},
+description={uniform distribution over a set}
+}
+\newglossaryentry{calS}{
+type=symbols,
+name={\ensuremath{\mathcal{S}}},
+description={set with all samples generated by a sampling method}
+}
+\newglossaryentry{Cpxy}{
+type=symbols,
+name={\ensuremath{\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}}^{\text{p}}}},
+description={set with pruned CPT-labels, the BN is pruned around the states $\bfx$ and $\bfy$}
+}
+\newglossaryentry{Cnpxy}{
+type=symbols,
+name={\ensuremath{\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}}^{\text{np}}}},
+description={set with non-pruned CPT-labels, the BN is pruned around the states $\bfx$ and $\bfy$}
+}
+\newglossaryentry{H}{
+type=symbols,
+name={\ensuremath{H}},
+description={number of steps needed to make a pruned collection $\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}, h}^{\text{p}}$ and $\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}, h}^{\text{np}}$, such that $\bfx$ can make a transition to $\bfy$}
+}
+\newglossaryentry{h}{
+type=symbols,
+name={\ensuremath{h}},
+description={indexation of the number of steps needed to make a pruned collection such that $\bfx$ can make a transition to $\bfy$, $1 \leq h \leq H$}
+}
+\newglossaryentry{Cpxyh}{
+type=symbols,
+name={\ensuremath{\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\},h}^{\text{p}}}},
+description={$h$-th step in creating a set with pruned CPT-labels $\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}}^{\text{p}}$, such that $\bfx$ can make a transition to $\bfy$}
+}
+\newglossaryentry{Cnpxyh}{
+type=symbols,
+name={\ensuremath{\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\},h}^{\text{np}}}},
+description={$h$-th step in creating a set with non-pruned CPT-labels $\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}}^{\text{np}}$, such that $\bfx$ can make a transition to $\bfy$}
+}
+\newglossaryentry{Rhxy}{
+type=symbols,
+name={\ensuremath{{R}_h (\mathbf{x} \to \mathbf{y})}},
+description={transition probability to get from $\bfx$ to $\bfy$ in the $h$-th step}
+}
+\newglossaryentry{star}{
+type=symbols,
+name={\ensuremath{\star}},
+description={non-zero CPT-entry}
+}
+\newglossaryentry{Y}{
+type=symbols,
+name={\ensuremath{Y}},
+description={random variable to be estimated by MCMC simulations}
+}
+\newglossaryentry{mu}{
+type=symbols,
+name={\ensuremath{{\mu}}},
+description={estimation of $\mu$ by $N$ MCMC simulations}
+}
+\newglossaryentry{N}{
+type=symbols,
+name={\ensuremath{N}},
+description={total number of MCMC simulations}
+}
+\newglossaryentry{mu_hat}{
+type=symbols,
+name={\ensuremath{\hat{\mu}}},
+description={expected value of $Y$}
+}
+\newglossaryentry{sigma_t}{
+type=symbols,
+name={\ensuremath{{\sigma}^2(t)}},
+description={standard deviation of the MCMC approximations at sample $t$}
+}
+\newglossaryentry{alpha}{
+type=symbols,
+name={\ensuremath{{\alpha}}},
+description={quantifies the proportionality constant of the MCMC sampling technique that belongs to the convergence class $\mathcal{O}(t^{-1/2})$, used as indicator of the ROC}
+}
+\newglossaryentry{alpha'}{
+type=symbols,
+name={\ensuremath{{\alpha'}}},
+description={candidate proportionality constant during the procedure to determine the ROC $\alpha$}
+}
+\newglossaryentry{beta_i}{
+type=symbols,
+name={\ensuremath{{\beta_i}}},
+description={coefficients in the polynomial expansion of the standard deviation $\sigma^2(t)$}
+}
+\newglossaryentry{gamma}{
+type=symbols,
+name={\ensuremath{\gamma}},
+description={acceptance probability in Metropolis sampling}
+}
+\newglossaryentry{g_t}{
+type=symbols,
+name={\ensuremath{g(t)}},
+description={simplified polynomial expansion of $\sigma^2(t)\sqrt{t}$ }
+}
+\newglossaryentry{delta}{
+type=symbols,
+name={\ensuremath{\delta}},
+description={parameter in the polynomial expansion of $g(t)=\sigma^2(t)\sqrt{t}$, used to tune the convex- and concaveness of $g(t)$ }
+}
+\newglossaryentry{f}{
+type=symbols,
+name={\ensuremath{f}},
+description={linear function fitted to the simplified polynomial expansion $g$ plotted in terms $t^{-\delta}$}
+}
+\newglossaryentry{V}{
+type=symbols,
+name={\ensuremath{V}},
+description={set of predetermined fixed size, contains feasible states generated by HFS}
+}
+
+
+\setacronymstyle{long-short}
+\newacronym{BN}{BN}{Bayesian network}
+\newacronym{MCMC}{MCMC}{Markov chain Monte Carlo}
+\newacronym{DAG}{DAG}{directed acyclic graph}
+\newacronym{CPT}{CPT}{conditional probability table}
+\newacronym{MLN}{MLN}{Markov logic network}
+\newacronym{SAT}{SAT}{satisfiability problem}
+\newacronym{HFS}{HFS}{hybrid forward sampling}
+\newacronym{MAP}{MAP}{maximum a posteriori}
+\newacronym{AHD}{AHD}{average Hellinger distance}
+
+\makeglossaries
+\renewcommand{\glsnamefont}[1]{\normalfont{#1}}
+
+%\usepackage{geometry}
+\usepackage[english]{babel}
+\usepackage[hidelinks]{hyperref}
+\usepackage{comment}
+\usepackage{cite}
+\usepackage{adjustbox}
+\usepackage{enumitem}
+	\setenumerate{itemsep = 0.1cm}
+\usepackage[font = small, margin=0.5cm]{caption}
+\usepackage{subcaption}
+%\usepackage{fullpage} % messes up the margins headers/footers
+\usepackage{amssymb}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage[section]{placeins}
+\usepackage{graphicx}
+\usepackage{dsfont}
+\usepackage{caption}
+\usepackage{lipsum}
+\usepackage[hang,flushmargin]{footmisc} 
+\usepackage{cleveref}
+\usepackage{multicol}
+\usepackage[numbers,square,sort]{natbib}
+\usepackage{algorithmicx}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{subcaption}
+\usepackage{float} 
+\usepackage{cancel}
+\usepackage{multirow} 
+\usepackage{booktabs} 
+\usepackage{varioref} 
+\usepackage{filecontents}
+\usepackage[outdir=./]{epstopdf}
+\usepackage{tabto}
+\NumTabs{4}
+\usepackage{wrapfig}
+\usepackage{pgf}
+\usepackage{color}
+\usepackage{hyperref}
+\hypersetup{colorlinks, breaklinks, urlcolor=black, linkcolor=black, citecolor=black}
+\usepackage{pgfplots}
+\usepackage{array}
+\usetikzlibrary{shapes, arrows}
+\tikzset{
+    events/.style={ellipse, draw, align=center},
+}
+\usepackage{filecontents}
+\setlength\parindent{24pt}
+\usepackage[hmarginratio=1:1, left=25mm, top=25mm, bottom=35mm]{geometry}
+\allowdisplaybreaks
+\AtBeginDocument{\renewcommand{\bibname}{References}}
+
+\newcommand\blfootnote[1]{%
+  \begingroup
+  \renewcommand\thefootnote{}\footnote{#1}%
+  \addtocounter{footnote}{-1}%
+  \endgroup
+}
+
+%Font and spacing of words/lines
+\setlength{\textfloatsep}{5pt}
+\usepackage{libertine}
+\usepackage{setspace}
+	\setstretch{1.05}
+\usepackage[tracking = true, letterspace = 100]{microtype}
+
+%Sectioning settings
+\usepackage{abstract}
+	\renewcommand{\abstractnamefont}{\scshape\sffamily\Large}
+	\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+	
+\usepackage{titlesec}
+	\titleformat	
+		\chapter[display]
+			\huge
+  				{\textsc{\lsstyle\chaptertitlename\ \thechapter}}{0pt}{\Huge\bfseries}
+	\titleformat
+		\section
+  			{\bfseries\normalfont\Large}{\thesection}{1em}{}
+	\titleformat
+		\subsection
+			{\bfseries\normalfont\large}{\thesubsection}{1em}{}
+	\titlespacing*{\section}{0cm}{1pc}{1pc}
+	
+\titleformat{\chapter}
+  {\bfseries\huge}{\normalfont{\lsstyle\chaptertitlename\ \thechapter}}{1em}{}
+  
+\titlespacing*{\chapter}{0pt}{0pc}{1.5pc}
+\titlespacing*{\section}{0pt}{1.5pc}{.5pc}
+\titlespacing*{\subsection}{0pt}{1.5pc}{.5pc}
+
+%Headers and footers
+\usepackage{fancyhdr}
+	\setlength{\headheight}{13.59999pt}
+	\pagestyle{plain}
+		{
+			\fancyhf{}
+			\renewcommand{\headrulewidth}{0pt}
+			\fancyfoot[C]{\thepage}
+		}
+	\pagestyle{fancy}
+		{
+			\fancyhf{}
+			\renewcommand{\sectionmark}[1]{\markright{\thesection~ - ~#1}}
+			\renewcommand{\chaptermark}[1]{\markboth{\chaptername~\thechapter~ - ~#1}{}}
+			\fancyhead[LO]{\nouppercase{\textsc\rightmark}}
+			\fancyhead[RE]{\nouppercase{\textsc\leftmark}}
+			\fancyfoot[C]{\thepage}
+		}
+
+
+%Pictures
+\usepackage{graphicx}
+\usepackage{mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+% Tikz
+\usepackage{tikz}
+	\usetikzlibrary{positioning}
+    \usetikzlibrary{calc}
+\usepackage{tikz-qtree}
+\usetikzlibrary{arrows,calc,plotmarks,intersections}
+\tikzset{>=stealth', help lines/.style={dashed, thick}, axis/.style={<->}, important line/.style={thick}, connection/.style={thick, dotted},}
+\usetikzlibrary{shapes.geometric,positioning}
+
+% Math packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathrsfs}
+	
+%Theorem commands
+\theoremstyle{plain}
+	\newtheorem{thm}{Theorem}[chapter]
+	\newtheorem{lem}[thm]{Lemma}
+	\newtheorem{con}[thm]{Conjecture}
+\theoremstyle{definition}
+	\newtheorem{definition}[thm]{Definition}
+	\newtheorem{example}[thm]{Example}
+	\newtheorem{exmps}[thm]{Examples}
+	\newtheorem{prop}[thm]{Proposition}
+\theoremstyle{remark}
+	\newtheorem*{remark}{Remark}
+	\newtheorem*{remarks}{Remarks}
+	\newtheorem{notation}[thm]{Notation}
+
+
+% Probability notations
+% Definition commands
+
+\newcommand{\A}{{\mathcal A}}
+\newcommand{\B}{{\mathcal B}}
+\newcommand{\E}{{\mathbb E}}
+\newcommand{\F}{{\mathcal F}}
+\newcommand{\G}{{\mathcal G}}
+\renewcommand{\H}{{\mathcal H}}
+\newcommand{\I}{{\mathcal{I}}}
+\newcommand{\M}{{\mathcal M}}
+\newcommand{\Q}{{\mathcal{Q}}}
+\newcommand{\X}{{\mathcal{X}}}
+
+\newcommand{\calP}{{\mathcal{P}}}
+\newcommand{\Var}{{\text{Var}}}
+
+\newcommand{\one}[1]{\mathrm{#1}}
+\newcommand{\two}[2]{\mathrm{#1#2}}
+\newcommand{\three}[3]{\mathrm{#1#2#3}}
+\newcommand{\four}[4]{\mathrm{#1#2#3#4}}
+
+\newcommand{\ps}{\textit{prune sampling }}
+\newcommand{\psp}{\textit{prune sampling. }}
+\newcommand{\Ps}{\textit{Prune sampling }}
+
+\renewcommand{\gg}{{\text{g} }}
+\newcommand{\gT}{{\text{g}_\text{T} }}
+\newcommand{\gF}{{\text{g}_\text{F} }}
+\renewcommand{\ss}{{\text{s} }}
+\newcommand{\sT}{{\text{s}_\text{T} }}
+\newcommand{\sF}{{\text{s}_\text{F} }}
+\newcommand{\rr}{{\text{r} }}
+\newcommand{\rT}{{\text{r}_\text{T} }}
+\newcommand{\rF}{{\text{r}_\text{F} }}
+
+
+%mathbf
+\newcommand{\bfe}{{\mathbf{e}}}
+\newcommand{\bfy}{{\mathbf{y}}}
+\newcommand{\bfX}{{\mathbf{X}}}
+\newcommand{\bfE}{{\mathbf{E}}}
+
+%color-text
+\newcommand{\red}[1]{{\textcolor{red}{#1}}}
+
+% number systems
+
+\def\N{{\mathbb N}}
+\def\bbZ{{\mathbb Z}}
+\def\bbQ{{\mathbb Q}}
+\def\bbR{{\mathbb R}}
+\def\bbC{{\mathbb C}}
+
+\renewcommand{\P}{{\mathbb P}}
+
+% Renewed definition commands
+\renewcommand{\S}[1]{\mathscr{#1}}
+
+% Renewed commands
+\renewcommand{\epsilon}{\varepsilon}
+
+\begin{document}
+
+%\newgeometry{hmarginratio = 1:1}
+
+
+%% new commands
+
+
+
+% Titlepage
+
+\begin{titlepage}
+	\centering
+	\vspace{1cm}
+	
+\scshape\sffamily{\Large master thesis jurriaan parie }\\[1.5cm]
+
+\HRule \\[0.4cm]
+{ \huge \scshape\sffamily{ performance of sampling methods \vskip 0.25cm for deterministic bayesian networks}} \\[0.3cm]
+\HRule \\[1.5cm]
+
+\scshape\sffamily{ \Large msc mathematical sciences, \\ utrecht university }
+
+\vfill
+	
+\large \scshape\sffamily{supervised by:}
+
+\vspace{2pc}
+	
+\noindent\makebox[0.5\linewidth][c]{%
+\begin{minipage}[t!]{.47\textwidth}
+	{\large \scshape\sffamily{dr. frank philipson} } \\ \\
+	\scshape\sffamily{cyber security and robustness, tno} \\
+	\centering
+	\includegraphics[scale=0.54]{tno_logo_zwart.jpg}
+\end{minipage}}
+\hfill
+\begin{minipage}[t!]{.47\textwidth}
+	{ \large \scshape\sffamily{prof. dr. gerard barkema} } \\ \\
+	\scshape\sffamily{information and computing sciences, utrecht university}
+	\centering
+	\includegraphics[height = 7pc]{UU_logo_EN_RGB.jpg}
+\end{minipage}
+
+\vfill
+
+\large \scshape\sffamily{september 14, 2018}
+
+	
+\end{titlepage}
+
+
+%\pagenumbering{roman}
+\pagenumbering{arabic}
+
+\pagestyle{plain}
+
+% Abstract
+
+\begin{abstract}
+The performance of the recently introduced \ps algorithm \cite{phillipson2018} is characterised for various types of Bayesian networks and compared to the popular Markov chain Monte Carlo (MCMC) sampling methods Gibbs- and Metropolis sampling. We devised a procedure to obtain the performance of the MCMC sampling methods in the limit of infinite simulation time, extrapolated from relatively short simulations. This approach was used to conduct a study to compare the accuracy, rate of convergence and the time consumption of the sampling methods. We show that Markov chains created by \textit{prune sampling} always converge to the desired posterior distribution, also for networks where conventional Gibbs sampling fails. {Beside that, we demonstrate} that \ps outperforms {Gibbs sampling -- arguably the most widely used MCMC inference technique --} at least for a class of BNs. Though, this tempting feature comes at a price. In the first version of \textit{prune sampling}, the procedure to choose a configuration of the BN for the next iteration is rather time intensive. Our conclusion is that \ps is {a competitive} method for all types of small and medium sized BNs, but standard methods perform better for all types of large BNs. Ultimately, we improved  the first version of \ps by providing sophisticated solutions for its flaws.
+
+\blfootnote{\noindent Part of this thesis will be published as \textit{Prune sampling: a MCMC inference technique for discrete and deterministic Bayesian networks}} 
+\end{abstract}
+
+%a competitive
+%former: the preferred
+
+%Gibbs sampling
+%former: standars sampling techniques
+
+%Beside that, we demonstrate that
+%former: We show
+
+%In the first version of \ps, for large BNs the procedure to choose the next iteration step uniformly is rather time intensive.
+%former: In the first version of \ps, the procedure to choose uniformly a configuration for large BNs for the next iteration is rather time intensive.
+
+% Contents
+
+\tableofcontents
+
+\clearpage
+
+%\pagenumbering{arabic}
+
+\restoregeometry
+
+
+%Introduction
+
+\chapter{Introduction}\label{intro}
+This thesis is about Bayesian network inference. In particular, it is about the performance of Markov chain Monte Carlo sampling methods in presence of deterministic relations, which form an important class of approximate inference techniques for Bayesian networks. In this first chapter, we give a brief overview of the study we perform in this master thesis.
+
+\section{Bayesian networks and inference}
+A Bayesian network (BN) is a probabilistic model that represents a set of random variables and their conditional dependencies. One could represent a BN graphically by considering a directed acyclic graph where the set of nodes is induced by the set of random variables and where the set of edges is given by the conditional dependencies between these random variables. Assuming that instances fall into one of a number of mutually exclusive and exhaustive classes, discrete BNs are used to model probabilistic relationships. As an illustration, BNs model genetic linkage \cite{fishelson2004}, causal reasoning \cite{pearl2014probabilistic} and defence systems \cite{phillipson2015modelling}. For all of these models, BNs are used to answer probabilistic queries about variables and their relationships. An interesting feature of BNs is that the network can be used to find out updated knowledge of the state of a subset of variables when other variables (the evidence variables) are observed. This process, of computing the posterior distribution of variables when evidence is given, is called inference. Though, exact inference in BNs is often too computationally intensive. On the other hand, approximate inference methods have to deal with a lack of convergence and often perform poorly in the presence of determinism \cite{koller2009probabilistic, poon2006sound, gogate2011samplesearch}. Therefore, a plethora of different inference strategies have been developed \cite{nasrabadi2007pattern, nielsen2009bayesian, koller2009probabilistic, pearl2014probabilistic}.
+
+\section{Goals and approach of this research project}
+In order to improve the reliability of approximate inference methods, at TNO an unprecedented Markov Chain Monte Carlo (MCMC) approximate inference method named \ps was created. In this research project, I characterise the performance of the first implemented version of \ps for discrete and deterministic BNs. We devised a procedure to obtain the performance of MCMC sampling methods in the limit of infinite simulation time, extrapolated from relatively short simulations. This approach was used to conduct a study to compare the accuracy, rate of convergence and the time consumption of \ps with two conventional MCMC sampling methods: Gibbs- and Metropolis sampling. In addition, we disclose the pitfalls of \ps and show how this first version could be improved. Results of this study will be published in \textit{Prune sampling: a MCMC inference technique for discrete and deterministic Bayesian networks} \cite{phillipson2018}.
+
+
+\section{Overview of the thesis}
+We start introducing the BN framework, inference techniques and their shortcomings in Chapter 2. In Chapter 3, we introduce the concept and elaborate on the implementation of \textit{prune sampling}. Consecutively, in Chapter 4, we present the performance of \ps in terms of accuracy, the rate of convergence and time consumption compared with Metropolis- and Gibbs sampling. In Chapter 5, we propose solutions to the flaws of \ps and and discuss results of improved versions of the algorithm.
+
+\chapter{Bayesian network inference}\label{ch:2}
+In this chapter, we introduce the main concepts our study: the framework of Bayesian networks (BNs), the task of doing BN inference and \gls{MCMC} sampling methods for BNs. We highlight the pros and cons of commonly used MCMC inference techniques. Such that -- later on -- we can make a comparison between the performance of those methods and the \ps method more clearly.
+
+\section{Bayesian networks}\label{sec:BN}
+First, we introduce the concept of a BN structure and its corresponding probabilistic methodology.
+\begin{definition}[Bayesian network]
+A \gls{BN} structure $\gls{BN_structure}$ is a \gls{DAG} whose nodes represent random variables $\gls{var_set} = (X_1, \ldots , X_{\gls{n}})$. Let $\gls{par_var}$ denote the direct parents of $\gls{var}$ in $\G$ and $\gls{non_des_var}$ denote the variables in the graph that are non-descendants of $X_i$. Then $\G$ encodes the following set of conditional independence assumptions, called the local independencies, and denoted by $\gls{loc_indep}$:
+\begin{align*}
+\text{for each variable $X_i$: $(X_{\gls{i}} \gls{indep} \text{ND}_{X_i} | \text{Pa}_{X_i})$}.
+\end{align*}
+In other words, the local independencies state that each node $X_i$ is conditionally independent of its non-descendants given its parents \citep[p.~57]{koller2009probabilistic}.
+\end{definition}
+
+When dealing with spaces composed solely of discrete-valued random variables, to each node $X_i$ we assign a state $x_i \in Val(X_i)$. Here, $\gls{val_X_i}$ denotes the set of values that a random variable $X_i$ can take. We display the conditional probability distribution $P(X_i | \text{Pa}_{X_i})$ in a \gls{CPT}, where
+\begin{align*}
+\sum_{i \in \{1, \ldots , n\}} P(\gls{x_i} | \text{Pa}_{X_i}) = 1.
+\end{align*}
+So, a BN exists of a graph with a collection of local probability distributions, given in CPTs. Together, these local probability distributions give the joint probability distribution of the BN. We use $\gls{bfX} \subseteq \X$ to denote a set of random variables, while $\gls{bfX}$ denotes an assignment of values to the variables in this set. For convenience, a state (or configuration) of a BN is denoted as $\bfx = (x_1, \ldots , x_n)$ and $\gls{P}(\bfx)$ denotes the probability of the BN having this state $\gls{bfx}$. Next, we introduce the event called determinism \citep[p.~158]{koller2009probabilistic}.
+\begin{definition}[Deterministic relation]
+The CPT contains one of more zeros. That is, there exists a function $f: Val(\text{Pa}_{X_i}) \to Val(X_i)$, such that
+\begin{align*}
+P(x_i | \text{Pa}_{X_i}) =
+\begin{cases}
+1 & x_i = f(\text{Pa}_{X_i}) \\ 
+0 & \text{otherwise}.
+\end{cases}
+\end{align*} 
+\end{definition}
+We consider a state $\bfx$ being feasible if each unique CPT-entry that corresponds to this state is strictly positive.
+\begin{definition}[Feasible state]
+A feasible state of the BN is a state $\bfx$ such that $P(\bfx)>0$.
+\end{definition}
+We define the \textit{sample space} as all possible (not necessarily feasible) states of a BN and we denote this set by $\gls{Omega}$. The above introduced concepts are all depicted in Example \ref{ex:rain-sprinkler}.
+\begin{example}\label{ex:rain-sprinkler}
+Consider the \textit{Rain-Sprinkler} BN in Figure \ref{rainBN}. In this model, one could consider the event of grass being wet ($\gg$) as a results of two causes: either a sprinkler ($\ss$) is on or it is raining ($\rr$). Beside that, it is supposed that the rain has a direct effect on the use of the sprinkler. All three variables have two possible values, T (for true) and F (for false). From the CPTs it becomes clear that when it rains, the sprinkler is usually not turned on, i.e. $P( \sT |  \rT) = 0.01$. The counter intuitive state of the BN, that the grass is wet given it is not raining and the sprinkler is off: $\bfx = (\rF,  \sF, \gT)$, is excluded by the deterministic relation $P(\gT | \rF,  \sF) = 0$.  Taking the fixed (topological) order of the variables $R, S, G$ into account, the joint probability function is given by
+\begin{align}
+P(R, S, G) = P(G | R, S) P(S|R) P(R).
+\label{eq:jointprob}
+\end{align}
+This BN can answer queries like \textit{what is the probability that it is raining, given the grass is wet?} by using the conditional probability formula and summing over all (auxiliary) variables
+\begin{align}
+P(R = \rT | G = \gT) = \frac{P(R = \rT, G = \gT)}{P(G = \rT)} = \frac{\sum_{S \in \{T,F\}} P(R = \rT, S, G = \gT)}{\sum_{R, S \in \{T,F\}} P(R, S, G = \gT)}.
+\label{eq:conditional-summation}
+\end{align}
+\end{example}
+More background concerning the mathematical representation of BNs and its methodology could be found in \cite{koller2009probabilistic}, Chapter~3; \cite{nielsen2009bayesian}, Chapter~2; \cite{pearl2014probabilistic}, Chapter~2. 
+\begin{center}
+\begin{figure}[t!]
+\centering
+\begin{tikzpicture}[node distance=1.2cm, >=triangle 60]
+\node [events] (s) {Sprinkler};
+\node [events,  right=of s] (r) {Rain};
+\node [events,  below right=of s] (g) {Grass wet};
+
+
+\draw [->] (r) -- (s);
+\draw [->] (r) -- (g);
+\draw [->] (s) -- (g);
+
+{\small
+\node [right = 2cm of r] (t_r) {
+    \begin{tabular}{|c||c|} \hline
+    	$\text{r}_\text{T}$ & $0.2$\\ \hline
+    	$\text{r}_\text{F}$ & $0.8$ \\ \hline
+    \end{tabular}
+    };
+    
+\node [left = 2cm of s] (t_s) {
+    \begin{tabular}{|c||c|c|} \hline
+	& $\text{r}_\text{T}$ & $\text{r}_\text{F}$    \\ \hline \hline
+	$\text{s}_\text{T}$ & 0.01 & 0.4   \\ \hline
+	$\text{s}_\text{F}$ & 0.99 & 0.6 \\ \hline
+\end{tabular}
+    };
+    
+\node [below left = 1cm of g] (t_g) {
+    \begin{tabular}{|c||c|c|c|c|} \hline
+	& $\text{r}_\text{T},\ \text{s}_\text{T}$ & $\text{r}_\text{T},\ \text{s}_\text{F}$ & $\text{r}_\text{F},\ \text{s}_\text{T}$ & $\text{r}_\text{F},\ \text{s}_\text{F}$  \\ \hline \hline
+	$\text{g}_\text{T}$ & 0.99 & 0.8 & 0.9 & 0  \\ \hline
+	$\text{g}_\text{F}$ & 0.01 & 0.2 & 0.1 & 1 \\ \hline
+\end{tabular}
+    };
+}
+    
+\draw [dotted] (r) -- (t_r);
+\draw [dotted] (s) -- (t_s);
+\draw [dotted] (g) -- (t_g);
+
+\end{tikzpicture}
+\caption{a BN structure and corresponding CPTs are used to model the event of grass being wet (g) as a results of two causes: either a sprinkler (s) is on or it is raining (r).}
+\label{rainBN}
+\end{figure}
+\end{center}
+\vspace{-1.9pc}
+\section{Inference}\label{sec:inference}
+The task of answering questions as \textit{what is $P(R = \text{r}_\text{T} | G = \text{g}_\text{T})$?} is called \textit{inference}. Below, we describe how one could answer such queries by computing the exact probability. \\
+
+When values of variables are known, or are \textit{given}, we call this set $\bfE \subset \X$ evidence. Now, we can formulate the main goal of our this study as: given a set of evidence $\bfE = \bfe$ and nodes of interest $\bfX \subset \X$, such that $\bfE \cap \bfX = \emptyset$, what is the probability distribution $P(\bfX | \bfE = \bfe)$? Answering this type of questions is called \textit{inferring unobserved variables}. We write $P$ as the posterior probability distribution of interest, with reduced CPTs according to the evidence nodes. In the next example, we return to the \textit{Rain-Sprinkler} BN to give an illustration of this type of inference.
+\begin{example}\label{ex:exact-marg}
+Again, consider the BN from Figure \ref{rainBN}. We show how the question in Example \ref{ex:rain-sprinkler} -- \textit{what is $P(R = \text{r}_\text{T} | G = \text{g}_\text{T})$?} -- could be computed explicitly. Using the expansion for the joint probability function from Equation \ref{eq:jointprob} and the conditional probabilities from the CPTs, one could evaluate each term in the numerator and denominator of Equation \ref{eq:conditional-summation} in the way we evaluate
+\begin{align*}
+P(R = \rT, S = \sF, G = \gT) &= P(G = \gT | R = \rT, S = \sF) P(S = \sF | R = \rT) P(R = \rT) \\
+&= 0.8 \cdot 0.99 \cdot 0.2 \\
+&= 0.1584. 
+\end{align*}
+Doing these calculations for all cases, one will obtain
+\begin{align*}
+P(R = \rT | G = \gT) &= \frac{0.00198_{\rT, \sT, \gT} + 0.1584_{\rT, \sF, \gT} }{0.00198_{\rT, \sT, \gT} + 0.288_{\rF, \sT, \gT} + 0.1584_{\rT, \sF, \gT} + 0.0_{\rF, \sF, \gT}}\\
+& = \frac{891}{2491} \approx 0.3577.
+\end{align*}
+Hence, the probability that it is raining, given the grass is wet is approximately 36\%.
+\end{example}
+The procedure described in Example \ref{ex:exact-marg} is called \textit{exact marginalization}. It illustrates that in order to do inference, there is not always need for an explicit joint distribution. Though, when we deal with more complex BNs, \textit{exact marginalization} is still vulnerable for an exponentially blow up of the number of computations to be executed. In general, all exact inference methods -- variable elimination, clique tree propagation, recursive conditioning et cetera -- have to execute computations that are exponential in the network's treewidth (a measure for graph complexity). To make all of those concepts detailed here is out of the scope of this thesis. Therefore, for a comprehensive discussion of those methods we refer to \cite{koller2009probabilistic}, Chapter~9; \cite{nielsen2009bayesian}, Chapter~4. \\
+One way to avoid the exponential character of exact inference techniques, is to consider approximate inference methods. In order to do so, in the next section, we introduce how samples of states of BNs could be generated by using Markov chain Monte Carlo simulations.
+
+%In cases where much of the evidence is at the leaves of the network, forward sampling techniques for example are essentially sampling from the prior distribution, which is often very far from the desired posterior. 
+
+%\subsection{Exact algorithms}
+%\subsection{Approximation algorithms}
+
+%answer queries of the form
+
+\section{Approximate sampling methods}\label{sec:approx-inf}
+Before elaborating on approximate sampling inference methods, we first discuss how to sample from a finite discrete distribution we defined in section \ref{sec:BN}.
+\begin{definition}[Sampling from a discrete distribution]\label{def:sampling}
+We know that given the state of its parents, the distribution of every $X_i$ in a BN is denoted by 
+\begin{align*}
+P(X_i | \text{Pa}(X_i) = \bfx ).
+\end{align*}
+Now, suppose $Val(X_i) = M$. Then, with probability $p_1, \ldots, p_M$ respectively one of the $M$ possible states is assigned to variable $X_i$. Note that $\sum_{m=1}^M p_m = 1$ and that these probabilities $p_{\gls{m}}$ are the column CPT-entries of variable $X_i$. Sampling from such a distribution can be done by partitioning the interval $[0,1)$ in $M$  smaller intervals of the form
+\begin{align*}
+[0, p_1), [p_1, p_1 + p_2), [p_1 + p_2, p_1 + p_2 + p_3), \ldots , [1-p_M, 1).
+\end{align*}
+Subsequently, a random number generator could be used to generate a random number $r_0$ in the interval $[0,1)$. The unique smaller interval in which $r_0$ is found yields the sampled state.
+\end{definition}
+Approximate sampling methods use this technique to assign values to variables in a BN on a large scale. Consecutively, applying statistics on these generated samples could answer probabilistic queries and could extract characteristics of the BN. In which way approximate sampling methods generate samples (how values are assigned to variables) depends on the chosen heuristic. Later on in this section, we show how unobserved variables could be inferred based on a bunch of generated samples and which heuristic Metropolis- and Gibbs sampling use to create samples. First, we start with an example. Suppose we already have a bunch of $6$ samples. The next example illustrates the key concept of all approximate inference techniques.
+\begin{example}\label{ex:sampling}
+Consider the BN in Figure \ref{rainBN}. Let \rr be our variable of interest and suppose $\bfx^{(1)}, \ldots , \bfx^{(6)}$ are independent and identically distributed (i.i.d.) samples of $(R, S, G)$ created by a certain sampling heuristic. The bunch of $6$ samples is given by
+\begin{multicols}{2}
+\begin{enumerate}
+\item $\bfx^{(1)} = ( R^{(1)} = \rF, S^{(1)} = \sT,  G^{(1)} = \gT)$
+\item $\bfx^{(2)} = ( R^{(2)} = \rT, S^{(2)} = \sF,  G^{(2)} = \gT)$
+\item $\bfx^{(3)} = ( R^{(3)} = \rF, S^{(3)} = \sT,  G^{(3)} = \gT)$
+\item $\bfx^{(4)} = ( R^{(4)} = \rF, S^{(4)} = \sT,  G^{(4)} = \gF )$
+\item $\bfx^{(5)} = ( R^{(5)} = \rT, S^{(5)} = \sT,  G^{(5)} = \gT)$
+\item $\bfx^{(6)} = ( R^{(6)} = \rF, S^{(6)} = \sF,  G^{(6)} = \gF)$.
+\end{enumerate}
+\end{multicols}
+%Here, $\textasteriskcentered$ denotes that any value could be assigned to the corresponding variable, though (in this context) which values exactly is not relevant. 
+\noindent Then, the probability of $R = \text{r}_\text{T}$ can be approximated by 
+\begin{align*}
+\gls{tilde_P}_6(R = \rT ) = \E[ \mathds{1}_{R = \rT} ] = \sum_{t=1}^6 \mathds{1}_{R^{(t)} = \rT} = \frac{2}{6},
+\end{align*}
+where $\mathds{1}_{R = \rT}$ is the indicator function of the event $R = \rT$.
+\end{example}
+In general, for a variable of interest $X$ with $\gls{T} \in \N$ (not te be confused with T  for true) i.i.d. samples, the probability of $X = x$ can be approximated by 
+\begin{align*}
+\widetilde{P}_T(X = x) = \E[ \mathds{1}_{X=x} ] = \sum_{t=1}^T \mathds{1}_{X^{(t)} = x}.
+\end{align*}
+The above introduced indicator function $\mathds{1}$ is a function on the state space $\Omega$ that indicates if an event of interest occurs or not. Note that the 6 samples from example \ref{ex:sampling} is an approximation of the entire state space and does therefore not share the same distribution of the assigned variables ($P(R = \rT ) =  ... \neq 2/6$). In general, the aim of approximate inference sampling methods is to mimic $\Omega$ as good as possible. When a set of samples has exactly the same distribution as the real state space, we call this \textit{complete uniform samples}. \\
+
+Beside technical concerns about sampling, a plethora of techniques have been develop to create samples $\bfx^{(1)}, \ldots \bfx^{(T)}$. Discussing all those methods here in detail is beyond the scope of this thesis. For an overview of approximate sampling techniques and its limitations we refer to \cite{koller2009probabilistic}, Chapter 12; \cite{nielsen2009bayesian} Chapter 4. In the next subsection, we focus on how samples of a BN can be generated using Markov chain Monte Carlo methods. 
+
+\subsection{Markov chain Monte Carlo sampling}\label{sec:mcmc}
+We introduce the concept of Markov chain Monte Carlo sampling and explain under which conditions the Markov chain guarantee convergence to the desired posterior distribution. Furthermore, we give an illustration how Metropolis sampling could be used on the \textit{Rain-Sprinkler} BN. \\
+
+In contrast to Example \ref{ex:sampling}, suppose that sample $\gls{sample_x}$ is not created i.i.d. for all $\gls{t} \geq 1$. But we create sample $\bfx^{(t+1)}$ by tweaking the state of sample $\bfx^{(t)}$ according to a certain heuristic. Repeating this process yields the Markov chain $(\bfx^{(t)})_{t \in \N_0}$. Repeating this often -- for $t = 1, \ldots T$ with large $T$  -- this process is called \textit{Markov chain Monte Carlo} (MCMC) sampling. 
+Due to a cleverly chosen heuristic, MCMC methods construct a Markov chain such that, although the first sample may be generated from the prior distributions, successive samples are generated from distributions that provably get closer and closer to the desired posterior distribution. It could be shown \citep[p.~517]{koller2009probabilistic} that $\widetilde{P}_T \to P$ as $T \to \infty$. In order to use this tempting feature of MCMC methods, we need to guarantee that the limit of this process exists and is unique. Since we only consider Markov chains on finite state spaces, from the theory of Markov chains we know that if a Markov chain is regular and reversible with respect to a distribution $\pi$, then $\pi$ is the unique stationary distribution. These notions are defined below.
+
+
+%In cases where much of the evidence is at the leaves of the network, forward sampling techniques for example are essentially sampling from the prior distribution, which is often very far from the desired posterior. 
+
+\begin{definition}[Regular Markov chain]
+A Markov chain is said to be regular if there exists some number $k \in \N$ such that for every $\bfx, \bfx' \in Val(\bfX)$ the probability of getting from $\bfx$ to $\gls{bfx_a}$ -- denoted as $(\bfx \to \bfx')$ -- in exactly $k$ steps, is $> 0$. 
+\end{definition}
+
+\begin{definition}[Reversible Markov chain]
+A finite-state Markov chain $Q$ is called reversible if there exists a unique distribution $\pi$ such that for all states $\bfx$ and $\bfx'$
+\begin{align}
+\pi(\bfx) Q(\bfx \to \bfx') = \pi(\bfx') Q(\bfx' \to \bfx).
+\end{align}
+\end{definition}
+
+\begin{definition}[Stationary distribution]
+A distribution $\pi$ is a stationary distribution for a Markov chain Q if
+\begin{align}
+\pi(\bfx') = \sum_{\bfx \in Val(\bfX)} \pi(\bfx) Q(\bfx \to \bfx').
+\end{align}
+\end{definition}
+A heuristic that generates a Markov chain that tend to be regular and reversible is \textit{Metropolis sampling}. In the context of BN sampling, it follows the next procedure.
+\begin{definition}[Metropolis sampling]
+\leavevmode
+\makeatletter
+\@nobreaktrue
+\makeatother
+\vspace{0.5pc}
+\begin{itemize}
+\item Select an initial state $\bfx^{(0)}$ of the BN;
+\item for each iteration $0 < t \leq T$: create a candidate sample $\bfx'$ by drawing a value from a proposed distribution. Here, for all $X_i$ we draw uniformly random a value from $Val(X_i)$;
+%We could consider a normal distribution being `centered' on $X_i = x_i$ as making a random one-to-one representation of $Val(X_i) = \{x_1, \ldots , x_m \}$ (according to the fixed ordening) to the set $\{- \floor*{\frac{m}{2}}, \floor*{\frac{m}{2}}\}$. Then, we sample a random number $u$ from a normal distribution with mean that corresponds to the integer representing the variable of interest. According to specific boundaries we end up in a new proposed state.
+\item determine the acceptance ratio $\gls{gamma} = \min \big( 1, \frac{P(\bfx')}{P(\bfx^{(t-1)})} \big)$ from the CPTs;
+\item generate a uniform random number $u \in [0,1]$;
+\begin{itemize}
+\item if $u \leq \gamma$ then $\bfx^{(t)} = \bfx'$;
+\item if $u > \gamma$ then $\bfx^{(t)} = \bfx^{(t-1)}$.
+\end{itemize}
+\end{itemize}
+The above construction allows us to produce a Markov chain for an arbitrary stationary distribution. Though, in order to guarantee convergence to the desired distribution, we point out that the constructed chain still needs to be regular. This property does not follow directly from the construction. Under which conditions Metropolis sampling guarantees convergence is discussed in \citep[p.~505]{koller2009probabilistic}.
+\end{definition}
+In the next example, we show how Metropolis sampling works out on the \textit{Rain-Sprinkler} network.
+\begin{example}[Metropolis sampling]
+Consider the BN in Figure \ref{rainBN}. Suppose that we have the initial state 
+\begin{align*}
+\bfx^{(0)} = (R^{(0)} = \rT, S^{(0)} = \sF, G^{(0)} = \gT)
+\end{align*}
+and no evidence is available. We select $R^{(1)}$ according the distribution $P(R^{(1)}=\rT)=P(R^{(1)}=\rF) = 0.5$. Repeating this for $S$ and $G$, one could obtain
+%In order to generate a sample $R^{(1)}$, according to a normal distribution, we could consider a normal distribution being `centered' on $R^{(0)} = \rT$ as making a one-to-one representation of $Val(R) = \{\rT, \rF\}$ to the set $\{0, 1\}$. Then, we can sample a random number $u$ according a standard normal distribution. Then, if $u \leq 0$: $X^{(1)} = \rT$ and if $u > 0: X^{(1)} = \rF$. 
+\begin{align*}
+\bfx' = (R' = \rT, S' = \sF, G' = \gF).
+\end{align*}
+We determine $\gamma$ as
+\begin{align*}
+\gamma = \frac{P(R' = \rT, S' = \sF, G' = \gF)}{P(R^{(0)} = \rT, S^{(0)} = \sF, G^{(0)} = \gT)} = \frac{0.0396}{0.1584} = 0.25. 
+\end{align*}
+Then, we $\bfx^{(1)} = \bfx'$ if the uniform random number $u \in [0,1]$ is smaller than $0.25$, otherwise $\bfx^{(1)} = \bfx^{(0)}$.
+\end{example}
+Repeating this procedure, we are able to generate $T$ samples of the BN. Ultimately, from this bunch of samples we can do inference as described in Example \ref{ex:sampling}. When we adjust the proposal distribution of Metropolis sampling, we could obtain a special case of Metropolis sampling called \textit{Gibbs sampling}. 
+\subsection{Gibbs sampling}
+Gibbs sampling \cite{geman1984stochastic} is one of the most popular MCMC methods to date.  We show how Gibbs sampling is related to Metropolis sampling and how regularity and reversibility could break down due to the appearance of deterministic relations in the BN.
+\begin{definition}[Gibbs sampling]
+Let $(X_1, \ldots , X_n)$ be an arbitrary ordering of the variables in $\G$. The Gibbs sampling algorithm begins with a random assignment $\bfx^{(0)}$ to all variables in the BN. Then, for $t = 1, \ldots, T$ it performs the following $T$ Gibbs iterations. For $i=1, \ldots, n$, it generates a new value $x_i^{(t)}$ for variable $X_i$ by sampling a value from the distribution $P(X_i | \bfx_{-i}^{(t)})$, where $\bfx_{-i}^{(t)} = (x_1^{(t)}, \ldots, x_{i-1}^{(t)}, x_{i+1}^{(t-1)}, \ldots, x_{n}^{(t-1)})$. After $T$ samples are generated, all one-variable marginals can be estimated using the following quantity
+\begin{align}\label{eq:gibss}
+\widetilde{P}_T(x_i) = \frac{1}{T} \sum_{t=1}^T P(x_i | \bfx_{-i}^{(t)} ).
+\end{align}
+It could be shown, that in the limit of infinite samples, $\widetilde{P}_T(x_i)$ will converge to $P(x_i)$ if the underlying Markov chain is regular and reversible \cite{venugopal2013giss}.
+\end{definition}
+In the next example, we show how Gibbs sampling works out on the \textit{Rain-Sprinkler} network.
+\begin{example}[Gibbs sampling]
+Consider the BN in Figure \ref{rainBN}. Suppose we have the initial state 
+\begin{align*}
+\bfx^{(0)} = (R^{(0)} = \rT, S^{(0)} = \sF, G^{(0)} = \gT)
+\end{align*}
+and no evidence is available. For each Gibbs iteration, we resample all unobserved variables, one in a time, in a predetermined order, say $(R, S, G)$. So, we first sample $R^{(1)}$ from the distribution $P(R | S^{(0)} = \sF, G^{(0)} = \gT)$, which could be made explicitly
+%\begin{align*}
+%P(R = \rT | S^{(0)} = \sT, G^{(0)} = \gT) &= \frac{P(\rT, \sT,  \gT)}{P(\sT, \gT)} = \frac{P(\gT | \rT, \sT) P(\sT | \rT) P(\rT)}{\sum_{\rr \in {\{T,F\}}}P(\rr, \sT, \gT)} \\
+%&= \frac{0.99 \cdot 0.01 \cdot 0.2}{0.00198_{\rT, \sT, \gT} + 0.288_{\rF, \sT, \gT}} \approx 0.0068.
+%\end{align*}
+\begin{align*}
+P(R = \rT | S^{(0)} = \sF, G^{(0)} = \gT) &= \frac{P(\rT, \sF,  \gT)}{P(\sT, \gT)} = \frac{0.1584}{0.00198_{\rT, \sT, \gT} + 0.288_{\rF, \sT, \gT}} \approx 0.5462.
+\end{align*}
+Hence $P(R = \rF | S^{(0)} = \sF, G^{(0)} = \gT) \approx 0.4538$. If we have drawn a value from this distribution, for example $R^{(1)} = \rF$, we continue to resample $S^{(1)}$ from the distribution $P(S | R^{(1)} = \rF, G^{(0)} = \gT)$, obtaining for example $S^{(1)} = \sT$. Finally, we sample $G^{(1)}$ from $P(G | R^{(1)} = \rF, S^{(1)} = \sT)$, resulting in $\gT$. Therefore, the result of the first iteration of Gibbs sampling is the sample $\bfx^{(1)} = (R^{(1)} = \rF, S^{(1)} = \sT, G^{(1)} = \gT)$. This process repeats.
+\end{example}
+As mentioned before, Gibbs sampling could perform poorly in the presence of deterministic relations \cite{koller2009probabilistic, poon2006sound, gogate2011samplesearch}. In the next example, we give an illustration of this phenomenon.
+\begin{example}\label{ex:gibbs}
+Consider the BN in Figure \ref{gibbs}. Suppose the initial configuration $\bfx^{(0)} = (A^{(0)} = 0,\ B^{(0)} = 0)$ -- shortened $(0,0)$ -- is given and suppose no evidence is available. 
+In the first Gibbs iteration, we resample both unobserved variables, one at a time, in the order $A, B$. Thus, we first sample $A^{(1)}$ from the distribution $P(A | B^{(0)} = 0)$. According to the CPT, with probability $1$ this turns out to be $A=0$. Consecutively, we sample $B^{(1)}$ from the distribution $P(B | A^{(1)} = 0 )$. Which always returns $B = 0$. As a consequence, the Markov chain created by Gibbs sampling behaves like
+\begin{align*}\label{gibbs-trap}
+(0,0) \to (0,0) \to (0,0) \to \ldots ,
+\end{align*}
+yielding that $\bfx^{(i)} = (0,0)$ for all $i \geq 0$. Hence, inference based on Gibbs sampling returns $P(A=0) = 1$. The real distribution for $A$ on the other hand must equal $P(A=0) = P(A=1) = 0.5$.
+\end{example}
+When no deterministic relations are present in a BN, it could be shown \cite{poon2006sound} that Gibbs sampling generates a regular and reversible Markov chain (and therefore converges to the desired posterior distribution). Though, as illustrated in Example \ref{ex:gibbs}, when deterministic dependencies are present in the BN, regularity and reversibility could break down and the estimation given in Equation (\ref{eq:gibss}) could no longer converge to $P(x_i)$. \\
+Many solutions have been proposed in the past to address this problem \cite{venugopal2013giss, poon2006sound}. So do we: we devised a MCMC method that always converges to the desired posterior distribution, especially in the presence of deterministic relations.
+\begin{center}
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[node distance=1.2cm, >=triangle 60]
+\node [events] (a) {A};
+\node [events,  right=of a] (b) {B};
+
+
+\draw [->] (a) -- (b);
+
+{\small
+\node [left = 1cm of a] (ta) {
+    \begin{tabular}{|c||c|} \hline
+    	$A=0$ & $0.5$ \\ \hline
+    	$A=1$ & $0.5$\\ \hline
+    \end{tabular}
+    };
+    
+\node [right = 1cm of b] (tb) {
+    \begin{tabular}{|c||c|c|} \hline
+	&$A=0$&$ A=1 $  \\ \hline \hline
+	$B=0$ & $1$ & $0$ \\ \hline
+	$B=1$ & $0$ & $1$ \\ \hline
+\end{tabular}
+    };}
+    
+\draw [dotted] (a) -- (ta);
+\draw [dotted] (b) -- (tb);
+\end{tikzpicture}
+\caption{a BN with a deterministic relation. The state of B is equal to the state of A with probability 1.}
+\label{gibbs}
+\end{figure}
+\end{center}
+
+\chapter{Prune Sampling}\label{ch:3}
+In Section \ref{sec:mcmc} we looked at MCMC sampling methods and their short comings when deterministic relations appear in a BN. In this chapter we define \psp \Ps is a MCMC sampling method that always converges to the correct posterior distribution, even in the presence of determinism. First, we explain how this technique is inspired by the more general but sound MC-SAT algorithm. Then, we introduce the mathematical notation and -definition of \psp Consecutively, we show theoretically why the \textit{prune} technique always generates a regular and reversible Markov chain with respect to the desired distribution. Ultimately, we elaborate on the practical implementation of the \ps algorithm.
+
+\section{Background: MC-SAT algorithm}
+As we concluded Chapter \ref{ch:2}, many solutions have been proposed in the past to address the problem of trapped Gibbs samples in a subset of the state space. Notable examples are the Sample Search-, GiSS- \cite{venugopal2013giss} and slice sampling method \cite{besag1993spatial, damlen1999gibbs, gilks1996interdisciplinary}. The MC-SAT algorithm \cite{poon2006sound} is a special case of slice sampling and exploits the strategy of auxiliary variables in the more general framework of Markov logic networks (MLNs). Poon and Domingos show that (on MLNs) MC-SAT is a sound MCMC algorithm, meaning it generates a Markov chain which is regular and reversible, even in the presence of deterministic relations. \\
+
+To use MC-SAT for BN inference, a BN needs to be converted to a weighted \gls{SAT}. This has two drawbacks. In the first place, an explicit translation of a BN to a weighted SAT problem is memory intensive. Secondly, the graphical dependencies of BNs are lost when the BN structure is translated to a SAT problem. In order not to suffer from these drawbacks, we bring the key strenghts of the MC-SAT algorithm -- the construction of a random sample space --  to the field of BNs. In doing so, we preserve the compact and graphical structure of BNs. To explain these ideas in the best possible way, we first introduce the mathematical notation and -definition of \psp
+
+\section{Notation and definition}
+The key idea of \ps is straight-forward: in order to be able to select a sample of the state space uniformly, the exhaustive listing of all feasible states of the original BN is impossible (due to too much memory and time consumption, as described in Section \ref{sec:inference}). Though, the exhaustive listing of all solutions of a randomly pruned BN is possible and still assures a sample to be chosen uniformly from the entire state space. In order to characterise this concept and to explain how \ps generates samples completely uniform, we introduce the following notation. \\
+
+Given a BN structure $\G$ with $n$ variables and corresponding CPTs. For $i = 1, \ldots , n$, let $l_i$ be the index of the labels of the CPT-entries corresponding to variable $X_i$, so $1 \leq \gls{l_i} \leq | Val(X_i) | \cdot | Val(\text{Pa}_{X_i})|$. Then, we denote 
+\begin{align}
+\begin{split}
+\gls{C} := \{ & \gls{kli} : \gls{c_k_l_i} \text{ is an entry in the CPT of variable $X_i$, for $1 \leq i \leq n$} \}
+\end{split}
+\end{align}
+as the collection of all CPT-labels of $\G$. Here, $\gls{k}$ is an abbreviation of the name of variable $X_i$. For convenience, this notation is applied on the simple deterministic BN we saw before.
+\begin{example} The collection of CPT-labels $\C$ of the BN in Figure \ref{gibbs} contains 6 labels: 2 for the CPT of node $A$ -- indexed by $A(1), A(2)$ -- and 4 for the CPT of node $B$ -- indexed by $B(1), B(2), B(3), B(4)$. For completeness, the set with all CPT-labels in the BN is given by $\C = \{ A(1), A(2), B(1), B(2), B(3), B(4) \}$.
+\end{example}
+A state $\bfx$ of the BN corresponds to a unique collection of $n$ CPT-entries.  We denote the collection of CPT-labels $k(l_i)$ corresponding to this state by $\gls{Cx}$. Accordingly, state $\bfx = (A = 0, B = 0)$ of the BN presented in Figure \ref{gibbs} corresponds to $\C_\bfx = \{ A(1), B(1) \}$. In general, observe that for $i = 1, \ldots, n$
+\begin{align*}
+P(\bfx) = \prod_{k(l_i) \in \C_\bfx} c_{ k(l_i)}.
+\end{align*}
+\begin{figure}[t!]
+\centering
+\begin{adjustbox}{width=\textwidth}
+\begin{tikzpicture}[node distance=1.2cm, >= triangle 60]
+
+\node [events] (kidney) {Kidney};
+\node [events, below right=of kidney] (bp) {BloodPres.};
+\node [events, above right=of bp] (lifestyle) {Lifestyle};
+\node [events, below=of bp] (measure) {Measurement};
+\node [events, below right=of lifestyle] (sports) {Sports};
+
+
+\draw [->] (kidney) -- (bp);
+\draw [->] (lifestyle) -- (bp);
+\draw [->] (lifestyle) -- (sports);
+\draw [->] (bp) -- (measure);
+
+{\small
+\node [left = 1cm of kidney] (t_k) {
+    \begin{tabular}{|c||c|} \hline
+    	$k_b$ & $\cancel{0.5}$\\ \hline
+    	$\mathbf{k_g}$ & $\mathbf{0.5}$ \\ \hline
+    \end{tabular}
+    };
+    
+\node [right = 1cm of lifestyle] (t_l) {
+\begin{tabular}{|c||c|} \hline
+	$\mathbf{l_b}$ & $\mathbf{0.5}$\\ \hline
+	$l_g$ & $0.5$ \\ \hline
+\end{tabular}
+};
+    
+\node [below = 1cm of t_k] (t_bp) {
+    \begin{tabular}{|c||c|c|c|c|} \hline
+	&$k_b, l_b$ & $ k_b, l_g $ &$ \mathbf{k_g, l_b}$ & $ k_g, l_g $  \\ \hline \hline
+	$b_n$ & $\cancel{0.1}$ & $\cancel{0.2}$ & $\cancel{0.2}$ & $0.9$  \\ \hline
+	$\mathbf{b_e}$ & $0.9$ & $0.8$ & $\mathbf{0.8}$ & $\cancel{0.1}$ \\ \hline
+\end{tabular}};
+
+\node [right = 0.6cm of sports] (t_s) {
+    \begin{tabular}{|c||c|c|} \hline
+	&$\mathbf{l_b}$&$ l_g $  \\ \hline \hline
+	$s_n$ & $0.8$ & $\cancel{0.2}$  \\ \hline
+	$\mathbf{s_y}$ & $\mathbf{0.2}$ & $\cancel{0.8}$ \\ \hline
+\end{tabular}};
+
+\node [right = 1cm of measure] (t_m) {
+    \begin{tabular}{|c||c|c|} \hline
+	&$b_n$&$ \mathbf{b_e} $  \\ \hline \hline
+	$m_n$ & $0.9$ & $\cancel{0.1}$  \\ \hline
+	$\mathbf{m_e}$ & $\cancel{0.1}$ & $\mathbf{0.9}$ \\ \hline
+\end{tabular}}
+
+;}
+    
+\draw [dotted] (kidney) -- (t_k);
+\draw [dotted] (lifestyle) -- (t_l);
+\draw [dotted] (bp) -- (t_bp);
+\draw [dotted] (sports) -- (t_s);
+\draw [dotted] (measure) -- (t_m);
+\end{tikzpicture}
+\end{adjustbox}
+\caption{a pruned version of the BloodPressure network around the boldfaced initial state $\bfx^{(0)} = (k_g, l_b, b_e, s_y, m_e)$. Note that the lower the value of the CPT-entry, the higher the probability that the index gets pruned. We see that $S_{\C_{\bfx^{(0)}}^{\text{np}}}$ contains two feasible states, i.e. $(k_g, l_b, b_e, s_y, m_e)$ and $(k_g, l_b, b_e, s_n, m_e)$.}
+\label{pruning}
+\end{figure}
+In addition, let $\gls{textC}$ be an arbitrary collection of CPT-labels. We denote the set of possible (not necessarily feasible) states that correspond to these CPT-labels by $\gls{S_C}$. Having introduced this notation and definitions, we are ready to define the concept of \textit{pruning}.
+\begin{definition}[Pruning around state $\bfx$]\label{prunedef}
+Let $\gls{Cxp}$ be the subset of $\C$ that is constructed by adding each CPT-label $k(l_i) \in \C \setminus \C_{\bfx}$ with probability $1-c_{k(l_i)}$ to the set $\C_\bfx^{\text{p}}$ and with probability $c_{k(l_i)}$ not. We say that the collection $\C_\bfx^{\text{p}}$ contains the \textit{pruned} CPT-labels. 
+\end{definition}
+The next example gives an illustration of the \textit{pruning} technique on the BloodPressure BN.
+\begin{example}\label{ex:pruning}
+Consider the BN in Figure \ref{pruning}. Pruning around the boldfaced initial state $\bfx^{(0)} = (k_g, l_b, b_e, s_y, m_e)$ could yield the non-crossed indices 
+\begin{align*}
+\C_{\bfx^{(0)}}^{\text{p}} = \{ K(2), L(2), BP(4), BP(5), BP(6), S(1), M(1) \}.
+\end{align*}
+\end{example}
+Note that the lower the value of the CPT-entry, the higher the probability that the label gets pruned. The collection of CPT-labels that do not get pruned is given by $\gls{Cxnp}:=\C \setminus \C_\bfx^{\text{p}}$. In the situation of Example \ref{ex:pruning}, $S_{\C_{\bfx^{(0)}}^{\text{np}}}$ exist of two feasible states, i.e. $(k_g, l_b, b_e, s_y, m_e)$ and $(k_g, l_b, b_e, s_n, m_e)$. Now we have introduced these concepts, one should note three things
+\begin{enumerate}
+\item $\C_\bfx^{\text{p}}$ is a random set;
+\item $\C_\bfx \subset \C_\bfx^{\text{np}} \text{ and } \bfx \in S_{\C_\bfx^{\text{np}}}$;
+\item the probability of generating $\C_\bfx^{\text{p}}$ and $\C_\bfx^{\text{np}}$ is given by
+\begin{align*}
+\prod_{k(l_i) \in \C_\bfx^{\text{p}}}(1-c_{k(l_i)}) \cdot \prod_{k(l_i) \in \C_\bfx^{\text{np}} \setminus \C_{\bfx}} c_{k(l_i)}.
+\end{align*}
+%\item $\C_{\bfx^{(i-1)},n}$ contains all the non-zero indices in $\C$, implying that $S_{\C_{\bfx^{(i-1)},n}}$ contains all feasible states of the BN, with strictly positive probability.
+\end{enumerate}
+Due to the pruning of CPT-labels, the number of feasible states in the pruned BN is much smaller in comparison to the number of feasible states in the original BN. This significant decrease of the number of feasible states can make \ps practically applicable. Assuming we have sufficient memory, a breath first search approach can be used to list all feasible states of the pruned BN. From this collection we can easily draw a state uniformly to select the next sample.
+
+\begin{definition}[Uniform sampling over a set of states]
+As defined before, $S_{\C_\bfx^{\text{np}}}$ is the set of (feasible) states corresponding to the CPT-labels which are not pruned. We define $\gls{U}$ as a uniform distribution over some set. Therefore, the uniform distribution over the states in $S_{\C_\bfx^{\text{np}}}$ is denoted as
+\begin{align*}
+\U(S_{\C_\bfx^{\text{np}}})(\bfy) = \frac{1}{|S_{\C_\bfx^{\text{np}}}|}.
+\end{align*}
+and represents the probability of uniformly sampling state $\bfy$ from $S_{\C_\bfx^{\text{np}}}$.
+\end{definition}
+Doing these steps -- pruning, uniform sampling, selecting a new sample --  gives us a sequence of samples that is able to visit the whole state space. We call this process \ps, the pseudo-code could be found in Algorithm \ref{prunealg}. The algorithm takes as input a BN structure $\G$ with corresponding CPTs, an initial configuration $\bfx^{(0)}$ and the integer $T$ for the number of samples to be generated. The algorithm start with the initial sample $\bfx^{(0)}$. For $t = 1, \ldots , T$ it then prunes around $\bfx^{(t-1)}$ to obtain $\C_{\bfx^{(t-1)}}^{\text{np}}$ and to consecutively sample $\bfx^{(t)}$ from $\U\big( S_{\C_{\bfx^{(t-1)}}^{\text{np}}} \big)$. Finally, the algorithm adds the new sample $\bfx^{(t)}$ to the set $\gls{calS}$.  \\
+
+Note that with strictly positive probability $\C_{\bfx^{(t-1)}}^{\text{np}}$ contains all the non-zero indices in $\C$, implying that $S_{\C_{\bfx^{(t-1)}}^{\text{np}}}$ contains all feasible states of the BN. This means that \ps generates a regular Markov chain, i.e. with positive probability a state $\bfx$ can transition to an other (arbitrary) feasible state $\bfy$. To show that the Markov chain generated by \ps satisfies the reversibility condition takes more effort and is addressed in the next section. 
+\begin{algorithm}[h!]
+\renewcommand\thealgorithm{1}
+\caption{Prune sampling algorithm}
+\label{prunealg}
+\begin{algorithmic}
+%\Require{We can prune a BN given a state $\mathbf{x}$}
+\Function{PruneSampling}{BN, initial, T}
+\State $\mathbf{x}^{(0)} \gets $ initial
+     \State $\mathcal{S} \gets \{\mathbf{x}^{(0)}\}$
+     \For{$t \gets 1 $ to$ $ T}
+     \State $\C_{\bfx^{(t-1)}}^{\text{p}} \gets \text{Prune around } \mathbf{x}^{(t-1)}$ \\ \Comment{{\footnotesize See Definition $3.2$ }}
+	\State $\C_{\bfx^{(t-1)}}^{\text{np}} \gets \mathcal{C} \setminus \C_\bfx^{\text{p}}$  
+     \State $\mathbf{x}^{(t)} \sim  \U(S_{\C_\bfx^{\text{np}}}) $ 
+     \State $\mathcal{S} \gets \mathcal{S} \cup \mathbf{x}^{(t)}$
+     \EndFor
+     \State \Return{$\mathcal{S}$}
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Regularity and reversibility}
+To make a transition from a state $\bfx$ to a state $\bfy$ we need to prune around $\bfx$ such that non of the labels corresponding to $\bfy$ is pruned. This leads to the following definition. 
+
+\begin{definition}[Pruning around state $\bfx$ and $\bfy$]
+Let $\gls{Cpxy}$ be the subset of $\mathcal{C}$ that is constructed by pruning around $\mathbf{x}$ or pruning around $\mathbf{y}$ such that none of the labels corresponding to $\mathbf{x}$ and non of the labels corresponding to $\mathbf{y}$ is contained in $\mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}}^{\text{p}}$.
+\end{definition}
+The collection of CPT-labels that do not get pruned is given by $\gls{Cnpxy} := \C \setminus \mathcal{C}_{\{\mathbf{x}, \mathbf{y}\}}^{\text{p}}$. For each two states $\bfx$ and $\bfy$ there are finitely many ways, $\gls{h} =1,\ldots, \gls{H} \in \N$, to create a pruned collection $\gls{Cpxyh}$ and a non-pruned collection $\gls{Cnpxyh}$, such that $\bfx$ can make a transition to $\bfy$ by sampling from $\U(S_{\C_{\{\bfx, \bfy\},h}^{\text{np}}})$. We define the transition probability to get from $\bfx$ to $\bfy$ by
+\begin{align}\label{transprob}
+\gls{Rhxy} &:= \left(\prod_{k(l_i) \in \C_{\{\bfx, \bfy\},h}^{\text{p}} } (1-c_{k(l_i)}) \right) \cdot \left( \prod_{k(l_i) \in \C_{\{\bfx, \bfy\},h}^{\text{np}} \setminus \mathcal{C}_{\mathbf{x}}  } c_{k(l_i)}   \right) \cdot \mathcal{U} \big( S_{\C_{\{\bfx, \bfy\},h}^{\text{np}}} \big)(\mathbf{y}) \\ \nonumber
+&\;=\left(\prod_{k(l_i) \in \C_{\{\bfx, \bfy\},h}^{\text{p}} } (1-c_{k(l_i)}) \right)\cdot \left( \prod_{k(l_i) \in \C_{\{\bfx, \bfy\},h}^{\text{np}} \setminus \mathcal{C}_{\mathbf{x}}  } c_{k(l_i)}   \right)  \nonumber \cdot \frac{1}{|S_{\C_{\{\bfx, \bfy\},h}^{\text{np}}}|}.
+\end{align}
+In words, Equation (\ref{transprob}) expresses the probability of pruning certain CPT-labels around $\bfx$, such that none of the CPT-labels corresponding to $\bfy$ is pruned, and subsequently sampling $\bfy$ uniformly from the states corresponding to the CPT-labels that were not pruned. The total probability of transitioning from $\bfx$ to $\bfy$ is therefore given by
+\begin{align} \label{total}
+{R}(\mathbf{x} \to \mathbf{y}) = \sum_{h=1}^{H} {R}_h (\mathbf{x} \to \mathbf{y}).
+\end{align}
+To show reversibility we need to show that the transition probability satisfies the detailed balance equation
+\begin{align*}
+P(\mathbf{x}) R(\mathbf{x} \to \mathbf{y}) = P(\mathbf{y}) R(\mathbf{y} \to \mathbf{x}) 
+\end{align*}
+which equals
+\begin{align*}
+P(\mathbf{x}) \left(\sum_{h=1}^{H} {R}_h (\mathbf{x} \to \mathbf{y}) \right) = P(\mathbf{y}) \left(\sum_{h=1}^{H} {R}_h (\mathbf{y} \to \mathbf{x}) \right).
+\end{align*}
+So, it is sufficient to show that
+\begin{align} \label{toshow}
+P(\mathbf{x}) {R}_h (\mathbf{x} \to \mathbf{y}) = P(\mathbf{y})  {R}_h (\mathbf{y} \to \mathbf{x}), 
+\end{align}
+for $h = 1, \ldots, H$. The following computation shows that Equation \eqref{toshow} holds
+\begin{align*}
+&P(\mathbf{x}) {R}_h (\mathbf{x} \to \mathbf{y}) \\
+&= \frac{1}{Z} \cdot P(\mathbf{x}) \cdot \left(\prod_{k(l_i) \in \C_{\{\bfx, \bfy\},h}^{\text{p}} } (1-c_{k(l_i)}) \right)\cdot \left( \prod_{k(l_i) \in \C_{\{\bfx, \bfy\},h}^{\text{np}}  \setminus \mathcal{C}_{\mathbf{x}} } c_{k(l_i)} \right) \\ 
+&= \frac{1}{Z} \cdot \prod_{k(l_i) \in \mathcal{C}_{\mathbf{x}}} c_{k(l_i)} \cdot \left(\prod_{k(l_i) \in \C_{\{\bfx, \bfy\},h}^{\text{p}} } (1-c_{k(l_i)}) \right)\cdot \left( \prod_{k(l_i) \in \C_{\{\bfx, \bfy\},h}^{\text{np}} \setminus \mathcal{C}_{\mathbf{x}} } c_{k(l_i)} \right) \\ 
+&= \frac{1}{Z} \cdot \left(\prod_{k(l_i) \in \C_{\{\bfx, \bfy\},h}^{\text{p}}} (1-c_{k(l_i)}) \right)\cdot \left( \prod_{k(l_i) \in \C_{\{\bfx, \bfy\},h}^{\text{np}}   } c_{k(l_i)}   \right) \\ 
+&= \frac{1}{Z} \cdot \left(\prod_{k(l_i) \in \C_{\{\bfx, \bfy\},h}^{\text{p}}} (1-c_{k(l_i)}) \right)\cdot \left( \prod_{k(l_i) \in \mathcal{C}_{\mathbf{y}}} c_{k(l_i)}   \right) \cdot  \prod_{k(l_i) \in \C_{\{\bfx, \bfy\},h}^{\text{np}} \setminus \mathcal{C}_{\mathbf{y}}  } c_{k(l_i)} \\ 
+&= \frac{1}{Z} \cdot \left(\prod_{k(l_i) \in \C_{\{\bfx, \bfy\},h}^{\text{p}} } (1-c_{k(l_i)}) \right)\cdot P(\mathbf{y}) \cdot\left( \prod_{k(l_i) \in \C_{\{\bfx, \bfy\},h}^{\text{np}}  \setminus \mathcal{C}_{\mathbf{y}}  } c_{k(l_i)}   \right) \\ 
+&= P(\mathbf{y}) {R}_h (\mathbf{y} \to \mathbf{x}),
+\end{align*}
+\noindent where $Z = |S_{\C_{\{\bfx, \bfy\},h}^{\text{np}} }|$. We conclude that \ps generates a regular and a reversible Markov chain with respect to the desired distribution $P$. As discussed before, we now know that $P$ is the unique stationary distribution of the Markov chain generated by \textit{prune sampling}. So, we have shown theoretically why \ps always generates a regular and reversible Markov chain. Next, we describe the approach to implement this \ps technique.
+
+
+\section{Practical implementation}
+To implement the \ps algorithm, two non-trivial steps are required
+\begin{enumerate}
+\item to generate an initial state of the BN;
+\item to sample uniformly over the pruned BN, i.e. sampling from the distribution $\U(S_{\C_\bfx^{\text{np}}})$.
+\end{enumerate}
+In the next two subsections we elaborate on how we will meet these requirements and explain how the MC-SAT algorithm deals with these questions.
+
+\subsection{Generate initial states}\label{sec:gen_init}
+In order to create an initial state, we need a complete assignment to the BN variables. To fulfill this, MC-SAT works with local search SAT solvers \cite{poon2006sound}. The first version of the \ps algorithm generates an initial state by the commonly used method \textit{forward sampling}. First, we give a short description of this well-know sampling method. Subsequently, we present two easy to implement variations.
+\begin{definition}[Forward sampling]
+Let $X_1, \ldots , X_n$ be a topological ordering of $\X$. We assign a value to the variables consistent with the topological order of the BN. We start assigning randomly values to the root variables of the network. Consecutively, we choose -- conditioned on the assigned values to the variable its parents -- randomly a value from the corresponding distribution defined in the CPT. Continuing this process results in an initial feasible state $\bfx^{(0)}$ of the BN.
+\end{definition}
+Since forward sampling is guided by its CPT-entries, it is likely that a generated initial state of the BN is a state with high probability. This bias could be a disadvantage of forward sampling. For example, when Gibbs sampling is trapped, its initial state decides in which subset of the state space it is trapped. To obtain more diversity in the generated (initial) samples, one could consider \textit{random forward sampling}.
+\begin{definition}[Random forward sampling]\label{def:rfs}
+Suppose we apply forward sampling, but instead of sampling variable $X_i$ from $P(X_i \mid \text{Pa}_{X_i} = \mathbf{x})$, we choose a random sample from the set of non-zero probability states $\{x_i : P(X_i = x_i \mid \text{Pa}_{X_i}=\mathbf{x}) > 0\}$. At this point, $\bfx$ is a collection of $i-1$ assigned values to corresponding variables in the BN. 
+\end{definition}
+Note that if one uses random forward sampling it is only relevant to know whether a CPT-entry is zero or non-zero. 
+\begin{example}
+In random forward sampling it is only relevant to know whether a CPT-entry is zero or non-zero (\gls{star}). The CPT of variable \textit{Grass wet} in the \textit{Rain Sprinkler} BN from Figure \ref{rainBN} therefore reduces to  
+\begin{table}[h!]
+\centering
+\resizebox{0.5\columnwidth}{!}{
+    \begin{tabular}{|c||c|c|c|c|} \hline
+	& {\small $\text{r}_\text{T},\ \text{s}_\text{T}$ }& {\small $\text{r}_\text{T},\ \text{s}_\text{F}$ } & {\small $\text{r}_\text{F},\ \text{s}_\text{T}$ } & {\small $\text{r}_\text{F},\ \text{s}_\text{F}$ } \\ \hline \hline
+	{\small $ \text{g}_\text{T}$ } & $\star$ & $\star$ & $\star$ & 0  \\ \hline
+	{\small $\text{g}_\text{F}$ } & $\star$ & $\star$ & $\star$ & $\star$ \\ \hline
+\end{tabular}
+}.
+\caption{in order to select a CPT-entry, the random forward sampling approach is only interested whether an entry is zero or non-zero. Consecutively, from all $\star$ CPT-entries it selects one entry randomly.}
+\label{block}
+\end{table}
+\end{example}
+Since random forward sampling is only interested whether a CPT-entry is zero or non-zero and consecutively selects a CPT-entry randomly, it generates more diverse initial states than regular forward sampling. We could even consider a \textit{hybrid forward sampling approach} that combines {forward sampling} and {random forward sampling}.
+\begin{definition}[Hybrid forward sampling]\label{def:hfs}
+Consider a hybrid approach in which we apply forward sampling, but at each variable $X_i$ either (say with probability $p$) we choose the sampling distribution $P(X_i \mid \text{Pa}_{X_i} = \mathbf{x})$ or (with probability $1-p$) we choose the uniform distribution over $\{x : P(X_i = x \mid \text{Pa}_{X_i}=\mathbf{x}) > 0\}$. 
+\end{definition}
+Hybrid forward sampling provides a heuristic to assess the \gls{MAP} estimate, which is an initial state $\bfx$ of the BN such that $P(\bfx)$ is maximised. In the case one wants to start with a Markov chain from a highly probable state, this approach could be of added value. Situations in which the MAP estimate is useful, could be found in \cite{park2002using}. In the next subsection, we discuss how the pruning technique samples a state for the next iteration uniformly. 
+
+
+\subsection{Sampling from the pruned network}\label{sec:sampling_uni}
+In order to generate states nearly uniform, MC-SAT uses an intelligent heuristic \cite{wei2004towards} based on a weighted SAT problem and applies the concept of simulated annealing. But, in contrast to \textit{prune sampling}, MC-SAT does not generate states completely uniform. Briefly, we explain why \ps does generate its states completely uniform and discuss its forthcoming drawbacks.\\
+
+Due to exhaustive listing of all feasible states of the pruned network -- determining the set $\U(S_{\C_\bfx^{\text{np}}})$ explicitly by regular forward sampling -- \ps guarantees completely uniform sampling. Although, the exhaustive enumeration of all feasible states of the pruned network is unavoidable. For this reason, on large BNs with large pruned networks, it could be the case that one still runs into memory problems. To reduce this computational effort, an other sampling heuristic method should be developed. We give three suggestion which could provide such a solution
+\begin{itemize}
+\item an easy to implement solution is to use hybrid forward sampling to generate feasible states of a pruned BN up to a fixed amount. So, consider generating a set of $V$ (with predetermined fixed size) with candidate samples. Subsequently, a sample from $V$ will be chosen randomly. The size of $V$ can be interpreted as a trade-off between uniformity and computational effort;
+\item Wei, Erenrich and Selman show in \cite{wei2004towards} that one can exploit ideas from random walk based methods to obtain effective near-uniform sampling;
+\item a more intelligent heuristics to obtain completely and near-uniform samples from the pruned BN could be the \textit{simulated annealing} approach suggested in \cite{wei2004towards}.
+\end{itemize}
+We take a closer look at these suggestions in Chapter \ref{ch:5}. First, in the next chapter, we discuss the performance of \ps compared with two conventional MCMC sampling methods.
+
+%To prevent extreme memory consumption one could consider the well-known sampling strategy \textit{reservoir sampling}.
+
+
+\chapter{Results}
+In this chapter we study the performance of the \ps algorithm and two conventional MCMC sampling methods to
+answer inference queries on 11 different BNs. First, we elaborate on some important general details regarding the experiments we conducted. Then, we show that \ps outperforms Gibbs sampling on two classes of BNs. Consecutively, for 3 BNs from 3 benchmark domains with an increasing amount of deterministic relations, we present and discuss results in terms of accuracy. We elaborate on a procedure to obtain the rate of convergence of the MCMC sampling methods in the limit of infinite simulation time, extrapolated from relatively short simulations. Thereafter, we characterise the performance of the three MCMC sampling methods in terms of time consumption. 
+
+\section{Experiments}
+We compare \ps with the two widely used MCMC inference methods Gibbs- and Metropolis sampling on three performance indicators (accuracy, rate of convergence and time consumption). Since pruning is devised to deal with determinism, we experiment on BNs with gradually increasing rates of evidence, i.e. deterministic relations. We use the three MCMC sampling methods to approximate one-variable marginals on small, medium and large BNs from four benchmark domains: simple deterministic-, block shaped-, Grid- and real world BNs. We work with a tool capable of creating and translating BNs in GeNIe (decision modeling software) into an equivalent model in Python. In Python, we use the implementations of Gibbs- and Metropolis sampling from the PyMC package. All the BNs we use in this study can be found for free online via the bnlearn Bayesian network repository or the UAI repository. We create results without thinning (in order to decrease autocorrelation using only every $q$-th sample) and if we use a burn-in period (throwing away iterations at the beginning of a MCMC simulation), this could be mentioned from the starting number of the `number of samples' at the x-axis. We execute our experiments on an Intel(R) Core(TM) i5-5300 CPU 2.30GHz core machine with 8 GB RAM, running operating system Windows 10.
+
+\section{Restraints of Gibbs sampling}\label{sec:gibbs-res}
+As illustrated in Example \ref{ex:gibbs}, we know that a Markov chain generated by Gibbs sampling could be trapped in a subset of the state space and therefore does not always converge to the desired distribution. In this section, we demonstrate this event by plotting the accuracy of the sampling methods and show why \ps is able to move around the entire state space. Moreover, we show that specific block shaped (non-deterministic) CPTs could prevent Gibbs sampling of visiting the whole state space as well. \\
+
+\subsection{Simple deterministic network}
+Based on the simple deterministic BN in Figure \ref{gibbs}, Figure \ref{simple-deterministic} displays how Gibbs- and \ps approximate the assigned value to variable $A$. The plot shows the ratio that the Markov chain assigns the most common state to the variable $A$. The horizontal red and green line represent the trapped chains generated by Gibbs sampling, i.e. displaying $P(A=1)=0$ and $P(A=1)=1$ respectively. The converging lines (blue and orange) correspond to the approximations of Markov chains generated by \psp \\
+
+Why \ps is able to converge to the correct distribution could be explained by working out Equation (\ref{total}) explicitly. 
+\begin{example}
+Without loss of generality, we consider the initial state $\bfx^{(0)} = (0,0)$. Following the \textit{pruning} procedure we obtain
+\begin{itemize}
+\item $\C_\bfx = \{ A(1), B(1) \}$.
+\item Two cases can occur, either
+\begin{itemize}
+\item{\makebox[5cm]{$A(2)$ does get pruned:\hfill}}{\makebox[5.5cm]{$\C_{\bfx^{(1)}}^{\text{p}} = \{ A(2), B(2), B(3) \}$\hfill}}{\makebox[2cm]{with probability $0.5$\hfill}}
+\item{\makebox[5cm]{$A(2)$ does not get pruned:\hfill}}{\makebox[5.5cm]{$\C_{\bfx^{(1)}}^{\text{p}} = \{ B(2), B(3) \}$\hfill}}{\makebox[2cm]{with probability $0.5$.\hfill}}
+\end{itemize} 
+\item Following this structure of case distinction, the non-pruned sets become
+\begin{itemize}
+\item{\makebox[5cm]{$A(2)$ does get pruned:\hfill}}{\makebox[7.7cm]{$\C_{\bfx^{(1)}}^{\text{np}} = \{ A(1), B(1), B(4) \}$\hfill}}{\makebox[2cm]{$(1)$\hfill}}
+\item{\makebox[5cm]{$A(2)$ does not get pruned:\hfill}}{\makebox[7.7cm]{$\C_{\bfx^{(1)}}^{\text{np}} = \{ A(1), A(2), B(1), B(4) \}$.\hfill}}{\makebox[2cm]{$(2)$\hfill}}
+\end{itemize} 
+\item Now we can determine the feasible states from which we could select the next sample uniformly
+\begin{itemize}
+\item{\makebox[2.5cm]{$(1)$ gives:\hfill}}{\makebox[9cm]{$S_{\C_\bfx^{\text{np}}} = \{ (c_{A(1)} = 0, c_{B(1)} = 0) \}$\hfill}}
+\item{\makebox[2.5cm]{$(2)$ gives:\hfill}}{\makebox[9cm]{$S_{\C_\bfx^{\text{np}}} = \{ (c_{A(1)} = 0, c_{B(1)} = 0), (c_{A(2)} = 1, c_{B(4)} = 1) \}$.\hfill}}
+\end{itemize} 
+\item From $(1)$, with probability $1$, we find feasible state $(0,0)$. From $(2)$, with probability $0.5$, either we find feasible state $(0,0)$ or $(1,1)$. Hence, the probability to get from state $(0,0)$ to $(0,0)$ is given 
+\begin{align*}
+Q((0,0) \to (0,0)) = 0.5 \cdot 0.5 + 0.5 \cdot 1 = \frac{3}{4}.
+\end{align*}
+\end{itemize}
+\end{example}
+\begin{figure}[t]
+\centering
+\begin{subfigure}{.49\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/simple_det_250_samples.png}
+  \caption{250 samples prune vs Gibbs}
+  \label{fig:sub1}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/simple_det_10000_samples.png}
+  \caption{10.000 samples prune vs Gibbs}
+  \label{fig:sub2}
+\end{subfigure}
+\caption{illustration of superior performance of \ps. Due to the deterministic relation in the BN given in Example \ref{ex:gibbs}, Gibbs sampling is trapped in the chain $(0,0)$ or $(1,1)$. Hence, doing inference on these Gibbs samples yield $P(A = 0)=0$ or $P(A = 0)=1$ (red and green line). As a consequence of the regular and reversible Markov chain generated by \ps (blue and orange line), this Markov chain is able to move around the entire state space and therefore converges to the correct probability distribution $P(A = 0) = 0.5$.}
+\label{simple-deterministic}
+\end{figure}
+This means that \ps is capable of making a transition from $(0,0)$ to $(1,1)$ and the other way around from $(1,1)$ to $(0,0)$. In Figure \ref{simple-deterministic}, we see that \ps -- from both initial states $(0,0)$ and $(1,1)$ -- is able to move around the entire state space, i.e. able to converge to the correct mean. The horizontal line at $0.5$ represents the exact probability of variable $A=0$. We conclude that for this class of BNs \ps is the preferred sampling method.\\
+
+The problem we addressed above is known as \textit{bad mixing}. The colloquial term \textit{mixing} is used in the field of MCMC methods to indicate whether a Markov chain is able to visit the whole state space or not. Techniques to improve mixing of MCMC methods have been proposed \cite{besag1993spatial, brooks2011handbook, gilks1996interdisciplinary}. For example, one could sample (according to the normal Gibbs sampling procedure) two or more variables at the same time from their joint distribution conditioned on all other variables. This is called \textit{blocked Gibbs sampling}. The pairwise deterministic relations between nodes would disappear. Though, {blocked Gibbs sampling} is not the solutions to all its limitations as we will see in the next example.
+
+
+\subsection{Block shaped network}
+In the previous subsection we demonstrated that Markov chains generated by Gibbs sampling could be trapped in a subset of the state space when deterministic relations are present in a BN. Below, we show another pitfall of the Gibbs sampling technique: a specific block shaped CPT could generate trapped Markov chains too.\\
+
+\begin{example}
+Consider the BN $X_1 \to X_2 \to \ldots \to X_n$, where each $X_i \in \{0,1,2,3\}$ for $1 \leq i \leq n$. Let $X_1$ be uniformly distributed and for $i \geq 2$ let each $X_i$ be conditionally distributed according to the block shaped distribution $P(X_i |X_{i-1})=$
+\begin{table}[h!]
+\centering
+\resizebox{0.5\columnwidth}{!}{
+\begin{tabular}{|c||c|c|c|c|} \hline
+	&$X_{i-1}=0$ & $ X_{i-1}=1 $ & $X_{i-1}=2$ & $X_{i-1}=3$  \\ \hline \hline
+	$X_i =0$ & $0.5$ & $0.5$ & $0$ & $0$ \\ \hline
+	$X_i =1$ & $0.5$ & $0.5$ & $0$ & $0$ \\ \hline
+	$X_i =2$ & $0$ & $0$ & $0.5$ & $0.5$ \\ \hline
+	$X_i =3$ & $0$ & $0$ & $0.5$ & $0.5$ \\ \hline
+\end{tabular}
+}.
+\caption{a block shaped CPT}
+\label{block}
+\end{table}\\
+If one applies Gibbs sampling on this block shaped BN, the correct posterior distribution would not be revealed. To get why, it is a useful ti observe there are only two possible initial states, either
+\begin{itemize}
+\item $X^{(0)}_1 \in \{0, 1\}$ or
+\item $X^{(0)}_1 \in \{2, 3\}$.
+\end{itemize}
+Consider the fixed (topological) order $(X_1, \ldots, X_n)$ and suppose $X^{(0)}_1 = 0$. Therefore, $\bfx^{(0)} = (X^{(0)}_1 = 0, \ldots, X^{(0)}_n = 0)$, that is $X_i^{(0)} = 0$ for $i \geq 1$. During an iteration Gibbs sampling is able to make the move from block $\{0, 1\}$ to $\{2,3\}$, i.e.
+\begin{itemize}
+\item $P(X^{(t+1)}_1 | X^{(t)}_2 = 0, \ldots, X^{(t)}_n = 0)$ could select $X^{(t+1)}_1 \in \{2,3\}$ with probability $0.5$.
+\end{itemize}
+Though, when for example $X^{(t+1)}_1 = 2$ we are trapped in the block $\{2,3\}$ since for $i \geq 2$: $X^{(t+1)}_i \in \{2, 3\}$. Hence, despite the fact that Gibbs sampling allows you to switch to the other block, we are always trapped in one of the subsets of the state space.
+\end{example}
+
+In Figure \ref{block-BN}, the red and green line represent the Markov chain generated by Gibbs sampling being trapped in block $\{0, 1\}$ or $\{2,3\}$ respectively. They both find with probability $0.5$ that $X_i = 0$ or $X_i = 1$ and $X_i = 2$ or $X_i = 3$ respectively. In the same figure we see that the Markov chain generated by \ps -- the blue and orange line -- is again able to move freely around the entire state space and therefore converges, for $i \geq 2$, to the correct probability $P(X_i = j)= 0.25$, where $j \in \{0,1,2,3\}$.
+\begin{figure}[h]
+\centering
+\begin{subfigure}{.49\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/gibbs_trap_2_gibbs_vs_2_prune_50_samples.png}
+  \caption{50 samples prune vs Gibbs}
+  \label{fig:sub1}
+\end{subfigure}
+\begin{subfigure}{.49\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/gibbs_trap_2_gibbs_vs_2_prune_10000_samples.png}
+  \caption{10.000 samples prune vs Gibbs}
+  \label{fig:sub2}
+\end{subfigure}
+\vspace{0.75pc}
+\caption{\ps could be superior to Gibbs sampling, even in the absence of deterministic relations. A non-deterministic block shaped CPT -- as presented in Table \ref{block} -- can prevent a Markov chain generated by Gibbs sampling of visiting the entire state space. In this example, being trapped in the subset $\{0, 1\}$ or $\{2, 3\}$ both yield the probability $0.5$ of assigning $0,1$ or $2,3$ to variable $X_i$ (red and green line respectively). \textit{Prune sampling} generates a Markov chain that is regular and reversible and therefore can move around freely through the whole state space. Hence, \ps converges to the uniformly probability $0.25$ of assigning value $0,1,2$ or $3$ to variable $X_i$ (blue and orange line).} 
+\label{block-BN}
+\end{figure}
+
+\section{Hellinger distance}
+Figure \ref{simple-deterministic} and \ref{block-BN} display so-called \textit{mean trace plots} of Markov chains generated by one of our sampling methods. For a variable of interest the mean trace plot displays the ratio the most frequent assigned value, is assigned to this variable of interest. Though, in order to study the accuracy of an approximation method, we have to take the exact value of this ratio (read: probability) into account. In general, a well-known way of measuring the difference between the exact and approximate value is to determine the \textit{average Hellinger distance}. \\
+
+The \gls{AHD} quantifies the closeness of two probability distributions. In the case of discrete probability distributions $P$ and $Q$ with binary variables (for all $i\geq 1$: $|Val(X_i)| = 2$), the AHD is defined as
+\begin{align*}
+H(P,Q) = \frac{1}{\sqrt{2}}\sqrt{ \sum_{i=1}^2 ( \sqrt{p_i} - \sqrt{q_i})^2 }.
+\end{align*}
+Note that the maximum distance $H(P,Q) = 1$ occurs when for all $i$: $p_i =1$ and $q_i = 0$ or vice versa. In the next section we use the AHD to measure the accuracy of the approximate MCMC sampling methods on 9 BNs. We first compute all $25.000$ Hellinger distances with respect to the exact probability. Consecutively, for all $100$ simultations we averaged these Hellinger distances at every $t$-th point in the sample, $1 \leq t \leq 25.000$. Note that this exact probability is computed by an exact inference algorithm, for example by using the decision modeling software in GeNIe. In the next section, we use the AHD to determine the performance of \ps in comparison to Gibbs- and Metropolis sampling on 9 different BNs.
+
+\section{Benchmark Bayesian networks}\label{BenchBNs}
+In this section, we conduct experiments with \ps on three other benchmark domains. Since \ps was developed to deal with deterministic relations in BNs, we conduct experiments with gradually increasing rates of determinism (0\%, 25\%, 50\%). Beside that, we consider three types of real world Bayesian networks: the small network (8 nodes, 18 parameters) Asia \cite{lauritzen1988local}, the medium network (37 nodes, 509 parameters) Alarm \cite{beinlich1989alarm} and the large network (76 nodes, 574 parameters) Win95pts. On these BNs, we first conduct experiments with no available evidence. Note that in a BN evidence is equivalent to a deterministic relation. Consecutively, we apply the three approximation methods on the same BNs with 25\% available evidence, i.e. 25\% determinism. At last, we conduct experiments on Grid BNs  \cite{sang2005solving} of size $3 \times 3$, $5 \times 5$ and $8 \times 8$. We use Grid networks with 50\% available evidence. We present and discuss the results -- in terms of accuracy (AHD) -- in the next subsections.
+
+\subsection{Real world Bayesian networks 0\% determinism}\label{real_world_0_ev}
+\begin{figure}[h!]
+\centering
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/asia_ahd_25000.png}
+\caption{Asia 0\% determinism}%
+\label{asia}%
+\end{subfigure}\hfill%
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/alarm_ahd_25000.png}
+\caption{Alarm 0\% determinism}%
+\label{alarm}%
+\end{subfigure}%
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/win95pts_ahd_25000.png}
+\caption{Win95pts 0\% determinism}%
+\label{win95pts}%
+\end{subfigure}\hfill%
+\vspace{0.75pc}
+\caption{underperformance of \ps in terms of accuracy on the benchmark real world BNs without evidence. That is: 0\% of the nodes contain deterministic relations. Because \ps is created to deal with determinism, we did expect underperformance of the pruning technique on these type of networks.  }
+\label{results1}
+\end{figure}
+On the Asia, Alarm and Win95pts BN with 0\% evidence available, we ask the MCMC approximation methods $P(\text{Dyspnea}), P(\text{Blood pressure})$ and $P(\text{Problem1})$ respectively. Since \ps is devised to deal with deterministic relation we do not expect the best performance of the pruning technique on this class of BNs. Figure \ref{results1} shows the performance of Gibbs-, Metropolis- and \psp On the small Asia BN we see that \ps is (almost) a competitive sampling method and reaches at least $0.01$ AHD. On the Alarm BN, \ps is close to the $0.01$ AHD but not as accurate as Gibbs- and Metropolis sampling are. We see structural underperformance of \ps on the Win95pts BN, converging to $0.05$ AHD whereas Gibbs- and Metropolis sampling guarantee at least an accuracy of $0.01$ AHD. Since more evidence will be available, we expect \ps to perform better on the next type of BNs.
+
+\subsection{Real world Bayesian networks 25\% determinism}\label{real_world_25_ev}
+\begin{figure}[b!]
+\centering
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/asia_ev_ahd_25000.png}
+\caption{Asia 25\% determinism}%
+\label{asia}%
+\end{subfigure}\hfill%
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/alarm_ev_ahd_25000.png}
+\caption{Alarm 25\% determinism}%
+\label{alarm}%
+\end{subfigure}%
+\begin{subfigure}{0.5\textwidth}
+\includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/win95pts_ev_ahd_25000.png}
+\caption{Win95pts 25\% determinism}%
+\label{win95pts}%
+\end{subfigure}\hfill%
+\vspace{0.75pc}
+\caption{compared with the results in section \ref{real_world_0_ev}, \ps starts to become more competitive in terms of accuracy as more determinism is present in the BNs. In these real world BNs 25\% of the nodes contain deterministic relations (evidence). Though, on the Win95pts BN \ps underperforms significantly.}
+\label{results2}
+\end{figure}
+For the same three BNs and the same inference queries we used in the previous subsection, we now conduct experiments with 25\% evidence available. Hence, we expect \ps to be a more competitive method. Figure \ref{results2} shows the performance of Gibbs-, Metropolis- and \ps on the Asia, Alarm and Win95pts BNs with 25\% evidence available. On the Asia BN, we see strong performance of all three the sampling methods: the three methods all reach at least $0.004$ AHD. On the Alarm BN all the approximation methods have more difficulties to reach accuracy. Though, \ps starts to become competitive and even outperforms Metropolis sampling. However, we see strong underperformance of \ps on the Win95pts BN: reaching $0.024$ AHD in contrast to less than $0.01$ AHD for Gibbs- and Metropolis sampling. The next subsection describes the performance of the sampling methods on BNs with 50\% determinism. 
+
+\subsection{Grid Bayesian networks 50\% determinism}
+\begin{figure}[b!]
+\centering
+\begin{subfigure}{0.49\textwidth}
+\includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/grid_3x3_ahd_25000.png}
+\caption{Grid $3 \times 3$ network 50\% determinism}%
+\label{grid_3x3}%
+\end{subfigure}\hfill%
+\begin{subfigure}{0.49\textwidth}
+\includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/grid_5x5_ahd_25000.png}
+\caption{Grid $5 \times 5$ network 50\% determinism}%
+\label{grid_5x5}%
+\end{subfigure}
+\begin{subfigure}{0.49\textwidth}
+\includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/grid_8x8_ahd_25000.png}
+\caption{Grid $8 \times 8$ network 50\% determinism}%
+\label{grid_8x8}%
+\end{subfigure}\hfill%
+\caption{underperformance of \ps in terms of accuracy on the benchmark grid BNs. 50\% of the nodes in these Grid networks are deterministic. Since \ps is created to deal with determinism, we did expect that pruning would perform much better on these type of networks. In this case, Gibbs and Metropolis sampling do converge to the correct posterior distribution. Note that this is not always true.}
+\label{results3}
+\end{figure}
+The last class of BNs we conduct experiments on is the class of Grid BNs. This type of BNs is developed by Sang, Beame, and Kautz 2005 \cite{sang2005solving} to create benchmark problems that are intrinsically hard because they are highly structured and contain many deterministic relations. The variables of a $n \times n$ grid are denoted by $X_{i,j}$ for $1 \leq i,j \leq n$. Each variable $X_{i,j}$ has parents $X_{i-1,j}$ and $X_{i,j-1}$ for $i,j>1$. Thus, $X_{1,1}$ is a source variable and $X_{n,n}$ is a sink variable. Given the CPTs of the variables, the problem is to compute the marginal probability of the sink $X_{n,n}$. The \textit{deterministic ratio} is the fraction of the variables that have a deterministic relation. The CPTs for such nodes are randomly filled in with $0$ or $1$. For the remaining variables, the CPTs are randomly filled with values chosen uniformly in the interval $(0, 1)$.\\
+
+In Figure \ref{results3} we see the performance of the three sampling methods on a Grid $3 \times 3$, $5 \times 5$ and $8 \times 8$ BN with 50\% deterministic relations. On all three Grid BNs we see significant underperformance of the \ps method. Gibbs- and Metropolis tend to reach at least $0.01$ AHD on all three BNs. In contrast, on the Grid $3 \times 3$ and $5 \times 5$ BN \ps reaches respectively $0.17$ and $0.15$ AHD. On the $8 \times 8$ BN \ps shows significant underperformance by reaching $0.05$ AHD. Hence, against our expectations, we have to conclude that \ps is not competitive on this class of BNs with the most deterministic relations.
+
+\section{Performance indicators}
+In this section, we discuss the performance of the sampling methods in terms of the rate of convergence and time consumption. On top of that, we elaborate on a procedure to determine the rate of convergence of a MCMC sampling method in the limit of infinite simulation time, extrapolated from relatively short simulations.
+
+\subsection{Rate of convergence}
+Consider $100$ simulations of $25.000$ samples generated by a certain MCMC sampling method. We show how these relatively short simulations could be used to determine the rate of convergence (ROC). \\
+
+Say, we qualify the probability we want to know as the expected value of a random variable $Y$, such as $\gls{mu} = \E[\gls{Y}]$. Suppose that by repeating a MCMC sampling method, we generate $\gls{N}$ simulations: $\bfy_1, \ldots , \bfy_N$. Where each simulation exists of $T$ number of samples. In order to approximate $Y$, we could take the average $\gls{mu_hat} = \sum_{s=1}^N \bfy_s$. The accuracy of this approximation depends on the number of simulations $N$ and the number of samples $T$. A possible measure for the error of MCMC approximation method, is the standard deviation $\gls{sigma_t} = \langle y^2 \rangle - \langle y \rangle ^2$, where
+\begin{align*}
+\centering
+\langle y \rangle = \frac{1}{N} \sum_{s=1}^N \bfy_s^{(t)} \hspace{1pc} \text{and} \hspace{1pc}  \langle y^2 \rangle = \frac{1}{N} \sum_{s=1}^N (\bfy_s^{(t)})^2
+\end{align*}
+and $1 \leq t \leq T$. So, $\bfy_s^{(t)}$ denotes the $t$-th element in the sample during the $s$-th time we run the MCMC method. 
+\begin{figure}[b!]
+\centering
+\begin{subfigure}[t]{0.5\textwidth}
+  \centering
+  \captionsetup{width = 0.9\textwidth}
+  \includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/1.png}
+  \caption{On the Grid $8 \times 8$ BN, a bunch of $100$ Metropolis simulations of $25.000$ samples approximates the one-variable marginal $P(X_{8,8} = T) \approx 0.81$.}
+  \label{sub_1a}
+\end{subfigure}%
+\begin{subfigure}[t]{0.5\textwidth}
+  \centering
+  \captionsetup{width = 0.9\textwidth}
+  \includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/2.png}
+  \caption{As a characteristic of the convergence class $\mathcal{O}(t^{-1/2})$, the standard deviation ${\sigma}^2(t)$ of the $100$ Metropolis simulations decreases with the number of samples $t$ according to rate $t^{-1/2}$.}
+  \label{sub_1b}
+\end{subfigure}
+\caption{asymptotic behavior of the standard deviation of MCMC sampling methods could be used to define the rate of convergence}
+\label{fig1}
+\end{figure}
+As an example, in Figure \ref{fig1}(a) we have run Metropolis sampling $N=100$ times to generate samples of $T=25.000$ points. It could be shown \cite{owen2013monte} that $\sigma^2$ decreases with the number of samples $t$ according to
+\begin{flalign*}
+{\sigma}^2 \propto \frac{1}{\sqrt{t}}. 
+\end{flalign*}
+To emphasize that the rate of convergence is of order $t^{-1/2}$ and to de-emphasize $\sigma$, we write ROC = $\mathcal{O}(t^{-1/2})$ as $t \to \infty$. In Figure \ref{fig1}(b), we see that -- based on $N = 100$ simulations -- $\sigma(t)$ is indeed proportional to $t^{-1/2}$. One could consider $\sigma^2(t) = \gls{alpha} / \sqrt{t}$. Then, this proportionality constant $\alpha$ quantifies the ROC of the MCMC sampling technique that belongs to the convergence class  $\mathcal{O}(t^{-1/2})$. Therefore, $\alpha$ is a performance indicator of the MCMC sampling techniques we are comparing. \\
+
+We describe an intelligent procedure to determine this constant $\alpha$. In the first place, if we plot $\log \sigma(t)$ versus $\log t$, we obtain Figure \ref{fig2}(a). To the asymptotic linear behavior of $\log \sigma(t)$ we can already fit a candidate proportionality constant $\alpha'$ (orange line). In Figure \ref{fig2}(a) we have token $\alpha' = 0.38$. Though, for the interval $10^0 < t < 10^1$, we see that $\sigma(t)$ does not yet behave as $t^{-1/2}$. Ideally -- when determining $\alpha$ for the simulations in this figure -- we do not involve this non-representative region. We show how to ignore this region in a sophisticated way. We introduce an auxiliary polynomial expansion such that
+\begin{align*}
+{\sigma}^2(t) = \frac{\alpha}{\sqrt{t}}(1+\beta_1 t^{-\delta} + \beta_2 t^{-2\delta} + \ldots )\ .
+\end{align*}
+Due to the prospect of overfitting, we simplify the above equation as
+\begin{align}
+\gls{g_t} = {\sigma}^2(t) \sqrt{t} = \alpha(1+ \beta t^{-\delta})\ .
+\label{poly-expan}
+\end{align}
+\begin{figure}[b!]
+\begin{subfigure}[t]{0.5\textwidth}
+  \centering
+  \captionsetup{width = 0.9\textwidth}
+  \includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/3.png}
+  \caption{Plotting the $\log$ of the standard deviation -- $\log {\sigma}^2(t)$ -- versus the $\log$ of the number of points -- $\log t$ -- yields a linear function, which could be approximated. Based on this plot, we can make a first estimate $\alpha'$ (candidate value for $\alpha$). Here, we take $\alpha' = 0.38$ hence $0.38/\sqrt{t}$ is the orange line.}
+  \label{sub_2a}
+\end{subfigure}%
+\begin{subfigure}[t]{0.5\textwidth}
+  \centering
+  \captionsetup{width = 0.9\textwidth}
+  \includegraphics[width = \textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Paper_Prune_Sampling/4.png}
+  \caption{To determine $\alpha$ based on its asymptotic behavior as $\alpha / \sqrt{t}$, we want to ignore the interval $[10^0, 10^1]$ in Figure \ref{fig2}(a). In doing so, we introduce a polynomial expansion to approximate the linear log plot as $\alpha(1+\beta t^{-\delta})$. Fitting this orange function to the blue line in the above figure, we retrieve that $\alpha = 0.40$. }
+  \label{sub_2b}
+\end{subfigure}
+\caption{procedure to determine the proportionality constant of a MCMC method by approximating the asymptotic behavior of the standard deviation}
+\label{fig2}
+\end{figure}
+\begin{figure*}[t!]
+\centering
+\captionsetup[subfigure]{justification=centering}
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_8x8/Metropolis/delta_dev/d_04_new}
+\end{subfigure}\hfill%
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_8x8/Metropolis/delta_dev/d_05_new}
+\end{subfigure}\hfill%
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_8x8/Metropolis/delta_dev/d_06_new}
+\end{subfigure}\hfill%
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_8x8/Metropolis/delta_dev/d_07_new}
+\end{subfigure}\hfill%
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_8x8/Metropolis/delta_dev/d_08_new}
+\end{subfigure}\hfill%
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_8x8/Metropolis/delta_dev/d_09_new}
+\end{subfigure}\hfill%
+\vspace{0.75pc}
+\caption{linear appearance of $g(t^{-\delta})$ for different values of $\delta$.}
+\label{fig3}
+\end{figure*}
+One should note that $g(t^{-\delta})$ is a linear function. Based on the above samples from the Grid $8 \times 8$ BN generated by Metropolis sampling displayed in Figure \ref{fig2}(a), in Figure \ref{fig3} we plot $g(t^{-\delta})$ for $\gls{delta} = 0.4, \ldots, 0.9$. We consider $\delta = 0.9$ to be the approximation with the most linear appearance. Consecutively, we fit a linear function $\gls{f}$ to $g(t^{-\delta})$ to determine its intersection with the y-axis, i.e. the proportionality constant $\alpha$ we are looking for. The result is depicted in Figure \ref{fig2}(b) and we retrieve that $\alpha = 0.40$. \\
+
+We call the translation of the number of samples $t$ to $t^{-\delta}$ a \textit{multiplicative inversion}. An essential observation is: since $t$ is multiplicatively inversed as $t^{-\delta}$, the right side of the plot in Figure \ref{fig2}(a) is displayed at the left side of Figure \ref{fig2}(b). On top of that, where the intervals $[10^0,10^1], [10^1,10^2], [10^2,10^3], [10^3,10^4]$ in Figure \ref{fig2}(a) on a logarithmic scale are of equal length (equidistant), the projection of those intervals in Figure \ref{fig2}(b) is not. The ratio of the lengths of those intervals is unequally distributed and depends on the value of $\delta$, i.e. the interval $[10^0,10^1]$ is represented more prominently as $\delta$ increases. Hence, the value of $\alpha$ on this interval could be estimated more carefully.
+%Therefore, we only consider a subset of the interval $[0,1]$ to determine the proportionality constant $\alpha$. In Figure \ref{fig2}(b) and \ref{fig3} we took the interval $[0,0.5]$. 
+To illustrate this projection graphically, we display the multiplicative inversion of the border points of the intervals $[10^0,10^1], \ldots, [10^3,10^4]$ to the interval $[0,1]$ for $\delta = 0.1, \ldots, 0.9$ in Figure \ref{fig4}.
+\begin{figure}[t!]
+\centering
+\captionsetup{width = 0.9\textwidth}
+\includegraphics[width = 0.68\textwidth]{/Users/jurriaan/Documents/LaTeX/MSc_thesis_UU/Scriptie_TeX/Figure1}
+\caption{multiplicative inverse $t^{-\delta}$ of the border points of the intervals $t \in [10^0,10^1], [10^1,10^2]$,  $[10^2,10^3], [10^3,10^4]$ for $\delta = 0.1, \ldots, 0.9$. The interval $[10^0,10^1]$ is represented more prominently as $\delta$ increases. Hence, the value of $\alpha$ on this interval could be estimated more carefully.}
+\label{fig4}
+\end{figure}\newpage
+
+We summarize the above described procedure to obtain the ROC of a MCMC sampling method in the limit of infinite simulation time, extrapolated from relatively short simulations as
+\begin{itemize}
+\item generate a bunch of MCMC simulations, as in Figure \ref{fig1}(a);
+\item determine the standard deviation ${\sigma}^2(t)$ between the simulations on every step $t$ in the sample size, as in Figure \ref{fig1}(b);
+\item plot the $\log$ of ${\sigma}^2(t)$ versus the $\log$ of the number of samples $t$, as the blue line in Figure \ref{fig2}(a);
+\item determine a candidate proportionality constant $\alpha'$ by fitting $\alpha' / \sqrt{t}$ to the above $\log$ plot, as the orange line in Figure \ref{fig2}(a);
+\item plot $g(t) = {\sigma}^2(t) \sqrt{t}$ in terms of $t^{-\delta}$ for $0 < \delta < 1$, as in Figure \ref{fig3};
+\item for $\delta$ such that $g(t)$ has the appearance of a linear function: fit a linear function $f$ to $g$, as the orange line in Figure \ref{fig2}(b);
+\item adjust $\gls{alpha'}$ according to the intersection of $f$ with the y-axis, as in Figure \ref{fig2}(b).
+\end{itemize}
+As an extra illustration why this method work, we give one last example.
+\begin{example}
+.
+\end{example}
+\vspace{8pc}
+\begin{center}
+\begin{table}[t]
+\begin{center}
+\begin{tabular}{l c c c}  
+\toprule
+\multicolumn{4}{r}{Sampling method} \\
+\cmidrule(r){2-4}
+Bayesian \\ network    & Gibbs    & Metropolis & Prune  \\
+\midrule
+Asia\_ev0 & 0.52 & \textbf{0.51} & 0.81  \\
+Alarm\_ev0 & \textbf{0.43} & 0.46 & 0.79  \\
+Win95pts\_ev0 & \textbf{0.48} & 0.55 & 0.59  \\
+Asia\_ev25 & 0.47 & \textbf{0.45} & 0.77  \\
+Alarm\_ev25 & 0.40 & \textbf{0.37} & 0.49  \\
+Win95pts\_ev25 & \textbf{0.45} & 0.48 & 0.50  \\
+%SAM_vAN & 0.40 & 0.45 & 0.56  \\
+Grid 3x3 & \textbf{0.37} & 0.38 & 0.62  \\
+Grid 5x5 & 0.54 & \textbf{0.49} & 0.55  \\
+Grid 8x8 & \textbf{0.39} & 0.40 & 0.53  \\
+%Grid 11x11 & 0.45 & 0.45 & x \\
+\bottomrule
+\end{tabular}
+\caption{the proportionality constants $\alpha$  of \ps are always higher than Gibbs- and Metropolis sampling. Hence, samples generated by \ps converge slower to the desired stationary distribution.}
+\label{ROC-table}
+\end{center}
+\end{table}
+\end{center}
+Following this procedure, we have determined the ROCs of Gibbs-, Metropolis- and \ps for all the 9 benchmark networks in Figure \ref{results1}-\ref{results3}. The results are presented in Table \ref{ROC-table}. We see that \ps has always a significantly higher ROC than Gibbs- and Metropolis sampling . Hence, \ps convergences always slower to the desired distribution.
+
+\subsection{Time consumption}\label{sec:time-cons}
+The last performance indicator we take into account is the time consumption of the MCMC sampling methods. Based on the average of $100$ simulations, for all networks in Figure \ref{results1}-\ref{results3} we examined the time the methods took to achieve $\sigma^2 = 0.01$. In this section we present the results and elaborate on the method how we determine the time consumption.
+\begin{center}
+\begin{table}[b!]
+\begin{center}
+\begin{tabular}{l c c c}  
+\toprule
+\multicolumn{4}{r}{Sampling method} \\
+\cmidrule(r){2-4}
+Bayesian \\ network    & Gibbs    & Metropolis & Prune  \\
+\midrule
+Asia\_ev0 & 2.72 & 1.31 & \textbf{0.53}  \\
+Alarm\_ev0 & 12.27 & 3.94 & \textbf{3.56}  \\
+Win95pts\_ev0 & 36.38 & \textbf{21.32} & 49.85  \\
+Asia\_ev25 & 2.56 & 1.05 & \textbf{0.41}  \\
+Alarm\_ev25 & 9.92 & 3.07 & \textbf{2.83}  \\
+Win95pts\_ev25 & 29.65 & \textbf{16.03} & 40.03  \\
+Grid 3x3 & 1.67 & 1.76 & \textbf{0.73}  \\
+Grid 5x5 & 12.13 & 4.70 & \textbf{2.42}  \\
+Grid 8x8 & 20.50 & \textbf{8.83} & 105.17  \\
+\bottomrule
+\end{tabular}
+\caption{time consumption of the sampling methods to achieve $\sigma^2 = 0.01$. \Ps is the fastest MCMC sampling method on all small and medium sized networks. Metropolis sampling performs better on the large sized BNs. For all types of BNs, Gibbs sampling is the slowest approximate MCMC sampling method.}
+\label{time-table}
+\end{center}
+\end{table}
+\end{center}
+As we saw in section \ref{BenchBNs}, the equilibrium a sampling method is converging to is not necessarily the correct probability (distribution). As an example, on the Win95pts BN \ps is converging to a value that differs $0.05$ AHD from the real distribution. Despite its approximation is close to the exact probability, it is not the same stationary distribution. Though, we did not take this into account in order to determine the time consumption of a sampling method. \\
+
+With the information about $\alpha$ from Table \ref{ROC-table}, we can determine the amount of samples a method needs to achieve $\sigma^2 = 0.01$, namely: $t = (\alpha / 0.01)^{2}$. So, if we use the Gibbs sampling method on the Asia BN with 0\% evidence available, we need
+\begin{align*}
+0.01= \frac{0.52}{\sqrt{t}} \qquad \implies \qquad t = \bigg( \frac{0.52}{0.01} \bigg)^2 = 2.704 \text{ samples}
+\end{align*}
+to achieve $\sigma^2 = 0.01$. Consecutively, we measure the time the methods need to generate this number of samples, including the generation of an initial state at the start using the time package in Python. The results are displayed in Table \ref{time-table}.\\
+
+For all small and medium sized BNs, we see that \ps is always faster than Gibbs- and Metropolis sampling. For large networks, this is not the case. As mentioned earlier in section \ref{sec:sampling_uni}, due to the exhaustive enumeration during the uniform sampling step, for large BNs \ps needs excessive computation time. This is a results of tje exponential blow up of $|S_{\C_\bfx^{\text{np}}}|$. Since we have discussed all three performance indicators, it is time for a final judgement.
+
+\section{Prune sampling in practice}
+Since we have characterised the behavior of \textit{prune sampling} by three indicators, now we can pass a well-founded judgement on its performance. \\
+
+We conclude that \ps is a MCMC sampling method for discrete and deterministic BNs that always converges to the desired distribution. For this reason, \ps outperforms Gibbs sampling for a class of block shaped and deterministic BNs. Though, this tempting feature comes at a price. If Gibbs- and Metropolis sampling do converge to the correct distribution and regardless of the amount of available evidence, \ps is a less accurate method with a lower ROC. Though, on small and medium sized BNs \ps is the fastest method. For large BNs, due to exhaustive enumeration of all possible feasible states, \ps becomes a time intensive method. In order to improve this first version of \textit{prune sampling}, we advise to develop an intelligent heuristic which avoids a breath first search approach to select a next sample during an iteration but that does guarantee uniformly sampling from the entire sample space. We investigate these suggestions -- to make \ps able to perform better within certain time limits on all types of BNs -- in the next chapter.
+
+%\section{Measures of complexity}
+%\subsection{d-seperation}
+%\subsection{Treewidth}
+%\subsection{Junction tree algorithm}
+%
+%
+%\chapter{Improvement of prune sampling}
+%\section{Logic sampling}
+%\section{Simulated annealing}
+\chapter{Improvement of prune sampling}\label{ch:5}
+In order to improve the first implemented version of \textit{prune sampling}, in this chapter we provide and review solutions for the principal obstacle of the {pruning} technique: uniformly sampling from the pruned network. In the first section, we construct solid grounds to address the problem. Afterwards, we consider solutions based on the concept of hybrid forward sampling and simulated annealing.
+
+\section{Exhaustive listing of all feasible states in a pruned network}
+As discussed in section \ref{sec:sampling_uni}, exhaustive listing of all feasible states of the pruned network -- i.e enumerating the set $S_{\C_\bfx^{\text{np}}}$ explicitly -- could be computational intense. This view is echoed by the experiments we conducted regarding the time consumption of \ps on small, medium and large networks. In this section, we take a closer look in which way the set $S_{\C_\bfx^{\text{np}}}$ is constructed en enumerated.\\
+
+From section \ref{sec:time-cons} we know that \ps is a fast MCMC sampling method on small and medium sized BNs. In terms of time consumption, on the Asia, Alarm, Grid $3 \times 3$ and $5 \times 5$ BNs, \ps in fact outperforms Gibbs- and Metropolis sampling consistently. However, on the large BNs \ps is a rather slow MCMC sampling method. For the Win95pts BN, \ps is respectively $1.25$ to $2$ times slower than Gibbs- and Metropolis sampling. For the Grid $8 \times 8$ BN \ps is even $5$ to almost $12$ times slower than Gibbs- and Metropolis sampling respectively. \\
+
+In other words, where the number of feasible states of a normal non-pruned BN increases as the number of variables and parameters in the original BN increases, we expect an exponential blow up of $|S_{\C_\bfx^{\text{np}}}|$ to be the main reason of excessive time-consumption. To illustrate this, we display in Figure \ref{results4} a histogram of the number of feasible states $|S_{\C_\bfx^{\text{np}}}|$ generated during $2.400$ iterations of \ps on the Asia, Alarm and Win95pts BNs without any available evidence. We choose these $2.400$ iterations random from the $25.000$ generated samples. 
+\begin{figure*}[h!]
+\centering
+\captionsetup[subfigure]{justification=centering}
+
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Asia/Prune/asia_hist_num_samples.png}
+\caption{Asia 0\% determinism, max set size $16$}%
+\label{asia_ev}%
+\end{subfigure}\hfill%
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Alarm/Prune/alarm_hist_num_samples.png}
+\caption{Alarm 0\% determinism, max set size $2.218$}%
+\label{alarm_ev}%
+\end{subfigure}\hfill%
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Win95pts/Prune/win95pts_hist_num_samples.png}
+\caption{Win95pts 0\% determinism, max set size $34.125$}%
+\label{win95pts_ev}%
+\end{subfigure}\hfill%
+\vspace{0.75pc}
+\caption{histogram of the number of feasible states in a pruned network during $2.400$ random iterations of \ps applied on the Asia, Alarm and Win95pts BNs without any available evidence. As the size of the BNs (nodes and parameters) increases, the maximum number of feasible states increases exponentially. The computation time for the set of $34.125$ feasible states takes $83$ times longer than average and therefore confiscates a large part of total time consumption.}
+\label{results4}
+\end{figure*}\\
+We observe from the histograms that for the medium and large BN the maximum value for $|S_{\C_\bfx^{\text{np}}}|$ is an extreme outlier. For the Alarm and Win95pts BN without evidence, the maximum set sizes are $2.218$ and $34.125$, respectively $35$ and $83$ times the average set size and where median value of the set are just $34$ and $50$ respectively. Therefore, for a significant part the set with the maximum number of feasible states will be responsible for the excessive computation time of \ps on large BNs.\\
+
+We observe the same phenomena for the Asia, Alarm and Win95pts BNs with 25\% of available evidence. The maximum set size of $|S_{\C_\bfx^{\text{np}}}|$ is $8$, $505$ and $2.662$ respectively. 
+\begin{figure*}[t!]
+\centering
+\captionsetup[subfigure]{justification=centering}
+
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Asia_ev25/Prune/asia_ev_hist_num_samples.png}
+\caption{Asia 25\% determinism, max set size $8$}%
+\label{asia_ev}%
+\end{subfigure}\hfill%
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Alarm_ev25/Prune/alarm_ev_hist_num_samples.png}
+\caption{Alarm 25\% determinism, max set size $505$}%
+\label{alarm_ev}%
+\end{subfigure}\hfill%
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Win95pts_ev25/Prune/win95pts_ev_hist_num_samples.png}
+\caption{Win95pts 25\% determinism, max set size $2.662$}%
+\label{win95pts_ev}%
+\end{subfigure}\hfill%
+
+\vspace{0.75pc}
+\caption{histogram of the number of feasible states in a pruned network during $2.400$ random iterations of \ps applied on the Asia, Alarm and Win95pts BNs with $25\%$ available evidence.  As the amount of available evidence increases, more CPT-entries are fixed during the generation of feasible states. Hence, the number of feasible states generated during one iteration and the maximum value of $|S_{\C_\bfx^{\text{np}}}|$ decreases. Though, the set with the maximum number of feasible states is still responsible for a significant part of the (excessive) time consumption of \psp }
+\label{results5}
+\end{figure*}
+Note that, due to the presence of evidence, more CPT-entries are fixed during the generation of feasible states. Hence, the number of feasible states generated during one iteration and the maximum set size of $|S_{\C_\bfx^{\text{np}}}|$ decreases. Though, the maximum set sizes still stand far apart from the average set size $2$, $22$, $177$ and median values $2$, $12$, $108$ respectively.
+\begin{figure*}[b!]
+\centering
+\captionsetup[subfigure]{justification=centering}
+
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_3x3/Prune/grid_3x3_hist_num_samples.png}
+\caption{Grid 3x3 50\% determinism, max set size $14$}%
+\label{grid_3x3}%
+\end{subfigure}\hfill%
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_5x5/Prune/grid_5x5_hist_num_samples.png}
+\caption{Grid 5x5 50\% determinism, max set size $130$}%
+\label{grid_5x5}%
+\end{subfigure}\hfill%
+\begin{subfigure}{.3\linewidth}
+\includegraphics[width=1.2\columnwidth]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_8x8/Prune/grid_8x8_hist_num_samples.png}
+\caption{Grid 8x8 50\% determinism, max set size $8.157$}%
+\label{grid_8x8}%
+\end{subfigure}\hfill%
+
+\vspace{0.75pc}
+\caption{histogram of the number of feasible states in a pruned network during $2.400$ random iterations of \ps applied on Grid $3 \times 3$, $5 \times 5$ and $8 \times 8$ BNs. For this domain of BNs, we see a less scattered distribution of the set sizes $|S_{\C_\bfx^{\text{np}}}|$. In contrast to the Asia, Alarm and Win95pts BNs, the average set size of feasible states generated during one iteration is higher. For this reason, as we saw before in section \ref{sec:time-cons}, \ps consumes a lot of time to generate samples for Grid BNs. }
+\label{results6}
+\end{figure*}\\ 
+
+For the Grid $3 \times 3$, $5 \times 5$ and $8 \times 8$ BNs we find average set sizes of $3$, $17$ and $794$ feasible states. With set sizes respectively $4.5$, $7,6$ and $10.27$ times bigger than average and median values $3$, $14$ and $609.5$, we conclude that the maximum number of feasible states is less scattered.\\
+
+Thus, in order to to choose the next state of the BN completely uniform, during every iteration enumeration of all those feasible states could become time intensive (for large BNs more than for medium sized BNs). To improve \textit{prune sampling}, one could consider to curb this enumeration, i.e. to limit the set size $|S_{\C_\bfx^{\text{np}}}|$. This approach could be interpreted as a trade-off between uniformity and computational effort. We discuss this concept in the next section.
+
+\section{Hybrid forward sampling}
+In order to control the time consumption of \textit{prune sampling}, one could consider a {hybrid forward sampling} (HFS) approach to curb the set size $|S_{\C_\bfx^{\text{np}}}|$ during each iteration. In this section, we discuss this approach and present the results of an implemented version of HFS in the existing \ps algorithm. \\
+
+The existing \ps method uses regular forward sampling to find feasible states in the pruned BN. As discussed in section \ref{sec:gen_init}, regular forward sampling could generate biased samples. To avoid this bias, we consider \gls{HFS} -- as defined in definition \ref{def:hfs} -- and this time we limit the set size $|S_{\C_\bfx^{\text{np}}}|$ of generated feasible states to a predetermined fixed. Subsequently, from this set $\gls{V}$ with candidate samples we choose randomly a next sample (state of the BN). The size of $V$ can be interpreted as a trade-off between uniformity (see section \ref{sec:approx-inf}) and computational effort. \\
+
+Based on the acceptable maximum size of $|S_{\C_\bfx^{\text{np}}}|$ on small BNs (Figure \ref{results4}(a)-\ref{results6}(a)) and the modest time consumption of on small BNs \ps (Table \ref{time-table}), we consider it unnecessary to curb the set size $V$ for these type of BNs at all. Despite the fact that \ps is the fastest method on medium sized BNs, we do conduct experiments in terms of accuracy and time-consumption for $|V| = 10, 100$ on this type of BNs. For large sized BNs and $|V| = 10, 100, 1000$, we conduct experiments for the same performance indicators. Since the set $V$ represents an approximation of the whole state space $\Omega$, we expect more near-uniform samples to be drawn as more feasible states are available in the set $V$. Hence, we expect increasing accuracy of HFS \ps as $|V|$ increases. In terms of accuracy, the results of the \ps technique using HFS for different set sizes of $V$, is presented in Figure \ref{results7}.\\
+
+We see that HFS \ps is consistently inferior to Gibbs-, Metropolis- and regular \ps on all type of medium and large BNs. Though, some interesting insights could be deduced from these results. A first observation is that on all BNs displayed in Figure \ref{results7}, it is remarkable that HFS \ps for $V = 10, 100$ and/or $1000$ all show the same performance. On the Win95pts BN with 25\% evidence available, the HFS \ps with $V = 10$ even performs better than HFS \ps using $V = 100, 1000$. This is in contrast to our expectations. Apparently, the trade-off between computational effort and uniformity behaves different than we consider it to be.
+\begin{figure*}[h!]
+\centering
+\begin{subfigure}{.5\linewidth}
+\includegraphics[height=5.3cm]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Alarm/alarm_ahd5_25000.png}
+\caption{Alarm 0\% determinism}%
+\label{alarm_ev}%
+\end{subfigure}\hfill%
+\begin{subfigure}{.5\linewidth}
+\includegraphics[height=5.3cm]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Win95pts/win95pts_ahd5_25000.png}
+\caption{Win95pts 0\% determinism}%
+\label{win95pts_ev}%
+\end{subfigure}
+\begin{subfigure}{.5\linewidth}
+\includegraphics[height=5.3cm]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Alarm_ev25/alarm_ev_ahd5_25000.png}
+\caption{Alarm 25\% determinism}%
+\label{grid_3x3}%
+\end{subfigure}\hfill%
+\begin{subfigure}{.5\linewidth}
+\includegraphics[height=5.3cm]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Win95pts_ev25/win95pts_ev_ahd6_25000.png}
+\caption{Win95pts 25\% determinism}%
+\label{grid_5x5}%
+\end{subfigure}
+\begin{subfigure}{.5\linewidth}
+\includegraphics[height=5.3cm]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_5x5/grid_5x5_ahd5_25000.png}
+\caption{Grid 5x5 50\% evidence}%
+\label{grid_3x3}%
+\end{subfigure}\hfill%
+\begin{subfigure}{.5\linewidth}
+\includegraphics[height=5.3cm]{/Users/jurriaan/Documents/MScWiskunde/20180907_TNOdrive/Bayesian_network_repository/xdsl-benchmark-GeNIe-files/Grid_8x8/grid_8x8_ahd6_25000.png}
+\caption{Grid 8x8 50\% evidence}%
+\label{grid_5x5}%
+\end{subfigure}
+\vspace{0.75pc}
+\caption{consistent underperformance of \ps using the \gls{HFS} approach. HFS allows \ps to construct a set $V$ of predetermined fixed size ($10$, $100$ and/or $1000$) of generated feasible states from the pruned BN in order to select (randomly) a state from $V$ as the new state of the BN for the next iteration. This approach could be seen as a trade-off between uniformity and computational effort.}
+\label{results7}
+\end{figure*}\vspace{1pc}
+
+Time-consumption of the HFS \ps technique is presented in Table \ref{time-table2}. We see that ... .
+\begin{center}
+\begin{table}[t!]
+\begin{center}
+\begin{tabular}{l c c c c}  
+\toprule
+\multicolumn{5}{c}{Sampling method} \\
+\cmidrule(r){2-5}
+Bayesian \\ network    & Prune    & Prune hybrid$\_10$ & Prune hybrid$\_100$ & Prune hybrid$\_1000$  \\
+\midrule
+Alarm\_ev0 & 3.56 & - & - & x  \\
+Win95pts\_ev0 & 49.85 & - & - & -  \\
+Alarm\_ev25 & 2.83 & - & - & x \\
+Win95pts\_ev25 & 40.03 & - & - & - \\
+Grid 5x5 & 2.42 & - & - & x \\
+Grid 8x8 & 105.17 & - & - & - \\
+\bottomrule
+\end{tabular}
+\caption{time consumption of \ps using the hybrid forward sampling approach. As a consequence of limiting the set size of $V$ to $10, 100$ and/ of $100$, \ps becomes a less time-intensive method. Though, this approach can not guarantee near-uniform sampling and is therefore less accurate than regular \psp }
+\label{time-table2}
+\end{center}
+\end{table}
+\end{center}\newpage
+To conclude, the implemented HFS \ps method showed unexpected and poor performance. At first, for none of the medium and large BNs the HFS approach performed more accurate approximations than the regular \ps method. Second, for multiple set sizes $|V|$ just a slight difference in performance occurred. Where on the Win95pts BN with 25\% evidence available $|V| = 10$ even demonstrated stronger performance than $|V| =100, 1000$. Hence, we do not consider the HFS \ps method as an improvement of the regular pruning technique. It becomes clear that near-uniform samples do effect the accuracy of the sampling method significantly. Therefore, we have to look further for a sampling method that guarantees completely uniform sampling within a certain time limit. The concept of \textit{simulated annealing} could be a candidate and we examine this approach in the next section.
+
+\section{Simulated annealing}
+\section{Complexity measures for Bayesian networks}
+
+\chapter{Conclusion}
+
+\newpage
+\chapter*{List of acronyms and symbols}
+%List of abbreviations
+\glsadd{MLN}
+\glsadd{U}
+\glsadd{beta_i}
+\printglossaries
+
+%Bibliography
+\bibliographystyle{acm}
+\bibliography{ref_msc_thesis}
+
+
+\end{document}
